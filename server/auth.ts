@@ -92,13 +92,21 @@ export function setupAuth(app: Express) {
   });
 
   app.post("/api/login", (req, res, next) => {
+    if (!req.body.username || !req.body.password) {
+      return res.status(400).json({ error: "Username and password are required" });
+    }
+    
     passport.authenticate("local", (err, user, info) => {
-      if (err) return next(err);
+      if (err) {
+        return res.status(500).json({ error: err.message });
+      }
       if (!user) {
         return res.status(401).json({ error: "Invalid credentials" });
       }
       req.logIn(user, (err) => {
-        if (err) return next(err);
+        if (err) {
+          return res.status(500).json({ error: err.message });
+        }
         res.status(200).json(user);
       });
     })(req, res, next);
