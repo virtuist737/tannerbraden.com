@@ -40,7 +40,10 @@ export default function AuthPage() {
   });
 
   const onLogin = (data: AuthFormValues) => {
-    loginMutation.mutate(data);
+    loginMutation.mutate({
+      username: data.username,
+      password: data.password,
+    });
   };
 
   return (
