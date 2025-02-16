@@ -1,11 +1,24 @@
 import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import { Link } from "wouter";
+import { Helmet } from 'react-helmet-async';
 import { Button } from "@/components/ui/button";
 
 const Home = () => {
   return (
     <div className="flex flex-col min-h-screen">
+      <Helmet>
+        <title>Your Name - Full Stack Developer & Designer</title>
+        <meta name="description" content="A passionate developer building beautiful and functional web experiences. Specializing in modern web technologies and creative solutions." />
+        <meta name="keywords" content="web developer, full stack developer, React developer, portfolio" />
+        <meta property="og:title" content="Your Name - Full Stack Developer & Designer" />
+        <meta property="og:description" content="A passionate developer building beautiful and functional web experiences. Specializing in modern web technologies and creative solutions." />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content={window.location.href} />
+        <meta name="twitter:title" content="Your Name - Full Stack Developer & Designer" />
+        <meta name="twitter:description" content="A passionate developer building beautiful and functional web experiences. Specializing in modern web technologies and creative solutions." />
+      </Helmet>
+
       {/* Hero Section */}
       <section className="container py-24 space-y-8">
         <motion.div
