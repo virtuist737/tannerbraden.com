@@ -62,7 +62,11 @@ const BlogPost = () => {
           <div className="flex items-center gap-4 text-sm text-muted-foreground">
             <div className="flex items-center gap-1">
               <CalendarDays className="h-4 w-4" />
-              <span>{format(new Date(post.publishedAt), "MMMM d, yyyy")}</span>
+              <span>
+                {post.publishedAt
+                  ? format(new Date(post.publishedAt), "MMMM d, yyyy")
+                  : "Not published"}
+              </span>
             </div>
             <div className="flex items-center gap-1">
               <Clock className="h-4 w-4" />
