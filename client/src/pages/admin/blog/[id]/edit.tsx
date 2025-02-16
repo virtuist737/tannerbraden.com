@@ -11,7 +11,7 @@ export default function EditBlogPost() {
   const [, navigate] = useLocation();
 
   const { data: post, isLoading } = useQuery<BlogPost>({
-    queryKey: ['/api/blog', id],
+    queryKey: [`/api/blog/${id}`],
     enabled: !!id,
   });
 
@@ -27,7 +27,8 @@ export default function EditBlogPost() {
       return res.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/blog'] });
+      queryClient.invalidateQueries({ queryKey: ["/api/blog"] });
+      queryClient.invalidateQueries({ queryKey: [`/api/blog/${id}`] });
       toast({
         title: "Success",
         description: "Blog post updated successfully",

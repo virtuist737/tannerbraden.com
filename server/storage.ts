@@ -102,7 +102,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async listBlogPosts(): Promise<BlogPost[]> {
-    return db.select().from(blogPosts).orderBy(blogPosts.publishedAt);
+    return db.select().from(blogPosts).orderBy(sql`${blogPosts.publishedAt} DESC`);
   }
 
   async updateBlogPost(id: number, updates: Partial<InsertBlogPost>): Promise<BlogPost | undefined> {
