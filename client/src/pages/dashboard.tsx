@@ -52,19 +52,19 @@ const Dashboard = () => {
   );
 
   return (
-    <div className="container py-12">
+    <div className="container px-4 py-6 sm:py-8 md:py-12">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="space-y-8"
+        className="space-y-6 sm:space-y-8"
       >
-        <div className="flex justify-between items-center">
-          <h1 className="text-4xl font-bold tracking-tighter">Analytics Dashboard</h1>
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tighter">Analytics Dashboard</h1>
         </div>
 
         {/* Overview Cards */}
-        <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Total Views</CardTitle>
@@ -93,15 +93,15 @@ const Dashboard = () => {
           {/* Page Views Trend */}
           <Card className="col-span-1">
             <CardHeader>
-              <CardTitle>Page Views Trend</CardTitle>
+              <CardTitle className="text-lg">Page Views Trend</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="h-[300px]">
+              <div className="h-[250px] sm:h-[300px]">
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart data={pageViewsData}>
                     <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="date" />
-                    <YAxis />
+                    <XAxis dataKey="date" tick={{ fontSize: 12 }} />
+                    <YAxis tick={{ fontSize: 12 }} />
                     <Tooltip />
                     <Line
                       type="monotone"
@@ -118,15 +118,15 @@ const Dashboard = () => {
           {/* Page Engagement */}
           <Card className="col-span-1">
             <CardHeader>
-              <CardTitle>Page Engagement</CardTitle>
+              <CardTitle className="text-lg">Page Engagement</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="h-[300px]">
+              <div className="h-[250px] sm:h-[300px]">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={pageEngagementData}>
                     <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="page" />
-                    <YAxis />
+                    <XAxis dataKey="page" tick={{ fontSize: 12 }} />
+                    <YAxis tick={{ fontSize: 12 }} />
                     <Tooltip />
                     <Bar
                       dataKey="avgTimeSpent"
@@ -142,10 +142,10 @@ const Dashboard = () => {
           {/* Traffic Sources */}
           <Card className="col-span-1 lg:col-span-2">
             <CardHeader>
-              <CardTitle>Traffic Sources</CardTitle>
+              <CardTitle className="text-lg">Traffic Sources</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="h-[300px]">
+              <div className="h-[250px] sm:h-[300px]">
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
                     <Pie
