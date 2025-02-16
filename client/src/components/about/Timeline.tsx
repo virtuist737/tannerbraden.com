@@ -112,7 +112,7 @@ const Timeline = () => {
   return (
     <div className="relative container max-w-7xl mx-auto px-4 py-16">
       {/* Central timeline line with gradient */}
-      <div className="absolute left-1/2 transform -translate-x-px h-full w-0.5 bg-gradient-to-b from-primary/5 via-primary to-primary/5" />
+      <div className="absolute left-1/2 transform -translate-x-[1px] h-full w-[2px] bg-gradient-to-b from-primary/5 via-primary to-primary/5" />
 
       <div className="relative">
         {timelineData.map((event, index) => {
@@ -120,8 +120,8 @@ const Timeline = () => {
 
           return (
             <div key={index} className="mb-16">
-              <div className="grid grid-cols-[1fr,auto,1fr] items-center gap-4">
-                {/* Left content or empty space */}
+              <div className="relative grid grid-cols-[1fr,auto,1fr] gap-8">
+                {/* Left side content */}
                 <div className={isEven ? 'pr-4' : ''}>
                   {isEven && (
                     <motion.div
@@ -130,73 +130,27 @@ const Timeline = () => {
                       initial="hidden"
                       whileInView="visible"
                       viewport={{ once: true, margin: "-100px" }}
+                      className="flex justify-end"
                     >
-                      <motion.div
-                        className="bg-card border rounded-xl p-6 shadow-lg hover:shadow-xl transition-shadow duration-300"
-                        whileHover={{ scale: 1.02 }}
-                        transition={{ duration: 0.2 }}
-                      >
-                        <div className="flex items-center gap-3 mb-2">
-                          <div className="flex items-center justify-center w-10 h-10 rounded-full bg-primary/10 text-primary">
-                            {getIcon(event.type)}
-                          </div>
-                          <div>
-                            <h3 className="font-semibold text-lg">{event.title}</h3>
-                            <time className="text-sm text-muted-foreground">{event.date}</time>
-                          </div>
-                        </div>
-
-                        <p className="text-muted-foreground mt-2">{event.description}</p>
-
-                        {event.details && (
-                          <div className="mt-4">
-                            <button
-                              onClick={() => setExpandedIndex(expandedIndex === index ? null : index)}
-                              className="flex items-center gap-1 text-sm text-primary hover:text-primary/80 transition-colors"
-                            >
-                              {expandedIndex === index ? "Show less" : "Learn more"}
-                              <motion.div
-                                animate={{ rotate: expandedIndex === index ? 180 : 0 }}
-                                transition={{ duration: 0.2 }}
-                              >
-                                <ChevronDown className="h-4 w-4" />
-                              </motion.div>
-                            </button>
-
-                            <AnimatePresence>
-                              {expandedIndex === index && (
-                                <motion.div
-                                  initial="collapsed"
-                                  animate="expanded"
-                                  exit="collapsed"
-                                  variants={expandVariants}
-                                  className="overflow-hidden"
-                                >
-                                  <p className="text-sm text-muted-foreground mt-4 pt-4 border-t">
-                                    {event.details}
-                                  </p>
-                                </motion.div>
-                              )}
-                            </AnimatePresence>
-                          </div>
-                        )}
-                      </motion.div>
+                      <Card event={event} expandedIndex={expandedIndex} index={index} setExpandedIndex={setExpandedIndex} />
                     </motion.div>
                   )}
                 </div>
 
-                {/* Timeline point */}
-                <motion.div
-                  className="flex items-center justify-center w-7"
-                  variants={dotVariants}
-                  initial="hidden"
-                  whileInView="visible"
-                  viewport={{ once: true }}
-                >
-                  <div className="w-3 h-3 rounded-full bg-primary shadow-[0_0_0_4px_rgba(var(--primary)/0.1)]" />
-                </motion.div>
+                {/* Timeline point - centered column */}
+                <div className="flex items-center justify-center">
+                  <motion.div
+                    variants={dotVariants}
+                    initial="hidden"
+                    whileInView="visible"
+                    viewport={{ once: true }}
+                    className="relative w-4 h-4 flex items-center justify-center"
+                  >
+                    <div className="w-3 h-3 rounded-full bg-primary shadow-[0_0_0_4px_rgba(var(--primary)/0.1)]" />
+                  </motion.div>
+                </div>
 
-                {/* Right content or empty space */}
+                {/* Right side content */}
                 <div className={isEven ? '' : 'pl-4'}>
                   {!isEven && (
                     <motion.div
@@ -205,57 +159,9 @@ const Timeline = () => {
                       initial="hidden"
                       whileInView="visible"
                       viewport={{ once: true, margin: "-100px" }}
+                      className="flex justify-start"
                     >
-                      <motion.div
-                        className="bg-card border rounded-xl p-6 shadow-lg hover:shadow-xl transition-shadow duration-300"
-                        whileHover={{ scale: 1.02 }}
-                        transition={{ duration: 0.2 }}
-                      >
-                        <div className="flex items-center gap-3 mb-2">
-                          <div className="flex items-center justify-center w-10 h-10 rounded-full bg-primary/10 text-primary">
-                            {getIcon(event.type)}
-                          </div>
-                          <div>
-                            <h3 className="font-semibold text-lg">{event.title}</h3>
-                            <time className="text-sm text-muted-foreground">{event.date}</time>
-                          </div>
-                        </div>
-
-                        <p className="text-muted-foreground mt-2">{event.description}</p>
-
-                        {event.details && (
-                          <div className="mt-4">
-                            <button
-                              onClick={() => setExpandedIndex(expandedIndex === index ? null : index)}
-                              className="flex items-center gap-1 text-sm text-primary hover:text-primary/80 transition-colors"
-                            >
-                              {expandedIndex === index ? "Show less" : "Learn more"}
-                              <motion.div
-                                animate={{ rotate: expandedIndex === index ? 180 : 0 }}
-                                transition={{ duration: 0.2 }}
-                              >
-                                <ChevronDown className="h-4 w-4" />
-                              </motion.div>
-                            </button>
-
-                            <AnimatePresence>
-                              {expandedIndex === index && (
-                                <motion.div
-                                  initial="collapsed"
-                                  animate="expanded"
-                                  exit="collapsed"
-                                  variants={expandVariants}
-                                  className="overflow-hidden"
-                                >
-                                  <p className="text-sm text-muted-foreground mt-4 pt-4 border-t">
-                                    {event.details}
-                                  </p>
-                                </motion.div>
-                              )}
-                            </AnimatePresence>
-                          </div>
-                        )}
-                      </motion.div>
+                      <Card event={event} expandedIndex={expandedIndex} index={index} setExpandedIndex={setExpandedIndex} />
                     </motion.div>
                   )}
                 </div>
@@ -267,5 +173,55 @@ const Timeline = () => {
     </div>
   );
 };
+
+// Helper component to reduce duplication
+const Card = ({ event, expandedIndex, index, setExpandedIndex }) => (
+  <div className="bg-card border rounded-xl p-6 shadow-lg hover:shadow-xl transition-shadow duration-300 max-w-xl">
+    <div className="flex items-center gap-3 mb-2">
+      <div className="flex items-center justify-center w-10 h-10 rounded-full bg-primary/10 text-primary">
+        {getIcon(event.type)}
+      </div>
+      <div>
+        <h3 className="font-semibold text-lg">{event.title}</h3>
+        <time className="text-sm text-muted-foreground">{event.date}</time>
+      </div>
+    </div>
+
+    <p className="text-muted-foreground mt-2">{event.description}</p>
+
+    {event.details && (
+      <div className="mt-4">
+        <button
+          onClick={() => setExpandedIndex(expandedIndex === index ? null : index)}
+          className="flex items-center gap-1 text-sm text-primary hover:text-primary/80 transition-colors"
+        >
+          {expandedIndex === index ? "Show less" : "Learn more"}
+          <motion.div
+            animate={{ rotate: expandedIndex === index ? 180 : 0 }}
+            transition={{ duration: 0.2 }}
+          >
+            <ChevronDown className="h-4 w-4" />
+          </motion.div>
+        </button>
+
+        <AnimatePresence>
+          {expandedIndex === index && (
+            <motion.div
+              initial="collapsed"
+              animate="expanded"
+              exit="collapsed"
+              variants={expandVariants}
+              className="overflow-hidden"
+            >
+              <p className="text-sm text-muted-foreground mt-4 pt-4 border-t">
+                {event.details}
+              </p>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+    )}
+  </div>
+);
 
 export default Timeline;
