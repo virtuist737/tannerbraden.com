@@ -54,119 +54,152 @@ const Timeline = () => {
   const getIcon = (type: TimelineEvent["type"]) => {
     switch (type) {
       case "work":
-        return <Briefcase className="h-5 w-5 sm:h-6 sm:w-6" />;
+        return <Briefcase className="h-5 w-5" />;
       case "education":
-        return <GraduationCap className="h-5 w-5 sm:h-6 sm:w-6" />;
+        return <GraduationCap className="h-5 w-5" />;
       case "achievement":
-        return <Award className="h-5 w-5 sm:h-6 sm:w-6" />;
+        return <Award className="h-5 w-5" />;
     }
   };
 
   const cardVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: (index: number) => ({
+    hidden: (isEven: boolean) => ({
+      opacity: 0,
+      x: isEven ? 50 : -50,
+    }),
+    visible: {
       opacity: 1,
-      y: 0,
+      x: 0,
+      transition: {
+        duration: 0.8,
+        ease: "easeOut",
+      },
+    },
+  };
+
+  const dotVariants = {
+    hidden: { scale: 0, opacity: 0 },
+    visible: {
+      scale: 1,
+      opacity: 1,
       transition: {
         duration: 0.5,
-        delay: index * 0.15,
+        type: "spring",
+        stiffness: 300,
+        damping: 20,
       },
-    }),
+    },
   };
 
   const expandVariants = {
     collapsed: { height: 0, opacity: 0 },
-    expanded: { height: "auto", opacity: 1 },
+    expanded: { 
+      height: "auto", 
+      opacity: 1,
+      transition: {
+        height: {
+          duration: 0.3,
+          ease: "easeOut",
+        },
+        opacity: {
+          duration: 0.2,
+          delay: 0.1,
+        },
+      },
+    },
   };
 
   return (
-    <div className="relative container max-w-4xl mx-auto px-4 py-8">
-      <div 
-        className="absolute left-4 sm:left-1/2 transform sm:-translate-x-1/2 h-full w-0.5 bg-gradient-to-b from-primary/20 via-primary to-primary/20" 
-      />
+    <div className="relative container max-w-7xl mx-auto px-4 py-16">
+      {/* Central timeline line with gradient */}
+      <div className="absolute left-1/2 transform -translate-x-px h-full w-0.5 bg-gradient-to-b from-primary/5 via-primary to-primary/5" />
 
-      {timelineData.map((event, index) => (
-        <motion.div
-          key={index}
-          custom={index}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: "-100px" }}
-          variants={cardVariants}
-          className={`relative flex items-start sm:items-center mb-12 ${
-            index % 2 === 0 ? "sm:justify-start" : "sm:justify-end"
-          }`}
-        >
-          <div
-            className={`relative pl-8 sm:pl-0 ${
-              index % 2 === 0 ? "sm:pr-8" : "sm:pl-8"
-            } w-full sm:w-1/2 flex ${index % 2 === 0 ? "sm:justify-end" : "sm:justify-start"}`}
-          >
-            <motion.div
-              className="bg-card p-4 sm:p-6 rounded-lg border shadow-sm w-full sm:max-w-md hover:shadow-lg transition-shadow duration-300"
-              whileHover={{ scale: 1.02 }}
-              transition={{ duration: 0.2 }}
-            >
-              <div className="flex items-center justify-between mb-2">
-                <div className="flex items-center gap-2">
-                  <div className="text-primary">{getIcon(event.type)}</div>
-                  <h3 className="font-semibold text-sm sm:text-base">{event.title}</h3>
-                </div>
-                <button
-                  onClick={() => setExpandedIndex(expandedIndex === index ? null : index)}
-                  className="text-muted-foreground hover:text-primary transition-colors"
-                  aria-label={expandedIndex === index ? "Show less" : "Show more"}
+      <div className="relative">
+        {timelineData.map((event, index) => {
+          const isEven = index % 2 === 0;
+
+          return (
+            <div key={index} className="mb-16 flex justify-center items-center">
+              <div className={`w-full grid grid-cols-[1fr,auto,1fr] gap-4 ${isEven ? '' : 'direction-rtl'}`}>
+                {/* Content */}
+                <motion.div
+                  className={`col-span-1 ${isEven ? 'text-right pr-4' : 'col-start-3 text-left pl-4'}`}
+                  variants={cardVariants}
+                  custom={isEven}
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={{ once: true, margin: "-100px" }}
                 >
                   <motion.div
-                    animate={{ rotate: expandedIndex === index ? 180 : 0 }}
+                    className="bg-card border rounded-xl p-6 shadow-lg hover:shadow-xl transition-shadow duration-300"
+                    whileHover={{ scale: 1.02 }}
                     transition={{ duration: 0.2 }}
                   >
-                    <ChevronDown className="h-4 w-4" />
-                  </motion.div>
-                </button>
-              </div>
-              <time className="text-xs sm:text-sm text-muted-foreground block mb-2">
-                {event.date}
-              </time>
-              <p className="text-xs sm:text-sm text-muted-foreground">
-                {event.description}
-              </p>
-              <AnimatePresence>
-                {expandedIndex === index && (
-                  <motion.div
-                    initial="collapsed"
-                    animate="expanded"
-                    exit="collapsed"
-                    variants={expandVariants}
-                    transition={{ duration: 0.2 }}
-                    className="overflow-hidden"
-                  >
-                    <p className="text-xs sm:text-sm text-muted-foreground mt-4 pt-4 border-t">
-                      {event.details}
-                    </p>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </motion.div>
-          </div>
+                    <div className="flex items-center gap-3 mb-2 justify-start">
+                      <div className="flex items-center justify-center w-10 h-10 rounded-full bg-primary/10 text-primary">
+                        {getIcon(event.type)}
+                      </div>
+                      <div>
+                        <h3 className="font-semibold text-lg">{event.title}</h3>
+                        <time className="text-sm text-muted-foreground">{event.date}</time>
+                      </div>
+                    </div>
 
-          <div className="absolute left-4 sm:left-1/2 transform -translate-x-1/2 -translate-y-1/2 top-6 sm:top-1/2">
-            <motion.div
-              className="w-3 h-3 sm:w-4 sm:h-4 rounded-full bg-primary border-4 border-background shadow-md"
-              initial={{ scale: 0 }}
-              whileInView={{ scale: 1 }}
-              viewport={{ once: true }}
-              transition={{ 
-                duration: 0.5,
-                delay: index * 0.15,
-                type: "spring",
-                stiffness: 200,
-                damping: 10
-              }}
-            />
-          </div>
-        </motion.div>
-      ))}
+                    <p className="text-muted-foreground mt-2">{event.description}</p>
+
+                    {event.details && (
+                      <div className="mt-4">
+                        <button
+                          onClick={() => setExpandedIndex(expandedIndex === index ? null : index)}
+                          className="flex items-center gap-1 text-sm text-primary hover:text-primary/80 transition-colors"
+                        >
+                          {expandedIndex === index ? "Show less" : "Learn more"}
+                          <motion.div
+                            animate={{ rotate: expandedIndex === index ? 180 : 0 }}
+                            transition={{ duration: 0.2 }}
+                          >
+                            <ChevronDown className="h-4 w-4" />
+                          </motion.div>
+                        </button>
+
+                        <AnimatePresence>
+                          {expandedIndex === index && (
+                            <motion.div
+                              initial="collapsed"
+                              animate="expanded"
+                              exit="collapsed"
+                              variants={expandVariants}
+                              className="overflow-hidden"
+                            >
+                              <p className="text-sm text-muted-foreground mt-4 pt-4 border-t">
+                                {event.details}
+                              </p>
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
+                      </div>
+                    )}
+                  </motion.div>
+                </motion.div>
+
+                {/* Timeline point */}
+                <motion.div
+                  className="relative flex items-center justify-center w-7"
+                  variants={dotVariants}
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={{ once: true, margin: "-100px" }}
+                >
+                  <div className="w-3 h-3 rounded-full bg-primary shadow-[0_0_0_4px_rgba(var(--primary)/0.1)]" />
+                </motion.div>
+
+                {/* Empty column for spacing */}
+                <div className={`col-span-1 ${isEven ? 'col-start-3' : ''}`} />
+              </div>
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 };
