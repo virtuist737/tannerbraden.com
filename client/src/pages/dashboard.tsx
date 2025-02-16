@@ -14,42 +14,27 @@ import {
   Cell,
 } from "recharts";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Users, Eye, Clock, MousePointer } from "lucide-react";
-
-// Mock data - In a real application, this would come from your analytics API
-const pageViewsData = [
-  { date: "2024-02-10", views: 120 },
-  { date: "2024-02-11", views: 150 },
-  { date: "2024-02-12", views: 180 },
-  { date: "2024-02-13", views: 220 },
-  { date: "2024-02-14", views: 190 },
-  { date: "2024-02-15", views: 250 },
-  { date: "2024-02-16", views: 280 },
-];
-
-const pageEngagementData = [
-  { page: "Home", avgTimeSpent: 145 },
-  { page: "About", avgTimeSpent: 90 },
-  { page: "Portfolio", avgTimeSpent: 180 },
-  { page: "Blog", avgTimeSpent: 210 },
-  { page: "Contact", avgTimeSpent: 60 },
-];
-
-const trafficSourceData = [
-  { name: "Direct", value: 400 },
-  { name: "Social", value: 300 },
-  { name: "Search", value: 500 },
-  { name: "Referral", value: 200 },
-];
+import { Users, Eye, Clock, MousePointer, PenSquare, Layout, Mail } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Link } from "wouter";
+import { useQuery } from "@tanstack/react-query";
+import type { PageView, BlogPost } from "@shared/schema";
 
 const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"];
 
 const Dashboard = () => {
-  const totalViews = pageViewsData.reduce((sum, item) => sum + item.views, 0);
-  const avgEngagement = Math.round(
-    pageEngagementData.reduce((sum, item) => sum + item.avgTimeSpent, 0) /
-      pageEngagementData.length,
-  );
+  const { data: pageViews } = useQuery<PageView[]>({
+    queryKey: ["/api/analytics/pageviews"],
+  });
+
+  const { data: blogPosts } = useQuery<BlogPost[]>({
+    queryKey: ["/api/blog"],
+  });
+
+  const totalViews = pageViews?.length ?? 0;
+  const avgEngagement = pageViews
+    ? Math.round(pageViews.reduce((sum, item) => sum + (item.duration ?? 0), 0) / pageViews.length)
+    : 0;
 
   return (
     <div className="py-6 sm:py-8 md:py-12">
@@ -60,7 +45,23 @@ const Dashboard = () => {
         className="space-y-6 sm:space-y-8"
       >
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tighter">Analytics Dashboard</h1>
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tighter">Admin Dashboard</h1>
+
+          {/* Quick Actions */}
+          <div className="flex gap-2">
+            <Button asChild>
+              <Link href="/admin/blog/new">
+                <PenSquare className="h-4 w-4 mr-2" />
+                New Post
+              </Link>
+            </Button>
+            <Button asChild variant="outline">
+              <Link href="/admin/pages">
+                <Layout className="h-4 w-4 mr-2" />
+                Manage Pages
+              </Link>
+            </Button>
+          </div>
         </div>
 
         {/* Overview Cards */}
@@ -85,7 +86,67 @@ const Dashboard = () => {
               <p className="text-xs text-muted-foreground">Per page visit</p>
             </CardContent>
           </Card>
-          {/* Add more overview cards as needed */}
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Blog Posts</CardTitle>
+              <PenSquare className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{blogPosts?.length ?? 0}</div>
+              <p className="text-xs text-muted-foreground">Total posts</p>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Admin Navigation */}
+        <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+          <Link href="/admin/blog">
+            <Card className="hover:bg-accent transition-colors cursor-pointer">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <PenSquare className="h-5 w-5" />
+                  Blog Management
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground">
+                  Create, edit, and manage your blog posts
+                </p>
+              </CardContent>
+            </Card>
+          </Link>
+
+          <Link href="/admin/pages">
+            <Card className="hover:bg-accent transition-colors cursor-pointer">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Layout className="h-5 w-5" />
+                  Page Builder
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground">
+                  Customize and manage website pages
+                </p>
+              </CardContent>
+            </Card>
+          </Link>
+
+          <Link href="/admin/newsletter">
+            <Card className="hover:bg-accent transition-colors cursor-pointer">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Mail className="h-5 w-5" />
+                  Newsletter
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground">
+                  Manage newsletter subscribers
+                </p>
+              </CardContent>
+            </Card>
+          </Link>
         </div>
 
         {/* Charts */}
@@ -98,7 +159,7 @@ const Dashboard = () => {
             <CardContent>
               <div className="h-[250px] sm:h-[300px]">
                 <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={pageViewsData}>
+                  <LineChart data={pageViews}>
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="date" tick={{ fontSize: 12 }} />
                     <YAxis tick={{ fontSize: 12 }} />
@@ -123,13 +184,13 @@ const Dashboard = () => {
             <CardContent>
               <div className="h-[250px] sm:h-[300px]">
                 <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={pageEngagementData}>
+                  <BarChart data={pageViews}>
                     <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="page" tick={{ fontSize: 12 }} />
+                    <XAxis dataKey="date" tick={{ fontSize: 12 }} />
                     <YAxis tick={{ fontSize: 12 }} />
                     <Tooltip />
                     <Bar
-                      dataKey="avgTimeSpent"
+                      dataKey="duration"
                       fill="hsl(var(--primary))"
                       radius={[4, 4, 0, 0]}
                     />
@@ -149,7 +210,7 @@ const Dashboard = () => {
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
                     <Pie
-                      data={trafficSourceData}
+                      data={pageViews}
                       cx="50%"
                       cy="50%"
                       labelLine={false}
@@ -158,9 +219,9 @@ const Dashboard = () => {
                       }
                       outerRadius={80}
                       fill="#8884d8"
-                      dataKey="value"
+                      dataKey="views"
                     >
-                      {trafficSourceData.map((entry, index) => (
+                      {pageViews?.map((entry, index) => (
                         <Cell
                           key={`cell-${index}`}
                           fill={COLORS[index % COLORS.length]}

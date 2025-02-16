@@ -16,10 +16,16 @@ import Contact from "@/pages/contact";
 import BlogPost from "@/pages/blog/[slug]";
 import Dashboard from "@/pages/dashboard";
 import Auth from "@/pages/auth";
+import AdminBlog from "@/pages/admin/blog";
+import AdminPages from "@/pages/admin/pages";
+import AdminNewsletter from "@/pages/admin/newsletter";
+import NewBlogPost from "@/pages/admin/blog/new";
+import EditBlogPost from "@/pages/admin/blog/[id]/edit";
 
 function Router() {
   return (
     <Switch>
+      {/* Public Routes */}
       <Route path="/" component={Home} />
       <Route path="/about" component={About} />
       <Route path="/blog" component={Blog} />
@@ -27,7 +33,15 @@ function Router() {
       <Route path="/portfolio" component={Portfolio} />
       <Route path="/contact" component={Contact} />
       <Route path="/auth" component={Auth} />
+
+      {/* Protected Admin Routes */}
       <ProtectedRoute path="/dashboard" component={Dashboard} />
+      <ProtectedRoute path="/admin/blog" component={AdminBlog} />
+      <ProtectedRoute path="/admin/blog/new" component={NewBlogPost} />
+      <ProtectedRoute path="/admin/blog/:id/edit" component={EditBlogPost} />
+      <ProtectedRoute path="/admin/pages" component={AdminPages} />
+      <ProtectedRoute path="/admin/newsletter" component={AdminNewsletter} />
+
       <Route component={NotFound} />
     </Switch>
   );
