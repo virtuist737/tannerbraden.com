@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
 import {
   Tabs,
   TabsContent,
@@ -19,10 +20,22 @@ import {
   Coffee,
   Code,
   Sparkles,
-  type LucideIcon
+  type LucideIcon,
+  Filter,
 } from "lucide-react";
 import type { Story, Interest, Favorite } from "@shared/schema";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+
+const categoryColors = {
+  'Books': 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300',
+  'Music': 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300',
+  'Movies': 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300',
+  'Technology': 'bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-300',
+  'Food': 'bg-pink-100 text-pink-800 dark:bg-pink-900 dark:text-pink-300',
+  'Travel': 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-300',
+  'Other': 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300',
+} as const;
 
 const About = () => {
   const { data: stories } = useQuery<Story[]>({
@@ -36,6 +49,16 @@ const About = () => {
   const { data: favorites } = useQuery<Favorite[]>({
     queryKey: ["/api/about/favorites"],
   });
+
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+
+  // Get unique categories from favorites
+  const categories = Array.from(new Set(favorites?.map(f => f.category) || []));
+
+  // Filter favorites based on selected category
+  const filteredFavorites = favorites?.filter(
+    favorite => !selectedCategory || favorite.category === selectedCategory
+  );
 
   return (
     <div className="container py-12 space-y-16">
@@ -127,12 +150,36 @@ const About = () => {
 
         {/* Favorites Tab */}
         <TabsContent value="favorites" className="space-y-8">
+          {/* Category Filter */}
+          <div className="flex flex-wrap gap-2 items-center">
+            <Filter className="h-4 w-4 mr-2 text-muted-foreground" />
+            <Button
+              variant={selectedCategory === null ? "secondary" : "outline"}
+              size="sm"
+              onClick={() => setSelectedCategory(null)}
+              className="rounded-full"
+            >
+              All
+            </Button>
+            {categories.map((category) => (
+              <Button
+                key={category}
+                variant={selectedCategory === category ? "secondary" : "outline"}
+                size="sm"
+                onClick={() => setSelectedCategory(category)}
+                className="rounded-full"
+              >
+                {category}
+              </Button>
+            ))}
+          </div>
+
           <motion.div 
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
           >
-            {favorites?.map((favorite) => (
+            {filteredFavorites?.map((favorite) => (
               <Card key={favorite.id}>
                 {favorite.image && (
                   <div 
@@ -141,8 +188,15 @@ const About = () => {
                   />
                 )}
                 <CardHeader>
-                  <CardTitle>{favorite.title}</CardTitle>
-                  <CardDescription>{favorite.category}</CardDescription>
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="text-xl">{favorite.title}</CardTitle>
+                    <Badge 
+                      variant="secondary"
+                      className={categoryColors[favorite.category as keyof typeof categoryColors] || categoryColors.Other}
+                    >
+                      {favorite.category}
+                    </Badge>
+                  </div>
                 </CardHeader>
                 <CardContent>
                   <p className="text-muted-foreground">{favorite.description}</p>
