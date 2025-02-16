@@ -4,35 +4,53 @@ import { Badge } from "@/components/ui/badge";
 import { Github, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-const projects = [
-  {
-    title: "Project One",
-    description:
-      "A full-stack web application built with React and Node.js. Features include user authentication, real-time updates, and a responsive design.",
-    image: "https://via.placeholder.com/600x400",
-    technologies: ["React", "Node.js", "PostgreSQL", "Tailwind CSS"],
-    github: "https://github.com",
-    live: "https://example.com",
-  },
-  // Add more projects here
-];
+        const projects = [
+          {
+            title: "Virtuist",
+            description:
+              "A web application designed to inspire, motivate and enable people to practice virtues. Built to help increase empathy, kindness, humility, rationality, and other virtues at scale.",
+            image: "/api/placeholder/600/400",
+            technologies: ["React", "Next.js", "TailwindCSS"],
+            live: "https://virtuist.app",
+          },
+          {
+            title: "PartnerStack Partner Program",
+            description:
+              "Built and grew PartnerStack's own partner-led GTM channel, including affiliate, referral, advocates, and influencer programs. Supported initiatives in product development, customer success and network growth.",
+            image: "/api/placeholder/600/400",
+            technologies: ["PartnerStack", "Marketing Automation", "Analytics"],
+          },
+          {
+            title: "Lucid Partner Marketing Program",
+            description:
+              "Led partner marketing initiatives resulting in 398% increase in partner-referred traffic and 378% increase in partner-referred new users. Managed $250K of digital marketing spend while maintaining high efficiency metrics.",
+            image: "/api/placeholder/600/400",
+            technologies: ["Partner Marketing", "Digital Marketing", "Analytics"],
+          },
+          {
+            title: "Yoyo Chinese Growth Initiative",
+            description:
+              "Managed comprehensive growth strategy including partnerships, SEO, CRO, product management, and content marketing. Launched and improved affiliate partner program while executing paid media campaigns.",
+            image: "/api/placeholder/600/400",
+            technologies: ["Growth Marketing", "SEO", "Content Marketing", "Partnerships"],
+          }
+        ];
 
-const Portfolio = () => {
-  return (
-    <div className="container py-12">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="space-y-8"
-      >
-        <div className="text-center space-y-4">
-          <h1 className="text-4xl font-bold tracking-tighter">My Projects</h1>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            A collection of my work that showcases my skills and experience in web
-            development and design.
-          </p>
-        </div>
+        const Portfolio = () => {
+          return (
+            <div className="container py-12">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 }}
+                className="space-y-8"
+              >
+                <div className="text-center space-y-4">
+                  <h1 className="text-4xl font-bold tracking-tighter">Featured Work</h1>
+                  <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+                    A showcase of my projects and initiatives in partnership development, growth marketing, and technology for human flourishing.
+                  </p>
+                </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {projects.map((project, index) => (

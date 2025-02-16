@@ -9,14 +9,26 @@ const Home = () => {
     <div className="flex flex-col min-h-screen">
       <Helmet>
         <title>Tanner Braden</title>
-        <meta name="description" content="A passionate developer building beautiful and functional web experiences. Specializing in modern web technologies and creative solutions." />
-        <meta name="keywords" content="web developer, full stack developer, React developer, portfolio" />
+        <meta 
+          name="description" 
+          content="Partnerships and growth specialist focused on improving human consciousness through scalable solutions. Experienced in partner marketing, program development, and driving meaningful impact." 
+        />
+        <meta 
+          name="keywords" 
+          content="partner marketing, growth specialist, partnerships lead, human consciousness, digital marketing, program development, partner programs" 
+        />
         <meta property="og:title" content="Tanner Braden" />
-        <meta property="og:description" content="A passionate developer building beautiful and functional web experiences. Specializing in modern web technologies and creative solutions." />
+        <meta 
+          property="og:description" 
+          content="Partnerships and growth specialist focused on improving human consciousness through scalable solutions. Experienced in partner marketing, program development, and driving meaningful impact." 
+        />
         <meta property="og:type" content="website" />
         <meta property="og:url" content={window.location.href} />
         <meta name="twitter:title" content="Tanner Braden" />
-        <meta name="twitter:description" content="A passionate developer building beautiful and functional web experiences. Specializing in modern web technologies and creative solutions." />
+        <meta 
+          name="twitter:description" 
+          content="Partnerships and growth specialist focused on improving human consciousness through scalable solutions. Experienced in partner marketing, program development, and driving meaningful impact." 
+        />
       </Helmet>
 
       {/* Hero Section */}
@@ -31,17 +43,17 @@ const Home = () => {
             Hi, I'm <span className="text-primary">Tanner</span>
           </h1>
           <p className="mt-6 text-xl text-muted-foreground">
-            Welcome to my personal website.
+            I help companies grow through partnerships while working to increase empathy, kindness, and human flourishing at scale.
           </p>
           <div className="flex items-center justify-center gap-4 mt-8">
             <Link href="/portfolio">
               <Button className="gap-2">
-                View My Work
+                My Mission
                 <ArrowRight className="h-4 w-4" />
               </Button>
             </Link>
             <Link href="/contact">
-              <Button variant="outline">Get in Touch</Button>
+              <Button variant="outline">Let's Connect</Button>
             </Link>
           </div>
         </motion.div>

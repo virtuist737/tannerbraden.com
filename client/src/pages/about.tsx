@@ -59,11 +59,7 @@ const About = () => {
         >
           <h1 className="text-4xl font-bold tracking-tighter mb-4">About Me</h1>
           <p className="text-xl text-muted-foreground">
-            I'm a passionate web developer with a love for creating beautiful,
-            functional, and user-friendly websites. With several years of
-            experience in the industry, I've worked on a wide range of projects
-            that have helped me develop a deep understanding of modern web
-            technologies.
+            I'm a partnerships and growth specialist with a deep drive to increase the quality of human consciousness. By combining my experience in partner marketing with my passion for building scalable solutions, I work to create meaningful impact through technology and collaboration. My background spans from growing partner programs by 398% to teaching in Taiwan, all while pursuing my mission to reduce suffering and promote human flourishing.
           </p>
         </motion.div>
       </section>
