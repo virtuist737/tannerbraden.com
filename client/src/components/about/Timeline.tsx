@@ -1,3 +1,4 @@
+
 import { motion, AnimatePresence } from "framer-motion";
 import { Briefcase, GraduationCap, Award, ChevronDown } from "lucide-react";
 import { useState } from "react";
@@ -119,19 +120,17 @@ const Timeline = () => {
           const isEven = index % 2 === 0;
 
           return (
-            <div key={index} className="mb-16 flex justify-center items-center">
-              <div className={`w-full grid grid-cols-[1fr,auto,1fr] gap-4 ${isEven ? '' : 'direction-rtl'}`}>
+            <div key={index} className="relative mb-16">
+              <div className={`grid grid-cols-[1fr,auto,1fr] gap-4 items-center`}>
                 {/* Content */}
-                <motion.div
-                  className={`col-span-1 ${isEven ? 'text-right pr-4' : 'col-start-3 text-left pl-4'}`}
-                  variants={cardVariants}
-                  custom={isEven}
-                  initial="hidden"
-                  whileInView="visible"
-                  viewport={{ once: true, margin: "-100px" }}
-                >
+                <div className={`${isEven ? 'text-right pr-4' : 'col-start-3 text-left pl-4'}`}>
                   <motion.div
                     className="bg-card border rounded-xl p-6 shadow-lg hover:shadow-xl transition-shadow duration-300"
+                    variants={cardVariants}
+                    custom={isEven}
+                    initial="hidden"
+                    whileInView="visible"
+                    viewport={{ once: true, margin: "-100px" }}
                     whileHover={{ scale: 1.02 }}
                     transition={{ duration: 0.2 }}
                   >
@@ -180,11 +179,11 @@ const Timeline = () => {
                       </div>
                     )}
                   </motion.div>
-                </motion.div>
+                </div>
 
                 {/* Timeline point */}
                 <motion.div
-                  className="relative flex items-center justify-center w-7"
+                  className="flex items-center justify-center w-7"
                   variants={dotVariants}
                   initial="hidden"
                   whileInView="visible"
@@ -194,7 +193,7 @@ const Timeline = () => {
                 </motion.div>
 
                 {/* Empty column for spacing */}
-                <div className={`col-span-1 ${isEven ? 'col-start-3' : ''}`} />
+                <div className={`${isEven ? 'col-start-3' : ''}`} />
               </div>
             </div>
           );
