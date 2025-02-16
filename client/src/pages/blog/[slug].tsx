@@ -46,7 +46,7 @@ const BlogPostPage = () => {
   }
 
   const shareUrl = window.location.href;
-  const readingTime = `${Math.ceil(post.content.length / 1000)} min read`;
+  const readingTime = `${Math.ceil((post.content?.length || 0) / 1000)} min read`;
 
   return (
     <div className="container py-12">
@@ -85,10 +85,12 @@ const BlogPostPage = () => {
           </div>
         )}
 
-        <div 
-          className="mt-8 prose prose-gray dark:prose-invert max-w-none"
-          dangerouslySetInnerHTML={{ __html: post.content }}
-        />
+        {post.content && (
+          <div 
+            className="mt-8 prose prose-gray dark:prose-invert max-w-none"
+            dangerouslySetInnerHTML={{ __html: post.content }}
+          />
+        )}
 
         {/* Social Share */}
         <div className="mt-8 pt-8 border-t">
