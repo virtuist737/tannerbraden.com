@@ -98,14 +98,15 @@ const About = () => {
             animate={{ opacity: 1 }}
             className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
           >
-            {filteredInterests?.map((interest) => (
-              <Card key={interest.id}>
+            {filteredInterests?.sort((a, b) => a.sortOrder - b.sortOrder).map((interest) => (
+              <Card key={interest.id} className="relative overflow-hidden group hover:shadow-lg transition-shadow">
                 <CardHeader>
                   <div className="flex items-center justify-between">
-                    <CardTitle>{interest.category}</CardTitle>
+                    <CardTitle className="text-xl">{interest.item}</CardTitle>
                     <Badge 
                       variant="secondary" 
                       className={`
+                        transition-colors
                         ${interest.type === 'interests' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300' : ''}
                         ${interest.type === 'instruments' ? 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300' : ''}
                         ${interest.type === 'activities' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300' : ''}
@@ -116,8 +117,9 @@ const About = () => {
                   </div>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-muted-foreground">{interest.item}</p>
+                  <p className="text-sm text-muted-foreground">Category: {interest.category}</p>
                 </CardContent>
+                <div className="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity" />
               </Card>
             ))}
           </motion.div>
