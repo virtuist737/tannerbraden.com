@@ -1,7 +1,18 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertBlogPostSchema, insertBlogCommentSchema, insertNewsletterSubscriptionSchema } from "@shared/schema";
+import { 
+  insertBlogPostSchema, 
+  insertBlogCommentSchema, 
+  insertNewsletterSubscriptionSchema,
+  insertLifeStorySchema,
+  insertLifePurposeSchema,
+  insertPersonalityTraitSchema,
+  insertPhilosophySchema,
+  insertExperienceSchema,
+  insertRecommendationSchema,
+  insertHobbySchema
+} from "@shared/schema";
 import { isAuthenticated } from "./auth";
 import * as UAParser from "ua-parser-js";
 
@@ -88,6 +99,98 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(204).end();
     } catch (error) {
       res.status(500).json({ error: "Failed to delete blog post" });
+    }
+  });
+
+  // Content Routes
+  app.get("/api/content/life-story", async (req, res) => {
+    try {
+      const stories = await storage.listLifeStories();
+      res.json(stories);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch life stories" });
+    }
+  });
+
+  app.get("/api/content/life-purpose", async (req, res) => {
+    try {
+      const purpose = await storage.getLifePurpose();
+      res.json(purpose);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch life purpose" });
+    }
+  });
+
+  app.get("/api/content/personality", async (req, res) => {
+    try {
+      const traits = await storage.listPersonalityTraits();
+      const weaknesses = await storage.listPersonalityWeaknesses();
+      res.json({ traits, weaknesses });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch personality data" });
+    }
+  });
+
+  app.get("/api/content/philosophy", async (req, res) => {
+    try {
+      const philosophy = await storage.listPhilosophy();
+      res.json(philosophy);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch philosophy" });
+    }
+  });
+
+  app.get("/api/content/experience", async (req, res) => {
+    try {
+      const experience = await storage.listExperience();
+      res.json(experience);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch experience" });
+    }
+  });
+
+  app.get("/api/content/recommendations", async (req, res) => {
+    try {
+      const recommendations = await storage.listRecommendations();
+      res.json(recommendations);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch recommendations" });
+    }
+  });
+
+  app.get("/api/content/hobbies", async (req, res) => {
+    try {
+      const hobbies = await storage.listHobbies();
+      res.json(hobbies);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch hobbies" });
+    }
+  });
+
+  // Protected Content Management Routes
+  app.post("/api/content/life-story", isAuthenticated, async (req, res) => {
+    try {
+      const parsedBody = insertLifeStorySchema.safeParse(req.body);
+      if (!parsedBody.success) {
+        return res.status(400).json({ error: "Invalid life story data" });
+      }
+      const story = await storage.createLifeStory(parsedBody.data);
+      res.status(201).json(story);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to create life story" });
+    }
+  });
+
+  app.post("/api/content/life-purpose", isAuthenticated, async (req, res) => {
+    try {
+      const parsedBody = insertLifePurposeSchema.safeParse(req.body);
+      if (!parsedBody.success) {
+        return res.status(400).json({ error: "Invalid life purpose data" });
+      }
+      const purpose = await storage.createLifePurpose(parsedBody.data);
+      res.status(201).json(purpose);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to create life purpose" });
     }
   });
 
