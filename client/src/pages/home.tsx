@@ -8,14 +8,14 @@ const Home = () => {
   return (
     <div className="flex flex-col min-h-screen">
       <Helmet>
-        <title>Your Name - Full Stack Developer & Designer</title>
+        <title>Tanner Braden</title>
         <meta name="description" content="A passionate developer building beautiful and functional web experiences. Specializing in modern web technologies and creative solutions." />
         <meta name="keywords" content="web developer, full stack developer, React developer, portfolio" />
-        <meta property="og:title" content="Your Name - Full Stack Developer & Designer" />
+        <meta property="og:title" content="Tanner Braden" />
         <meta property="og:description" content="A passionate developer building beautiful and functional web experiences. Specializing in modern web technologies and creative solutions." />
         <meta property="og:type" content="website" />
         <meta property="og:url" content={window.location.href} />
-        <meta name="twitter:title" content="Your Name - Full Stack Developer & Designer" />
+        <meta name="twitter:title" content="Tanner Braden" />
         <meta name="twitter:description" content="A passionate developer building beautiful and functional web experiences. Specializing in modern web technologies and creative solutions." />
       </Helmet>
 
@@ -28,12 +28,10 @@ const Home = () => {
           className="max-w-3xl mx-auto text-center"
         >
           <h1 className="text-4xl font-bold tracking-tighter sm:text-5xl md:text-6xl">
-            Hi, I'm <span className="text-primary">Your Name</span>
+            Hi, I'm <span className="text-primary">Tanner</span>
           </h1>
           <p className="mt-6 text-xl text-muted-foreground">
-            A passionate developer building beautiful and functional web
-            experiences. I specialize in modern web technologies and creative
-            solutions.
+            Welcome to my personal website.
           </p>
           <div className="flex items-center justify-center gap-4 mt-8">
             <Link href="/portfolio">

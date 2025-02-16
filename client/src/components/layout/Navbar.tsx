@@ -21,7 +21,7 @@ const Navbar = () => {
     <nav className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 items-center justify-between">
         <Link href="/">
-          <a className="text-xl font-bold">Portfolio</a>
+          <a className="text-xl font-bold">Tanner Braden</a>
         </Link>
 
         {/* Desktop Navigation */}
