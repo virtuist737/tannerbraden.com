@@ -22,6 +22,7 @@ import {
   type LucideIcon
 } from "lucide-react";
 import type { Story, Interest, Favorite } from "@shared/schema";
+import { Badge } from "@/components/ui/badge";
 
 const About = () => {
   const { data: stories } = useQuery<Story[]>({
@@ -98,9 +99,22 @@ const About = () => {
             {interests?.map((interest) => (
               <Card key={interest.id}>
                 <CardHeader>
-                  <div className="flex items-center gap-2">
-                    <span className="text-primary">{interest.icon}</span>
-                    <CardTitle>{interest.title}</CardTitle>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <span className="text-primary">{interest.icon}</span>
+                      <CardTitle>{interest.title}</CardTitle>
+                    </div>
+                    <Badge 
+                      variant="secondary" 
+                      className={`
+                        ${interest.category === 'Technology' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300' : ''}
+                        ${interest.category === 'Research' ? 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300' : ''}
+                        ${interest.category === 'Community' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300' : ''}
+                        ${interest.category === 'Design' ? 'bg-pink-100 text-pink-800 dark:bg-pink-900 dark:text-pink-300' : ''}
+                      `}
+                    >
+                      {interest.category}
+                    </Badge>
                   </div>
                 </CardHeader>
                 <CardContent>

@@ -83,6 +83,7 @@ export const interests = pgTable("interests", {
   title: text("title").notNull(),
   description: text("description").notNull(),
   icon: text("icon").notNull(),
+  category: text("category").notNull(),
   order: integer("order").notNull(),
 });
 
