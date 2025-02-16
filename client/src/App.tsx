@@ -21,6 +21,7 @@ const Dashboard = lazy(() => import("@/pages/dashboard"));
 const Auth = lazy(() => import("@/pages/auth"));
 const AdminBlog = lazy(() => import("@/pages/admin/blog"));
 const AdminNewsletter = lazy(() => import("@/pages/admin/newsletter"));
+const AdminTimeline = lazy(() => import("@/pages/admin/timeline"));
 const NewBlogPost = lazy(() => import("@/pages/admin/blog/new"));
 const EditBlogPost = lazy(() => import("@/pages/admin/blog/[id]/edit"));
 
@@ -45,11 +46,12 @@ function Router() {
         <Route path="/auth" component={Auth} />
 
         {/* Protected Admin Routes */}
-        <ProtectedRoute path="/dashboard" component={Dashboard} />
-        <ProtectedRoute path="/admin/blog" component={AdminBlog} />
-        <ProtectedRoute path="/admin/blog/new" component={NewBlogPost} />
-        <ProtectedRoute path="/admin/blog/:id/edit" component={EditBlogPost} />
-        <ProtectedRoute path="/admin/newsletter" component={AdminNewsletter} />
+        <Route path="/dashboard" component={() => <ProtectedRoute component={Dashboard} path="/dashboard" />} />
+        <Route path="/admin/blog" component={() => <ProtectedRoute component={AdminBlog} path="/admin/blog" />} />
+        <Route path="/admin/blog/new" component={() => <ProtectedRoute component={NewBlogPost} path="/admin/blog/new" />} />
+        <Route path="/admin/blog/:id/edit" component={() => <ProtectedRoute component={EditBlogPost} path="/admin/blog/:id/edit" />} />
+        <Route path="/admin/newsletter" component={() => <ProtectedRoute component={AdminNewsletter} path="/admin/newsletter" />} />
+        <Route path="/admin/timeline" component={() => <ProtectedRoute component={AdminTimeline} path="/admin/timeline" />} />
 
         <Route component={NotFound} />
       </Switch>
