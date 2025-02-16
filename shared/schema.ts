@@ -75,7 +75,6 @@ export const timeline = pgTable("timeline", {
   date: timestamp("date").notNull(),
   icon: text("icon").notNull(),
   category: text("category").notNull(),
-  order: integer("order").notNull(),
 });
 
 // Interests table
