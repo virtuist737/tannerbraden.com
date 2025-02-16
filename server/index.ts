@@ -18,16 +18,28 @@ app.use('/api', (req, res, next) => {
   next();
 });
 
-// Request logging middleware
+// Enhanced request logging middleware
 app.use((req, res, next) => {
   const start = Date.now();
   const path = req.path;
+  const method = req.method;
 
-  // Log incoming requests
-  console.log(`${req.method} ${path}`, {
-    body: req.body,
-    headers: req.headers
-  });
+  // Skip logging for static assets
+  if (path.match(/\.(js|css|png|jpg|jpeg|gif|ico|svg)$/)) {
+    return next();
+  }
+
+  // Format request details
+  const requestInfo = {
+    method,
+    path,
+    query: Object.keys(req.query).length ? req.query : undefined,
+    body: Object.keys(req.body).length ? req.body : undefined,
+  };
+
+  // Clean log output for requests
+  console.log(`🌐 ${new Date().toISOString()} | ${method} ${path}`, 
+    Object.keys(requestInfo).length > 2 ? requestInfo : '');
 
   let capturedJsonResponse: Record<string, any> | undefined = undefined;
 
@@ -40,13 +52,14 @@ app.use((req, res, next) => {
   res.on("finish", () => {
     const duration = Date.now() - start;
     if (path.startsWith("/api")) {
-      let logLine = `${req.method} ${path} ${res.statusCode} in ${duration}ms`;
-      if (capturedJsonResponse) {
-        logLine += ` :: ${JSON.stringify(capturedJsonResponse)}`;
-      }
+      const status = res.statusCode;
+      const statusEmoji = status >= 400 ? '❌' : '✅';
 
-      if (logLine.length > 80) {
-        logLine = logLine.slice(0, 79) + "…";
+      let logLine = `${statusEmoji} ${method} ${path} ${status} ${duration}ms`;
+
+      if (capturedJsonResponse && process.env.NODE_ENV === 'development') {
+        const responsePreview = JSON.stringify(capturedJsonResponse).slice(0, 100);
+        logLine += ` :: ${responsePreview}${responsePreview.length >= 100 ? '...' : ''}`;
       }
 
       log(logLine);
@@ -59,15 +72,24 @@ app.use((req, res, next) => {
 (async () => {
   const server = await registerRoutes(app);
 
-  // Global error handler
+  // Enhanced global error handler
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
-    console.error('Global error handler caught:', err);
-
     const status = err.status || err.statusCode || 500;
     const message = err.message || "Internal Server Error";
+    const stack = process.env.NODE_ENV === 'development' ? err.stack : undefined;
+
+    console.error('❌ Error:', {
+      status,
+      message,
+      stack,
+      timestamp: new Date().toISOString()
+    });
 
     if (!res.headersSent) {
-      res.status(status).json({ error: message });
+      res.status(status).json({ 
+        error: message,
+        ...(stack ? { stack } : {})
+      });
     }
   });
 
@@ -77,8 +99,8 @@ app.use((req, res, next) => {
     serveStatic(app);
   }
 
-  const PORT = 5000;
+  const PORT = process.env.PORT || 5000;
   server.listen(PORT, "0.0.0.0", () => {
-    log(`serving on port ${PORT}`);
+    log(`🚀 Server started on port ${PORT}`);
   });
 })();
