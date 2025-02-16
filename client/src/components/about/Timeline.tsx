@@ -10,6 +10,13 @@ interface TimelineEvent {
   details?: string;
 }
 
+interface CardProps {
+  event: TimelineEvent;
+  expandedIndex: number | null;
+  index: number;
+  setExpandedIndex: (index: number | null) => void;
+}
+
 const timelineData: TimelineEvent[] = [
   {
     title: "Senior Developer",
@@ -111,7 +118,6 @@ const Timeline = () => {
 
   return (
     <div className="relative container max-w-7xl mx-auto px-4 py-16">
-      {/* Central timeline line with gradient */}
       <div className="absolute left-1/2 transform -translate-x-[1px] h-full w-[2px] bg-gradient-to-b from-primary/5 via-primary to-primary/5" />
 
       <div className="relative">
@@ -132,7 +138,7 @@ const Timeline = () => {
                       viewport={{ once: true, margin: "-100px" }}
                       className="flex justify-end"
                     >
-                      <Card event={event} expandedIndex={expandedIndex} index={index} setExpandedIndex={setExpandedIndex} />
+                      <TimelineCard event={event} expandedIndex={expandedIndex} index={index} setExpandedIndex={setExpandedIndex} />
                     </motion.div>
                   )}
                 </div>
@@ -161,7 +167,7 @@ const Timeline = () => {
                       viewport={{ once: true, margin: "-100px" }}
                       className="flex justify-start"
                     >
-                      <Card event={event} expandedIndex={expandedIndex} index={index} setExpandedIndex={setExpandedIndex} />
+                      <TimelineCard event={event} expandedIndex={expandedIndex} index={index} setExpandedIndex={setExpandedIndex} />
                     </motion.div>
                   )}
                 </div>
@@ -174,8 +180,7 @@ const Timeline = () => {
   );
 };
 
-// Helper component to reduce duplication
-const Card = ({ event, expandedIndex, index, setExpandedIndex }) => (
+const TimelineCard: React.FC<CardProps> = ({ event, expandedIndex, index, setExpandedIndex }) => (
   <div className="bg-card border rounded-xl p-6 shadow-lg hover:shadow-xl transition-shadow duration-300 max-w-xl">
     <div className="flex items-center gap-3 mb-2">
       <div className="flex items-center justify-center w-10 h-10 rounded-full bg-primary/10 text-primary">

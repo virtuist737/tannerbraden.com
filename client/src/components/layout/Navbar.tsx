@@ -1,20 +1,25 @@
 import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
-import { Menu, X, BarChart2 } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import { useState } from "react";
 import ThemeToggle from "../shared/ThemeToggle";
+
+interface NavItem {
+  href: string;
+  label: string;
+}
+
+const navItems: NavItem[] = [
+  { href: "/", label: "Home" },
+  { href: "/about", label: "About" },
+  { href: "/portfolio", label: "Portfolio" },
+  { href: "/blog", label: "Blog" },
+  { href: "/contact", label: "Contact" },
+];
 
 const Navbar = () => {
   const [location] = useLocation();
   const [isOpen, setIsOpen] = useState(false);
-
-  const navItems = [
-    { href: "/", label: "Home" },
-    { href: "/about", label: "About" },
-    { href: "/portfolio", label: "Portfolio" },
-    { href: "/blog", label: "Blog" },
-    { href: "/contact", label: "Contact" },
-  ];
 
   return (
     <nav className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -30,9 +35,8 @@ const Navbar = () => {
               <a
                 className={`text-sm font-medium transition-colors hover:text-primary ${
                   location === item.href ? "text-primary" : "text-muted-foreground"
-                } flex items-center gap-1`}
+                }`}
               >
-                {item.icon && <item.icon className="h-4 w-4" />}
                 {item.label}
               </a>
             </Link>
@@ -64,10 +68,9 @@ const Navbar = () => {
                       location === item.href
                         ? "text-primary"
                         : "text-muted-foreground"
-                    } flex items-center gap-2`}
+                    }`}
                     onClick={() => setIsOpen(false)}
                   >
-                    {item.icon && <item.icon className="h-4 w-4" />}
                     {item.label}
                   </a>
                 </Link>
