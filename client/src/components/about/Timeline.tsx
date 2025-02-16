@@ -119,82 +119,146 @@ const Timeline = () => {
           const isEven = index % 2 === 0;
 
           return (
-            <div key={index} className="mb-16 flex justify-center items-center">
-              <div className={`w-full grid grid-cols-[1fr,auto,1fr] gap-4 ${isEven ? '' : 'direction-rtl'}`}>
-                {/* Content */}
-                <motion.div
-                  className={`col-span-1 ${isEven ? 'text-right pr-4' : 'col-start-3 text-left pl-4'}`}
-                  variants={cardVariants}
-                  custom={isEven}
-                  initial="hidden"
-                  whileInView="visible"
-                  viewport={{ once: true, margin: "-100px" }}
-                >
-                  <motion.div
-                    className="bg-card border rounded-xl p-6 shadow-lg hover:shadow-xl transition-shadow duration-300"
-                    whileHover={{ scale: 1.02 }}
-                    transition={{ duration: 0.2 }}
-                  >
-                    <div className="flex items-center gap-3 mb-2 justify-start">
-                      <div className="flex items-center justify-center w-10 h-10 rounded-full bg-primary/10 text-primary">
-                        {getIcon(event.type)}
-                      </div>
-                      <div>
-                        <h3 className="font-semibold text-lg">{event.title}</h3>
-                        <time className="text-sm text-muted-foreground">{event.date}</time>
-                      </div>
-                    </div>
+            <div key={index} className="mb-16">
+              <div className="grid grid-cols-[1fr,auto,1fr] items-center gap-4">
+                {/* Left content or empty space */}
+                <div className={isEven ? 'pr-4' : ''}>
+                  {isEven && (
+                    <motion.div
+                      variants={cardVariants}
+                      custom={isEven}
+                      initial="hidden"
+                      whileInView="visible"
+                      viewport={{ once: true, margin: "-100px" }}
+                    >
+                      <motion.div
+                        className="bg-card border rounded-xl p-6 shadow-lg hover:shadow-xl transition-shadow duration-300"
+                        whileHover={{ scale: 1.02 }}
+                        transition={{ duration: 0.2 }}
+                      >
+                        <div className="flex items-center gap-3 mb-2">
+                          <div className="flex items-center justify-center w-10 h-10 rounded-full bg-primary/10 text-primary">
+                            {getIcon(event.type)}
+                          </div>
+                          <div>
+                            <h3 className="font-semibold text-lg">{event.title}</h3>
+                            <time className="text-sm text-muted-foreground">{event.date}</time>
+                          </div>
+                        </div>
 
-                    <p className="text-muted-foreground mt-2">{event.description}</p>
+                        <p className="text-muted-foreground mt-2">{event.description}</p>
 
-                    {event.details && (
-                      <div className="mt-4">
-                        <button
-                          onClick={() => setExpandedIndex(expandedIndex === index ? null : index)}
-                          className="flex items-center gap-1 text-sm text-primary hover:text-primary/80 transition-colors"
-                        >
-                          {expandedIndex === index ? "Show less" : "Learn more"}
-                          <motion.div
-                            animate={{ rotate: expandedIndex === index ? 180 : 0 }}
-                            transition={{ duration: 0.2 }}
-                          >
-                            <ChevronDown className="h-4 w-4" />
-                          </motion.div>
-                        </button>
-
-                        <AnimatePresence>
-                          {expandedIndex === index && (
-                            <motion.div
-                              initial="collapsed"
-                              animate="expanded"
-                              exit="collapsed"
-                              variants={expandVariants}
-                              className="overflow-hidden"
+                        {event.details && (
+                          <div className="mt-4">
+                            <button
+                              onClick={() => setExpandedIndex(expandedIndex === index ? null : index)}
+                              className="flex items-center gap-1 text-sm text-primary hover:text-primary/80 transition-colors"
                             >
-                              <p className="text-sm text-muted-foreground mt-4 pt-4 border-t">
-                                {event.details}
-                              </p>
-                            </motion.div>
-                          )}
-                        </AnimatePresence>
-                      </div>
-                    )}
-                  </motion.div>
-                </motion.div>
+                              {expandedIndex === index ? "Show less" : "Learn more"}
+                              <motion.div
+                                animate={{ rotate: expandedIndex === index ? 180 : 0 }}
+                                transition={{ duration: 0.2 }}
+                              >
+                                <ChevronDown className="h-4 w-4" />
+                              </motion.div>
+                            </button>
+
+                            <AnimatePresence>
+                              {expandedIndex === index && (
+                                <motion.div
+                                  initial="collapsed"
+                                  animate="expanded"
+                                  exit="collapsed"
+                                  variants={expandVariants}
+                                  className="overflow-hidden"
+                                >
+                                  <p className="text-sm text-muted-foreground mt-4 pt-4 border-t">
+                                    {event.details}
+                                  </p>
+                                </motion.div>
+                              )}
+                            </AnimatePresence>
+                          </div>
+                        )}
+                      </motion.div>
+                    </motion.div>
+                  )}
+                </div>
 
                 {/* Timeline point */}
                 <motion.div
-                  className="relative flex items-center justify-center w-7"
+                  className="flex items-center justify-center w-7"
                   variants={dotVariants}
                   initial="hidden"
                   whileInView="visible"
-                  viewport={{ once: true, margin: "-100px" }}
+                  viewport={{ once: true }}
                 >
                   <div className="w-3 h-3 rounded-full bg-primary shadow-[0_0_0_4px_rgba(var(--primary)/0.1)]" />
                 </motion.div>
 
-                {/* Empty column for spacing */}
-                <div className={`col-span-1 ${isEven ? 'col-start-3' : ''}`} />
+                {/* Right content or empty space */}
+                <div className={isEven ? '' : 'pl-4'}>
+                  {!isEven && (
+                    <motion.div
+                      variants={cardVariants}
+                      custom={isEven}
+                      initial="hidden"
+                      whileInView="visible"
+                      viewport={{ once: true, margin: "-100px" }}
+                    >
+                      <motion.div
+                        className="bg-card border rounded-xl p-6 shadow-lg hover:shadow-xl transition-shadow duration-300"
+                        whileHover={{ scale: 1.02 }}
+                        transition={{ duration: 0.2 }}
+                      >
+                        <div className="flex items-center gap-3 mb-2">
+                          <div className="flex items-center justify-center w-10 h-10 rounded-full bg-primary/10 text-primary">
+                            {getIcon(event.type)}
+                          </div>
+                          <div>
+                            <h3 className="font-semibold text-lg">{event.title}</h3>
+                            <time className="text-sm text-muted-foreground">{event.date}</time>
+                          </div>
+                        </div>
+
+                        <p className="text-muted-foreground mt-2">{event.description}</p>
+
+                        {event.details && (
+                          <div className="mt-4">
+                            <button
+                              onClick={() => setExpandedIndex(expandedIndex === index ? null : index)}
+                              className="flex items-center gap-1 text-sm text-primary hover:text-primary/80 transition-colors"
+                            >
+                              {expandedIndex === index ? "Show less" : "Learn more"}
+                              <motion.div
+                                animate={{ rotate: expandedIndex === index ? 180 : 0 }}
+                                transition={{ duration: 0.2 }}
+                              >
+                                <ChevronDown className="h-4 w-4" />
+                              </motion.div>
+                            </button>
+
+                            <AnimatePresence>
+                              {expandedIndex === index && (
+                                <motion.div
+                                  initial="collapsed"
+                                  animate="expanded"
+                                  exit="collapsed"
+                                  variants={expandVariants}
+                                  className="overflow-hidden"
+                                >
+                                  <p className="text-sm text-muted-foreground mt-4 pt-4 border-t">
+                                    {event.details}
+                                  </p>
+                                </motion.div>
+                              )}
+                            </AnimatePresence>
+                          </div>
+                        )}
+                      </motion.div>
+                    </motion.div>
+                  )}
+                </div>
               </div>
             </div>
           );
