@@ -14,7 +14,6 @@ const Navbar = () => {
     { href: "/portfolio", label: "Portfolio" },
     { href: "/blog", label: "Blog" },
     { href: "/contact", label: "Contact" },
-    { href: "/dashboard", label: "Analytics", icon: BarChart2 },
   ];
 
   return (
