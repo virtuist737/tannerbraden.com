@@ -17,7 +17,6 @@ import BlogPost from "@/pages/blog/[slug]";
 import Dashboard from "@/pages/dashboard";
 import Auth from "@/pages/auth";
 import AdminBlog from "@/pages/admin/blog";
-import AdminPages from "@/pages/admin/pages";
 import AdminNewsletter from "@/pages/admin/newsletter";
 import NewBlogPost from "@/pages/admin/blog/new";
 import EditBlogPost from "@/pages/admin/blog/[id]/edit";
@@ -39,7 +38,6 @@ function Router() {
       <ProtectedRoute path="/admin/blog" component={AdminBlog} />
       <ProtectedRoute path="/admin/blog/new" component={NewBlogPost} />
       <ProtectedRoute path="/admin/blog/:id/edit" component={EditBlogPost} />
-      <ProtectedRoute path="/admin/pages" component={AdminPages} />
       <ProtectedRoute path="/admin/newsletter" component={AdminNewsletter} />
 
       <Route component={NotFound} />

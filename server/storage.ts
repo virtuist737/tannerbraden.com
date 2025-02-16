@@ -152,7 +152,7 @@ export class DatabaseStorage implements IStorage {
     return db
       .select()
       .from(newsletterSubscriptions)
-      .orderBy(newsletterSubscriptions.createdAt);
+      .orderBy(newsletterSubscriptions.subscribedAt);
   }
 
   // Analytics operations

@@ -14,7 +14,7 @@ import {
   Cell,
 } from "recharts";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Users, Eye, Clock, MousePointer, PenSquare, Layout, Mail } from "lucide-react";
+import { Users, Eye, Clock, MousePointer, PenSquare, Mail } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
 import { useQuery } from "@tanstack/react-query";
@@ -55,12 +55,6 @@ const Dashboard = () => {
                 New Post
               </Link>
             </Button>
-            <Button asChild variant="outline">
-              <Link href="/admin/pages">
-                <Layout className="h-4 w-4 mr-2" />
-                Manage Pages
-              </Link>
-            </Button>
           </div>
         </div>
 
@@ -99,7 +93,7 @@ const Dashboard = () => {
         </div>
 
         {/* Admin Navigation */}
-        <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-4 grid-cols-1 sm:grid-cols-2">
           <Link href="/admin/blog">
             <Card className="hover:bg-accent transition-colors cursor-pointer">
               <CardHeader>
@@ -111,22 +105,6 @@ const Dashboard = () => {
               <CardContent>
                 <p className="text-sm text-muted-foreground">
                   Create, edit, and manage your blog posts
-                </p>
-              </CardContent>
-            </Card>
-          </Link>
-
-          <Link href="/admin/pages">
-            <Card className="hover:bg-accent transition-colors cursor-pointer">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Layout className="h-5 w-5" />
-                  Page Builder
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm text-muted-foreground">
-                  Customize and manage website pages
                 </p>
               </CardContent>
             </Card>
