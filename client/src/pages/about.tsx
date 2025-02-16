@@ -32,11 +32,9 @@ const About = () => {
     queryKey: ["/api/about/favorites"],
   });
 
-  // Separate states for interests and favorites filters
   const [selectedInterestCategory, setSelectedInterestCategory] = useState<string | null>(null);
   const [selectedFavoriteCategory, setSelectedFavoriteCategory] = useState<string | null>(null);
 
-  // Separate category lists for interests and favorites
   const interestCategories = Array.from(new Set(interests?.map(i => i.category) || []));
   const favoriteCategories = Array.from(new Set(favorites?.map(f => f.category) || []));
 
@@ -50,7 +48,6 @@ const About = () => {
 
   return (
     <div className="container py-12 space-y-16">
-      {/* Bio Section */}
       <section className="max-w-4xl mx-auto space-y-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -64,7 +61,6 @@ const About = () => {
         </motion.div>
       </section>
 
-      {/* Tabbed Content */}
       <Tabs defaultValue="interests" className="space-y-8">
         <TabsList className="grid w-full grid-cols-3 max-w-[400px] mx-auto">
           <TabsTrigger value="timeline">Timeline</TabsTrigger>
@@ -72,14 +68,11 @@ const About = () => {
           <TabsTrigger value="favorites">Favorites</TabsTrigger>
         </TabsList>
 
-        {/* Timeline Tab */}
         <TabsContent value="timeline" className="space-y-8">
           <TimelineComponent />
         </TabsContent>
 
-        {/* Interests Tab */}
         <TabsContent value="interests" className="space-y-8">
-          {/* Category Filter */}
           <div className="flex flex-wrap gap-2 items-center">
             <Filter className="h-4 w-4 mr-2 text-muted-foreground" />
             <Button
@@ -135,9 +128,7 @@ const About = () => {
           </motion.div>
         </TabsContent>
 
-        {/* Favorites Tab */}
         <TabsContent value="favorites" className="space-y-8">
-          {/* Category Filter */}
           <div className="flex flex-wrap gap-2 items-center">
             <Filter className="h-4 w-4 mr-2 text-muted-foreground" />
             <Button
@@ -166,8 +157,8 @@ const About = () => {
             animate={{ opacity: 1 }}
             className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
           >
-            {filteredFavorites?.map((favorite) => (
-              <Card key={favorite.id}>
+            {filteredFavorites?.sort((a, b) => (a.order ?? 0) - (b.order ?? 0)).map((favorite) => (
+              <Card key={favorite.id} className="flex flex-col">
                 {favorite.image && (
                   <div 
                     className="aspect-video bg-cover bg-center" 
@@ -193,14 +184,16 @@ const About = () => {
                     </Badge>
                   </div>
                 </CardHeader>
-                <CardContent>
-                  <p className="text-muted-foreground">{favorite.description}</p>
+                <CardContent className="flex-1 flex flex-col">
+                  {favorite.description && (
+                    <p className="text-muted-foreground mb-4">{favorite.description}</p>
+                  )}
                   {favorite.link && (
                     <a 
                       href={favorite.link}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-primary hover:underline mt-2 inline-block"
+                      className="text-primary hover:underline mt-auto inline-block"
                     >
                       Learn more →
                     </a>
