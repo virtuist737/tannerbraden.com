@@ -4,44 +4,36 @@ import { CalendarDays, Clock, Share2, Twitter, Facebook, Linkedin } from "lucide
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import type { BlogPost } from "@/components/blog/BlogCard";
-
-// This would typically come from an API or CMS
-const getBlogPost = (slug: string): BlogPost | undefined => {
-  const posts = [
-    {
-      id: "1",
-      title: "Getting Started with React and TypeScript",
-      excerpt: "Learn how to set up a new React project with TypeScript and best practices for type safety.",
-      content: `
-        # Getting Started with React and TypeScript
-
-        TypeScript has become an essential tool in modern web development, especially when working with React. 
-        In this guide, we'll explore how to set up a new React project with TypeScript and learn some best practices 
-        for maintaining type safety throughout your application.
-
-        ## Why TypeScript?
-
-        TypeScript adds static typing to JavaScript, which helps catch errors early in development and improves 
-        the development experience with better tooling and autocompletion.
-
-        ## Setting Up Your Project
-
-        First, let's create a new React project with TypeScript using Vite...
-      `,
-      date: "March 15, 2024",
-      readingTime: "5 min read",
-      category: "React",
-      image: "https://images.unsplash.com/photo-1633356122544-f134324a6cee?w=800&auto=format&fit=crop&q=60",
-      slug: "getting-started-react-typescript",
-    },
-  ];
-
-  return posts.find((post) => post.slug === slug);
-};
+import { useQuery } from "@tanstack/react-query";
+import { format } from "date-fns";
 
 const BlogPost = () => {
   const { slug } = useParams();
-  const post = getBlogPost(slug || "");
+
+  const { data: post, isLoading } = useQuery<BlogPost>({
+    queryKey: ["/api/blog", slug],
+    enabled: !!slug,
+  });
+
+  if (isLoading) {
+    return (
+      <div className="container py-12">
+        <div className="max-w-3xl mx-auto animate-pulse space-y-8">
+          <div className="space-y-4">
+            <div className="h-4 bg-muted rounded w-1/4" />
+            <div className="h-8 bg-muted rounded w-3/4" />
+            <div className="h-4 bg-muted rounded w-1/2" />
+          </div>
+          <div className="aspect-video bg-muted rounded-lg" />
+          <div className="space-y-4">
+            <div className="h-4 bg-muted rounded w-full" />
+            <div className="h-4 bg-muted rounded w-full" />
+            <div className="h-4 bg-muted rounded w-2/3" />
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (!post) {
     return (
@@ -54,6 +46,7 @@ const BlogPost = () => {
   }
 
   const shareUrl = window.location.href;
+  const readingTime = post.readingTime || `${Math.ceil(post.content.length / 1000)} min read`;
 
   return (
     <div className="container py-12">
@@ -69,18 +62,18 @@ const BlogPost = () => {
           <div className="flex items-center gap-4 text-sm text-muted-foreground">
             <div className="flex items-center gap-1">
               <CalendarDays className="h-4 w-4" />
-              <span>{post.date}</span>
+              <span>{format(new Date(post.publishedAt), "MMMM d, yyyy")}</span>
             </div>
             <div className="flex items-center gap-1">
               <Clock className="h-4 w-4" />
-              <span>{post.readingTime}</span>
+              <span>{readingTime}</span>
             </div>
           </div>
         </div>
 
         <div className="aspect-video relative mt-8 overflow-hidden rounded-lg">
           <img
-            src={post.image}
+            src={post.coverImage}
             alt={post.title}
             className="object-cover w-full h-full"
           />

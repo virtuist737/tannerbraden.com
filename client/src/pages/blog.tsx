@@ -3,51 +3,44 @@ import BlogCard, { type BlogPost } from "@/components/blog/BlogCard";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { useState } from "react";
-
-const blogPosts: BlogPost[] = [
-  {
-    id: "1",
-    title: "Getting Started with React and TypeScript",
-    excerpt: "Learn how to set up a new React project with TypeScript and best practices for type safety.",
-    date: "March 15, 2024",
-    readingTime: "5 min read",
-    category: "React",
-    image: "https://images.unsplash.com/photo-1633356122544-f134324a6cee?w=800&auto=format&fit=crop&q=60",
-    slug: "getting-started-react-typescript"
-  },
-  {
-    id: "2",
-    title: "Building Responsive Layouts with Tailwind CSS",
-    excerpt: "Explore the power of Tailwind CSS for creating beautiful, responsive web designs.",
-    date: "March 10, 2024",
-    readingTime: "7 min read",
-    category: "CSS",
-    image: "https://images.unsplash.com/photo-1627398242454-45a1465c2479?w=800&auto=format&fit=crop&q=60",
-    slug: "responsive-layouts-tailwind"
-  },
-  {
-    id: "3",
-    title: "Modern State Management in React Applications",
-    excerpt: "Compare different state management solutions and learn when to use each one.",
-    date: "March 5, 2024",
-    readingTime: "8 min read",
-    category: "React",
-    image: "https://images.unsplash.com/photo-1618477247222-acbdb0e159b3?w=800&auto=format&fit=crop&q=60",
-    slug: "modern-state-management"
-  }
-];
-
-const categories = ["All", "React", "TypeScript", "CSS", "JavaScript", "Web Development"];
+import { useQuery } from "@tanstack/react-query";
 
 const Blog = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
 
-  const filteredPosts = blogPosts.filter((post) => {
-    const matchesSearch = post.title.toLowerCase().includes(searchQuery.toLowerCase());
+  const { data: posts, isLoading } = useQuery<BlogPost[]>({
+    queryKey: ["/api/blog"],
+  });
+
+  // Get unique categories from posts
+  const categories = ["All", ...new Set(posts?.map(post => post.category) || [])];
+
+  const filteredPosts = posts?.filter((post) => {
+    const matchesSearch = post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                         post.excerpt.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesCategory = selectedCategory === "All" || post.category === selectedCategory;
     return matchesSearch && matchesCategory;
-  });
+  }) || [];
+
+  if (isLoading) {
+    return (
+      <div className="container py-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="animate-pulse space-y-4">
+              <div className="aspect-video bg-muted rounded-lg" />
+              <div className="space-y-2">
+                <div className="h-4 bg-muted rounded w-1/4" />
+                <div className="h-8 bg-muted rounded w-3/4" />
+                <div className="h-4 bg-muted rounded w-full" />
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="container py-12">

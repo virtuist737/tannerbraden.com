@@ -2,17 +2,12 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { CalendarDays, Clock } from "lucide-react";
 import { Link } from "wouter";
+import { format } from "date-fns";
+import type { BlogPost as DBBlogPost } from "@shared/schema";
 
-export interface BlogPost {
-  id: string;
-  title: string;
-  excerpt: string;
-  content?: string; // Added content field
-  date: string;
-  readingTime: string;
-  category: string;
-  image: string;
-  slug: string;
+// Extended type to include UI-specific fields
+export interface BlogPost extends DBBlogPost {
+  readingTime?: string;
 }
 
 interface BlogCardProps {
@@ -20,13 +15,15 @@ interface BlogCardProps {
 }
 
 const BlogCard = ({ post }: BlogCardProps) => {
+  const readingTime = post.readingTime || `${Math.ceil(post.content.length / 1000)} min read`;
+
   return (
     <Link href={`/blog/${post.slug}`}>
       <Card className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer h-full">
         <CardHeader className="p-0">
           <div className="aspect-video relative overflow-hidden">
             <img
-              src={post.image}
+              src={post.coverImage}
               alt={post.title}
               className="object-cover w-full h-full transition-transform hover:scale-105"
             />
@@ -41,11 +38,11 @@ const BlogCard = ({ post }: BlogCardProps) => {
           <div className="flex items-center gap-4 text-sm text-muted-foreground">
             <div className="flex items-center gap-1">
               <CalendarDays className="h-4 w-4" />
-              <span>{post.date}</span>
+              <span>{format(new Date(post.publishedAt), "MMM d, yyyy")}</span>
             </div>
             <div className="flex items-center gap-1">
               <Clock className="h-4 w-4" />
-              <span>{post.readingTime}</span>
+              <span>{readingTime}</span>
             </div>
           </div>
         </CardContent>

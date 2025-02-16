@@ -38,6 +38,9 @@ export default function AdminBlog() {
     mutationFn: async (postId: number) => {
       await apiRequest(`/api/blog/${postId}`, {
         method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
       });
     },
     onSuccess: () => {
