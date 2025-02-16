@@ -18,8 +18,11 @@ import type { Timeline, Interest, Favorite } from "@shared/schema";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import TimelineComponent from "@/components/about/Timeline";
+import { ImageUpload } from "@/components/shared/ImageUpload";
+import { useQueryClient } from "@tanstack/react-query";
 
 const About = () => {
+  const queryClient = useQueryClient();
   const { data: timeline } = useQuery<Timeline[]>({
     queryKey: ["/api/about/timeline"],
   });
@@ -45,6 +48,10 @@ const About = () => {
   const filteredFavorites = favorites?.filter(
     favorite => !selectedFavoriteCategory || favorite.category === selectedFavoriteCategory
   );
+
+  const handleImageUploadSuccess = (entityType: string) => {
+    queryClient.invalidateQueries({ queryKey: [`/api/about/${entityType}`] });
+  };
 
   return (
     <div className="container py-12 space-y-16">
@@ -103,6 +110,12 @@ const About = () => {
           >
             {filteredInterests?.sort((a, b) => a.sortOrder - b.sortOrder).map((interest) => (
               <Card key={interest.id} className="relative overflow-hidden group hover:shadow-lg transition-shadow">
+                <ImageUpload
+                  imageUrl={interest.imageUrl}
+                  entityId={interest.id}
+                  entityType="interest"
+                  onSuccess={() => handleImageUploadSuccess('interests')}
+                />
                 <CardHeader>
                   <div className="flex items-center justify-between">
                     <CardTitle className="text-xl">{interest.item}</CardTitle>
@@ -158,77 +171,48 @@ const About = () => {
             className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
           >
             {filteredFavorites?.sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0)).map((favorite) => (
-              favorite.link ? (
-                <a
-                  key={favorite.id}
-                  href={favorite.link}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="block transition-transform hover:scale-[1.02]"
-                >
-                  <Card className="flex flex-col h-full">
-                    {favorite.image && (
-                      <div 
-                        className="aspect-video bg-cover bg-center" 
-                        style={{ backgroundImage: `url(${favorite.image})` }}
-                      />
-                    )}
-                    <CardHeader>
-                      <div className="flex items-center justify-between">
-                        <CardTitle className="text-xl">{favorite.title}</CardTitle>
-                        <Badge 
-                          variant="secondary"
-                          className={`
-                            ${favorite.category === 'app' ? 'bg-cyan-100 text-cyan-800 dark:bg-cyan-900 dark:text-cyan-300' : ''}
-                            ${favorite.category === 'book' ? 'bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-300' : ''}
-                            ${favorite.category === 'podcast' ? 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300' : ''}
-                            ${favorite.category === 'music' ? 'bg-pink-100 text-pink-800 dark:bg-pink-900 dark:text-pink-300' : ''}
-                            ${favorite.category === 'video games' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300' : ''}
-                          `}
-                        >
-                          {favorite.category}
-                        </Badge>
-                      </div>
-                    </CardHeader>
-                    <CardContent className="flex-1">
-                      {favorite.description && (
-                        <p className="text-muted-foreground">{favorite.description}</p>
-                      )}
-                    </CardContent>
-                  </Card>
-                </a>
-              ) : (
-                <Card key={favorite.id} className="flex flex-col h-full">
-                  {favorite.image && (
-                    <div 
-                      className="aspect-video bg-cover bg-center" 
-                      style={{ backgroundImage: `url(${favorite.image})` }}
-                    />
+              <Card key={favorite.id} className="flex flex-col h-full">
+                <ImageUpload
+                  imageUrl={favorite.image}
+                  entityId={favorite.id}
+                  entityType="favorite"
+                  onSuccess={() => handleImageUploadSuccess('favorites')}
+                />
+                <CardHeader>
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="text-xl">{favorite.title}</CardTitle>
+                    <Badge 
+                      variant="secondary"
+                      className={`
+                        ${favorite.category === 'app' ? 'bg-cyan-100 text-cyan-800 dark:bg-cyan-900 dark:text-cyan-300' : ''}
+                        ${favorite.category === 'book' ? 'bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-300' : ''}
+                        ${favorite.category === 'podcast' ? 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300' : ''}
+                        ${favorite.category === 'music' ? 'bg-pink-100 text-pink-800 dark:bg-pink-900 dark:text-pink-300' : ''}
+                        ${favorite.category === 'video games' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300' : ''}
+                      `}
+                    >
+                      {favorite.category}
+                    </Badge>
+                  </div>
+                </CardHeader>
+                <CardContent className="flex-1">
+                  {favorite.description && (
+                    <p className="text-muted-foreground">{favorite.description}</p>
                   )}
-                  <CardHeader>
-                    <div className="flex items-center justify-between">
-                      <CardTitle className="text-xl">{favorite.title}</CardTitle>
-                      <Badge 
-                        variant="secondary"
-                        className={`
-                          ${favorite.category === 'app' ? 'bg-cyan-100 text-cyan-800 dark:bg-cyan-900 dark:text-cyan-300' : ''}
-                          ${favorite.category === 'book' ? 'bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-300' : ''}
-                          ${favorite.category === 'podcast' ? 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300' : ''}
-                          ${favorite.category === 'music' ? 'bg-pink-100 text-pink-800 dark:bg-pink-900 dark:text-pink-300' : ''}
-                          ${favorite.category === 'video games' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300' : ''}
-                        `}
-                      >
-                        {favorite.category}
-                      </Badge>
-                    </div>
-                  </CardHeader>
-                  <CardContent className="flex-1">
-                    {favorite.description && (
-                      <p className="text-muted-foreground">{favorite.description}</p>
-                    )}
-                  </CardContent>
-                </Card>
-              )
+                </CardContent>
+                {favorite.link && (
+                  <div className="p-4 pt-0">
+                    <a
+                      href={favorite.link}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-sm text-blue-600 hover:underline dark:text-blue-400"
+                    >
+                      Visit Link →
+                    </a>
+                  </div>
+                )}
+              </Card>
             ))}
           </motion.div>
         </TabsContent>
