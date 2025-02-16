@@ -163,7 +163,7 @@ const TimelineCard: React.FC<CardProps> = ({ event, expandedIndex, index, setExp
         <div>
           <h3 className="font-semibold text-lg">{event.title}</h3>
           <time className="text-sm text-muted-foreground">
-            {new Date(event.date).toLocaleDateString('en-US', {
+            {new Date(event.date + 'T00:00:00').toLocaleDateString('en-US', {
               year: 'numeric',
               month: 'long'
             })}

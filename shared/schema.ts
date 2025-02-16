@@ -62,7 +62,7 @@ export const timeline = pgTable("timeline", {
   id: serial("id").primaryKey(),
   title: text("title").notNull(),
   content: text("content").notNull(),
-  date: timestamp("date").notNull(),
+  date: text("date").notNull(), // Changed from timestamp to text for YYYY-MM-DD format
   icon: text("icon").notNull(),
   category: text("category").notNull(),
 });
