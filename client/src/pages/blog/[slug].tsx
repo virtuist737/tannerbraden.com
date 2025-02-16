@@ -46,7 +46,7 @@ const BlogPost = () => {
   }
 
   const shareUrl = window.location.href;
-  const readingTime = post.readingTime || `${Math.ceil(post.content.length / 1000)} min read`;
+  const readingTime = post.readingTime || `${Math.ceil((post.content?.length || 0) / 1000)} min read`;
 
   return (
     <div className="container py-12">
