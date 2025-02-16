@@ -91,7 +91,7 @@ export const favorites = pgTable("favorites", {
   id: serial("id").primaryKey(),
   title: text("title").notNull(),
   category: text("category").notNull(),
-  description: text("description").notNull(),
+  description: text("description"),
   link: text("link"),
   image: text("image"),
   order: integer("order").notNull(),
