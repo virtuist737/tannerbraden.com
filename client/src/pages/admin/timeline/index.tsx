@@ -30,26 +30,30 @@ export default function AdminTimeline() {
   const queryClient = useQueryClient();
 
   const { data: timeline, isLoading } = useQuery<Timeline[]>({
-    queryKey: ["/api/about/timeline"],
+    queryKey: ["/api/timeline"],
   });
 
   const deleteMutation = useMutation({
     mutationFn: async (timelineId: number) => {
-      await apiRequest(`/api/about/timeline/${timelineId}`, {
+      const response = await apiRequest(`/api/timeline/${timelineId}`, {
         method: "DELETE",
       });
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || "Failed to delete timeline entry");
+      }
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/about/timeline"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/timeline"] });
       toast({
         title: "Success",
         description: "Timeline entry deleted successfully",
       });
     },
-    onError: (error) => {
+    onError: (error: Error) => {
       toast({
         title: "Error",
-        description: "Failed to delete timeline entry",
+        description: error.message || "Failed to delete timeline entry",
         variant: "destructive",
       });
     },

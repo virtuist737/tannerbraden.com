@@ -8,6 +8,16 @@ import { upload } from "./lib/upload";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Timeline Routes
+  app.get("/api/timeline", async (req, res) => {
+    try {
+      const timelineEvents = await storage.listTimeline();
+      res.json(timelineEvents);
+    } catch (error) {
+      console.error("Error fetching timeline:", error);
+      res.status(500).json({ error: "Failed to fetch timeline" });
+    }
+  });
+
   app.post("/api/timeline", isAuthenticated, async (req, res) => {
     try {
       const parsedBody = insertTimelineSchema.safeParse(req.body);
@@ -18,6 +28,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const timeline = await storage.createTimeline(parsedBody.data);
       res.status(201).json(timeline);
     } catch (error) {
+      console.error("Error creating timeline:", error);
       res.status(500).json({ error: "Failed to create timeline entry" });
     }
   });
@@ -35,6 +46,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       res.json(timeline);
     } catch (error) {
+      console.error("Error updating timeline:", error);
       res.status(500).json({ error: "Failed to update timeline entry" });
     }
   });
@@ -47,7 +59,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       res.status(204).end();
     } catch (error) {
+      console.error("Error deleting timeline:", error);
       res.status(500).json({ error: "Failed to delete timeline entry" });
+    }
+  });
+
+  app.get("/api/timeline/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ error: "Invalid timeline ID" });
+      }
+      const timeline = await storage.getTimeline(id);
+      if (!timeline) {
+        return res.status(404).json({ error: "Timeline entry not found" });
+      }
+      res.json(timeline);
+    } catch (error) {
+      console.error("Error fetching timeline:", error);
+      res.status(500).json({ error: "Failed to fetch timeline entry" });
     }
   });
 
