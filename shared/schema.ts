@@ -32,7 +32,7 @@ export const blogComments = pgTable("blog_comments", {
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
-// Analytics - Page Views
+// Analytics - Page Views with enhanced tracking
 export const pageViews = pgTable("page_views", {
   id: serial("id").primaryKey(),
   path: text("path").notNull(),
@@ -40,6 +40,13 @@ export const pageViews = pgTable("page_views", {
   duration: integer("duration"),
   userAgent: text("user_agent"),
   referrer: text("referrer"),
+  // New fields for enhanced analytics
+  deviceType: text("device_type"),
+  browser: text("browser"),
+  platform: text("platform"),
+  isExit: boolean("is_exit").default(false),
+  isBounce: boolean("is_bounce").default(false),
+  scrollDepth: integer("scroll_depth"),
 });
 
 // Analytics - User Sessions

@@ -49,6 +49,7 @@ export interface IStorage {
 
   // Analytics operations
   recordPageView(path: string, userAgent?: string, referrer?: string): Promise<PageView>;
+  updatePageView(id: number, updates: Partial<PageView>): Promise<PageView | undefined>;
   getPageViews(startDate: Date, endDate: Date): Promise<PageView[]>;
 
   // Session operations
@@ -166,6 +167,15 @@ export class DatabaseStorage implements IStorage {
       .values({ path, userAgent, referrer })
       .returning();
     return pageView;
+  }
+
+  async updatePageView(id: number, updates: Partial<PageView>): Promise<PageView | undefined> {
+    const [updatedView] = await db
+      .update(pageViews)
+      .set(updates)
+      .where(eq(pageViews.id, id))
+      .returning();
+    return updatedView;
   }
 
   async getPageViews(startDate: Date, endDate: Date): Promise<PageView[]> {

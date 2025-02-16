@@ -3,6 +3,7 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { insertBlogPostSchema, insertBlogCommentSchema, insertNewsletterSubscriptionSchema } from "@shared/schema";
 import { isAuthenticated } from "./auth";
+import * as UAParser from "ua-parser-js";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Blog Routes
@@ -93,11 +94,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Analytics Routes
   app.post("/api/analytics/pageview", async (req, res) => {
     try {
-      const { path } = req.body;
+      const { path, scrollDepth } = req.body;
       const userAgent = req.headers["user-agent"];
       const referrer = req.headers.referer;
 
-      await storage.recordPageView(path, userAgent, referrer);
+      // Parse user agent for detailed device info
+      const parser = new UAParser.UAParser(userAgent);
+      const result = parser.getResult();
+
+      const pageView = await storage.recordPageView(path, userAgent, referrer);
+      if (pageView) {
+        await storage.updatePageView(pageView.id, {
+          deviceType: result.device.type || "desktop",
+          browser: result.browser.name || "unknown",
+          platform: result.os.name || "unknown",
+          scrollDepth: scrollDepth || 0,
+          isExit: false,
+          isBounce: false,
+        });
+      }
+
       res.status(201).json({ message: "Page view recorded" });
     } catch (error) {
       res.status(500).json({ error: "Failed to record page view" });
@@ -110,7 +126,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const endDate = new Date(req.query.endDate as string || new Date());
 
       const pageViews = await storage.getPageViews(startDate, endDate);
-      res.json(pageViews);
+
+      // Calculate aggregate metrics
+      const totalViews = pageViews.length;
+      const bounceRate = pageViews.filter(view => view.isBounce).length / totalViews;
+      const averageEngagement = pageViews.reduce((sum, view) => sum + (view.duration || 0), 0) / totalViews;
+
+      const deviceBreakdown = pageViews.reduce((acc, view) => {
+        const deviceType = view.deviceType || 'unknown';
+        acc[deviceType] = (acc[deviceType] || 0) + 1;
+        return acc;
+      }, {} as Record<string, number>);
+
+      const analytics = {
+        pageViews,
+        metrics: {
+          totalViews,
+          bounceRate,
+          averageEngagement,
+          deviceBreakdown,
+        }
+      };
+
+      res.json(analytics);
     } catch (error) {
       res.status(500).json({ error: "Failed to fetch page views" });
     }
