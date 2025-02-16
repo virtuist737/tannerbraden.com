@@ -10,6 +10,8 @@ import About from "@/pages/about";
 import Blog from "@/pages/blog";
 import Portfolio from "@/pages/portfolio";
 import Contact from "@/pages/contact";
+import BlogPost from "@/pages/blog/[slug]"; // Fixed import path
+
 
 function Router() {
   return (
@@ -17,6 +19,7 @@ function Router() {
       <Route path="/" component={Home} />
       <Route path="/about" component={About} />
       <Route path="/blog" component={Blog} />
+      <Route path="/blog/:slug" component={BlogPost} />
       <Route path="/portfolio" component={Portfolio} />
       <Route path="/contact" component={Contact} />
       <Route component={NotFound} />

@@ -7,6 +7,7 @@ export interface BlogPost {
   id: string;
   title: string;
   excerpt: string;
+  content?: string; // Added content field
   date: string;
   readingTime: string;
   category: string;
