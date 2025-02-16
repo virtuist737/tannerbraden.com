@@ -214,7 +214,7 @@ export class DatabaseStorage implements IStorage {
     return db
       .select()
       .from(favorites)
-      .orderBy(favorites.sortOrder);
+      .orderBy(favorites.sortOrder, favorites.title);
   }
 }
 
