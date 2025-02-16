@@ -21,6 +21,14 @@ import {
   type PageView,
   type UserSession,
 } from "@shared/schema";
+import {
+  stories,
+  interests,
+  favorites,
+  type Story,
+  type Interest,
+  type Favorite
+} from "@shared/schema";
 
 const PostgresSessionStore = connectPg(session);
 
@@ -58,6 +66,11 @@ export interface IStorage {
 
   // Session store for authentication
   sessionStore: session.Store;
+
+  // About page methods
+  listStories(): Promise<Story[]>;
+  listInterests(): Promise<Interest[]>;
+  listFavorites(): Promise<Favorite[]>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -199,6 +212,28 @@ export class DatabaseStorage implements IStorage {
       .update(userSessions)
       .set({ endTime })
       .where(eq(userSessions.sessionId, sessionId));
+  }
+
+  // About page methods
+  async listStories(): Promise<Story[]> {
+    return db
+      .select()
+      .from(stories)
+      .orderBy(stories.order);
+  }
+
+  async listInterests(): Promise<Interest[]> {
+    return db
+      .select()
+      .from(interests)
+      .orderBy(interests.order);
+  }
+
+  async listFavorites(): Promise<Favorite[]> {
+    return db
+      .select()
+      .from(favorites)
+      .orderBy(favorites.order);
   }
 }
 

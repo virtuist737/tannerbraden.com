@@ -178,6 +178,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // About Page Routes
+  app.get("/api/about/stories", async (req, res) => {
+    try {
+      const stories = await storage.listStories();
+      res.json(stories);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch stories" });
+    }
+  });
+
+  app.get("/api/about/interests", async (req, res) => {
+    try {
+      const interests = await storage.listInterests();
+      res.json(interests);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch interests" });
+    }
+  });
+
+  app.get("/api/about/favorites", async (req, res) => {
+    try {
+      const favorites = await storage.listFavorites();
+      res.json(favorites);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch favorites" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }
