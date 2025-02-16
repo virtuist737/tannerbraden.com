@@ -1,7 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertBlogPostSchema, insertBlogCommentSchema, insertNewsletterSubscriptionSchema } from "@shared/schema";
+import { insertBlogPostSchema, insertNewsletterSubscriptionSchema } from "@shared/schema";
 import { isAuthenticated } from "./auth";
 import * as UAParser from "ua-parser-js";
 

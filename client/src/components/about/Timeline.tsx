@@ -1,72 +1,52 @@
 import { motion, AnimatePresence } from "framer-motion";
-import { Briefcase, GraduationCap, Award, ChevronDown } from "lucide-react";
+import { Briefcase, GraduationCap, Award, ChevronDown, Sparkle, Baby, Music, Plane, Heart, Brain, Map } from "lucide-react";
 import { useState } from "react";
-
-interface TimelineEvent {
-  title: string;
-  date: string;
-  description: string;
-  type: "work" | "education" | "achievement";
-  details?: string;
-}
+import { useQuery } from "@tanstack/react-query";
+import type { Timeline } from "@shared/schema";
 
 interface CardProps {
-  event: TimelineEvent;
+  event: Timeline;
   expandedIndex: number | null;
   index: number;
   setExpandedIndex: (index: number | null) => void;
 }
 
-const timelineData: TimelineEvent[] = [
-  {
-    title: "Senior Developer",
-    date: "2023 - Present",
-    description: "Leading development teams and architecting web solutions",
-    details: "Spearheading innovative projects, mentoring team members, and implementing best practices in software development. Focus on scalable architecture and performance optimization.",
-    type: "work",
+const expandVariants = {
+  collapsed: { height: 0, opacity: 0 },
+  expanded: { 
+    height: "auto", 
+    opacity: 1,
+    transition: {
+      height: {
+        duration: 0.3,
+        ease: "easeOut",
+      },
+      opacity: {
+        duration: 0.2,
+        delay: 0.1,
+      },
+    },
   },
-  {
-    title: "Full Stack Developer",
-    date: "2020 - 2023",
-    description: "Building full-stack applications and mentoring junior developers",
-    details: "Developed and maintained multiple production applications using React, Node.js, and PostgreSQL. Led technical discussions and code reviews.",
-    type: "work",
-  },
-  {
-    title: "Master's in Computer Science",
-    date: "2018 - 2020",
-    description: "Specialized in Software Engineering and Web Technologies",
-    details: "Research focus on distributed systems and modern web architectures. Completed thesis on scalable microservices architecture.",
-    type: "education",
-  },
-  {
-    title: "Outstanding Achievement Award",
-    date: "2019",
-    description: "Recognized for exceptional contributions to open source",
-    details: "Contributed to major open source projects and created developer tools used by thousands of developers worldwide.",
-    type: "achievement",
-  },
-  {
-    title: "Bachelor's in Computer Science",
-    date: "2014 - 2018",
-    description: "Foundation in programming and computer science principles",
-    details: "Core coursework in algorithms, data structures, and software engineering. Participated in competitive programming competitions.",
-    type: "education",
-  },
-];
+};
 
-const Timeline = () => {
+const TimelineComponent = () => {
   const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
+  const { data: timeline } = useQuery<Timeline[]>({
+    queryKey: ["/api/about/timeline"],
+  });
 
-  const getIcon = (type: TimelineEvent["type"]) => {
-    switch (type) {
-      case "work":
-        return <Briefcase className="h-5 w-5" />;
-      case "education":
-        return <GraduationCap className="h-5 w-5" />;
-      case "achievement":
-        return <Award className="h-5 w-5" />;
-    }
+  const dotVariants = {
+    hidden: { scale: 0, opacity: 0 },
+    visible: {
+      scale: 1,
+      opacity: 1,
+      transition: {
+        duration: 0.5,
+        type: "spring",
+        stiffness: 300,
+        damping: 20,
+      },
+    },
   };
 
   const cardVariants = {
@@ -84,48 +64,18 @@ const Timeline = () => {
     },
   };
 
-  const dotVariants = {
-    hidden: { scale: 0, opacity: 0 },
-    visible: {
-      scale: 1,
-      opacity: 1,
-      transition: {
-        duration: 0.5,
-        type: "spring",
-        stiffness: 300,
-        damping: 20,
-      },
-    },
-  };
-
-  const expandVariants = {
-    collapsed: { height: 0, opacity: 0 },
-    expanded: { 
-      height: "auto", 
-      opacity: 1,
-      transition: {
-        height: {
-          duration: 0.3,
-          ease: "easeOut",
-        },
-        opacity: {
-          duration: 0.2,
-          delay: 0.1,
-        },
-      },
-    },
-  };
+  if (!timeline) return null;
 
   return (
     <div className="relative container max-w-7xl mx-auto px-4 py-16">
       <div className="absolute left-1/2 transform -translate-x-[1px] h-full w-[2px] bg-gradient-to-b from-primary/5 via-primary to-primary/5" />
 
       <div className="relative">
-        {timelineData.map((event, index) => {
+        {timeline.map((event, index) => {
           const isEven = index % 2 === 0;
 
           return (
-            <div key={index} className="mb-16">
+            <div key={event.id} className="mb-16">
               <div className="relative grid grid-cols-[1fr,auto,1fr] gap-8">
                 {/* Left side content */}
                 <div className={isEven ? 'pr-4' : ''}>
@@ -143,7 +93,7 @@ const Timeline = () => {
                   )}
                 </div>
 
-                {/* Timeline point - centered column */}
+                {/* Timeline point */}
                 <div className="flex items-center justify-center">
                   <motion.div
                     variants={dotVariants}
@@ -180,53 +130,83 @@ const Timeline = () => {
   );
 };
 
-const TimelineCard: React.FC<CardProps> = ({ event, expandedIndex, index, setExpandedIndex }) => (
-  <div className="bg-card border rounded-xl p-6 shadow-lg hover:shadow-xl transition-shadow duration-300 max-w-xl">
-    <div className="flex items-center gap-3 mb-2">
-      <div className="flex items-center justify-center w-10 h-10 rounded-full bg-primary/10 text-primary">
-        {getIcon(event.type)}
-      </div>
-      <div>
-        <h3 className="font-semibold text-lg">{event.title}</h3>
-        <time className="text-sm text-muted-foreground">{event.date}</time>
-      </div>
-    </div>
+const TimelineCard: React.FC<CardProps> = ({ event, expandedIndex, index, setExpandedIndex }) => {
+  const getIcon = (icon: string) => {
+    switch (icon) {
+      case "👶":
+        return <Baby className="h-5 w-5" />;
+      case "🎵":
+        return <Music className="h-5 w-5" />;
+      case "✈️":
+        return <Plane className="h-5 w-5" />;
+      case "🎓":
+        return <GraduationCap className="h-5 w-5" />;
+      case "💑":
+        return <Heart className="h-5 w-5" />;
+      case "🤔":
+        return <Sparkle className="h-5 w-5" />;
+      case "🇨🇳":
+        return <Map className="h-5 w-5" />;
+      case "🧠":
+        return <Brain className="h-5 w-5" />;
+      default:
+        return <Briefcase className="h-5 w-5" />;
+    }
+  };
 
-    <p className="text-muted-foreground mt-2">{event.description}</p>
+  return (
+    <div className="bg-card border rounded-xl p-6 shadow-lg hover:shadow-xl transition-shadow duration-300 max-w-xl">
+      <div className="flex items-center gap-3 mb-2">
+        <div className="flex items-center justify-center w-10 h-10 rounded-full bg-primary/10 text-primary">
+          {getIcon(event.icon)}
+        </div>
+        <div>
+          <h3 className="font-semibold text-lg">{event.title}</h3>
+          <time className="text-sm text-muted-foreground">
+            {new Date(event.date).toLocaleDateString('en-US', {
+              year: 'numeric',
+              month: 'long'
+            })}
+          </time>
+        </div>
+      </div>
 
-    {event.details && (
-      <div className="mt-4">
-        <button
-          onClick={() => setExpandedIndex(expandedIndex === index ? null : index)}
-          className="flex items-center gap-1 text-sm text-primary hover:text-primary/80 transition-colors"
-        >
-          {expandedIndex === index ? "Show less" : "Learn more"}
-          <motion.div
-            animate={{ rotate: expandedIndex === index ? 180 : 0 }}
-            transition={{ duration: 0.2 }}
+      <p className="text-muted-foreground mt-2">{event.content}</p>
+
+      {event.content.length > 200 && (
+        <div className="mt-4">
+          <button
+            onClick={() => setExpandedIndex(expandedIndex === index ? null : index)}
+            className="flex items-center gap-1 text-sm text-primary hover:text-primary/80 transition-colors"
           >
-            <ChevronDown className="h-4 w-4" />
-          </motion.div>
-        </button>
-
-        <AnimatePresence>
-          {expandedIndex === index && (
+            {expandedIndex === index ? "Show less" : "Learn more"}
             <motion.div
-              initial="collapsed"
-              animate="expanded"
-              exit="collapsed"
-              variants={expandVariants}
-              className="overflow-hidden"
+              animate={{ rotate: expandedIndex === index ? 180 : 0 }}
+              transition={{ duration: 0.2 }}
             >
-              <p className="text-sm text-muted-foreground mt-4 pt-4 border-t">
-                {event.details}
-              </p>
+              <ChevronDown className="h-4 w-4" />
             </motion.div>
-          )}
-        </AnimatePresence>
-      </div>
-    )}
-  </div>
-);
+          </button>
 
-export default Timeline;
+          <AnimatePresence>
+            {expandedIndex === index && (
+              <motion.div
+                initial="collapsed"
+                animate="expanded"
+                exit="collapsed"
+                variants={expandVariants}
+                className="overflow-hidden"
+              >
+                <p className="text-sm text-muted-foreground mt-4 pt-4 border-t">
+                  {event.content}
+                </p>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default TimelineComponent;

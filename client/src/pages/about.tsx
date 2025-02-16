@@ -28,6 +28,7 @@ import {
 import type { Timeline, Interest, Favorite } from "@shared/schema";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import TimelineComponent from "@/components/about/Timeline";
 
 const About = () => {
   const { data: timeline } = useQuery<Timeline[]>({
@@ -74,66 +75,7 @@ const About = () => {
 
         {/* Timeline Tab */}
         <TabsContent value="timeline" className="space-y-8">
-          <div className="relative max-w-4xl mx-auto">
-            <div className="absolute left-1/2 transform -translate-x-px h-full w-0.5 bg-gradient-to-b from-primary/5 via-primary to-primary/5" />
-
-            {timeline?.map((event, index) => {
-              const isEven = index % 2 === 0;
-
-              return (
-                <motion.div
-                  key={event.id}
-                  initial={{ opacity: 0, x: isEven ? -50 : 50 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  viewport={{ once: true, margin: "-100px" }}
-                  transition={{ duration: 0.8, ease: "easeOut" }}
-                  className="mb-16"
-                >
-                  <div className={`grid grid-cols-[1fr,auto,1fr] gap-4 ${isEven ? '' : 'direction-rtl'}`}>
-                    <div className={`${isEven ? 'text-right pr-4' : 'col-start-3 text-left pl-4'}`}>
-                      <Card className="relative">
-                        <CardHeader className="space-y-2">
-                          <div className="flex items-center gap-3 mb-2">
-                            <span className="text-2xl">{event.icon}</span>
-                            <div>
-                              <CardTitle className="text-xl">{event.title}</CardTitle>
-                              <CardDescription>
-                                {new Date(event.date).toLocaleDateString('en-US', {
-                                  year: 'numeric',
-                                  month: 'long'
-                                })}
-                              </CardDescription>
-                            </div>
-                          </div>
-                        </CardHeader>
-                        <CardContent>
-                          <p className="text-muted-foreground whitespace-pre-wrap">
-                            {event.content}
-                          </p>
-                        </CardContent>
-                      </Card>
-                    </div>
-
-                    <div className="relative flex items-center justify-center w-7">
-                      <motion.div
-                        initial={{ scale: 0 }}
-                        whileInView={{ scale: 1 }}
-                        viewport={{ once: true }}
-                        transition={{
-                          type: "spring",
-                          stiffness: 300,
-                          damping: 20
-                        }}
-                        className="w-3 h-3 rounded-full bg-primary shadow-[0_0_0_4px_rgba(var(--primary)/0.1)]"
-                      />
-                    </div>
-
-                    <div className={`col-span-1 ${isEven ? 'col-start-3' : ''}`} />
-                  </div>
-                </motion.div>
-              );
-            })}
-          </div>
+          <TimelineComponent />
         </TabsContent>
 
         {/* Interests Tab */}

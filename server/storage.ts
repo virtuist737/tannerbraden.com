@@ -6,7 +6,6 @@ import { pool } from "./db";
 import {
   users,
   blogPosts,
-  blogComments,
   pageViews,
   userSessions,
   newsletterSubscriptions,
@@ -17,8 +16,6 @@ import {
   type InsertUser,
   type BlogPost,
   type InsertBlogPost,
-  type BlogComment,
-  type InsertBlogComment,
   type NewsletterSubscription,
   type InsertNewsletterSubscription,
   type PageView,
@@ -43,10 +40,6 @@ export interface IStorage {
   listBlogPosts(): Promise<BlogPost[]>;
   updateBlogPost(id: number, updates: Partial<InsertBlogPost>): Promise<BlogPost | undefined>;
   deleteBlogPost(id: number): Promise<boolean>;
-
-  // Comments operations
-  createBlogComment(comment: InsertBlogComment): Promise<BlogComment>;
-  getBlogComments(postId: number): Promise<BlogComment[]>;
 
   // Newsletter operations
   subscribeToNewsletter(email: string): Promise<NewsletterSubscription>;
@@ -132,16 +125,6 @@ export class DatabaseStorage implements IStorage {
       .where(eq(blogPosts.id, id))
       .returning();
     return !!deletedPost;
-  }
-
-  // Comments operations
-  async createBlogComment(comment: InsertBlogComment): Promise<BlogComment> {
-    const [newComment] = await db.insert(blogComments).values(comment).returning();
-    return newComment;
-  }
-
-  async getBlogComments(postId: number): Promise<BlogComment[]> {
-    return db.select().from(blogComments).where(eq(blogComments.postId, postId));
   }
 
   // Newsletter operations
