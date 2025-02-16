@@ -10,8 +10,8 @@ import About from "@/pages/about";
 import Blog from "@/pages/blog";
 import Portfolio from "@/pages/portfolio";
 import Contact from "@/pages/contact";
-import BlogPost from "@/pages/blog/[slug]"; // Fixed import path
-
+import BlogPost from "@/pages/blog/[slug]";
+import Dashboard from "@/pages/dashboard";
 
 function Router() {
   return (
@@ -22,6 +22,7 @@ function Router() {
       <Route path="/blog/:slug" component={BlogPost} />
       <Route path="/portfolio" component={Portfolio} />
       <Route path="/contact" component={Contact} />
+      <Route path="/dashboard" component={Dashboard} />
       <Route component={NotFound} />
     </Switch>
   );
