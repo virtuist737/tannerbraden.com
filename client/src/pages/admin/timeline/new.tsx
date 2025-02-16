@@ -11,13 +11,19 @@ export default function NewTimelineEntry() {
 
   const createEntryMutation = useMutation({
     mutationFn: async (data: InsertTimeline) => {
-      const res = await apiRequest("/api/about/timeline", {
+      const res = await apiRequest("/api/timeline", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(data),
       });
+
+      if (!res.ok) {
+        const error = await res.json();
+        throw new Error(error.message || "Failed to create timeline entry");
+      }
+
       return res.json();
     },
     onSuccess: () => {

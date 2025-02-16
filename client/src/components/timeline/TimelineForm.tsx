@@ -21,6 +21,7 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { type Timeline } from "@shared/schema";
+import { ImageUpload } from "@/components/shared/ImageUpload";
 
 const timelineFormSchema = insertTimelineSchema.extend({
   title: z.string().min(1, "Title is required"),
@@ -37,16 +38,23 @@ interface TimelineFormProps {
 }
 
 const CATEGORIES = ["Education", "Work", "Achievement", "Project"];
+const ICONS = [
+  { value: "graduation-cap", label: "Graduation Cap" },
+  { value: "briefcase", label: "Briefcase" },
+  { value: "award", label: "Award" },
+  { value: "code", label: "Code" },
+];
 
 const TimelineForm = ({ initialData, onSubmit, isSubmitting }: TimelineFormProps) => {
   const form = useForm<z.infer<typeof timelineFormSchema>>({
     resolver: zodResolver(timelineFormSchema),
-    defaultValues: initialData || {
-      title: "",
-      content: "",
-      date: "",
-      icon: "graduation-cap",
-      category: "",
+    defaultValues: {
+      title: initialData?.title ?? "",
+      content: initialData?.content ?? "",
+      date: initialData?.date ?? "",
+      icon: initialData?.icon ?? "graduation-cap",
+      category: initialData?.category ?? "",
+      imageUrl: initialData?.imageUrl ?? undefined,
     },
   });
 
@@ -108,6 +116,31 @@ const TimelineForm = ({ initialData, onSubmit, isSubmitting }: TimelineFormProps
 
         <FormField
           control={form.control}
+          name="icon"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Icon</FormLabel>
+              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select an icon" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  {ICONS.map((icon) => (
+                    <SelectItem key={icon.value} value={icon.value}>
+                      {icon.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
           name="content"
           render={({ field }) => (
             <FormItem>
@@ -119,6 +152,27 @@ const TimelineForm = ({ initialData, onSubmit, isSubmitting }: TimelineFormProps
             </FormItem>
           )}
         />
+
+        {initialData?.id && (
+          <FormField
+            control={form.control}
+            name="imageUrl"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Image</FormLabel>
+                <FormControl>
+                  <ImageUpload
+                    imageUrl={field.value}
+                    entityId={initialData.id}
+                    entityType="timeline"
+                    onSuccess={(url) => field.onChange(url)}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        )}
 
         <div className="flex justify-end gap-4">
           <Button type="submit" disabled={isSubmitting}>
