@@ -52,17 +52,6 @@ export const userSessions = pgTable("user_sessions", {
   data: jsonb("data"),
 });
 
-// Pages table
-export const pages = pgTable("pages", {
-  id: serial("id").primaryKey(),
-  title: text("title").notNull(),
-  slug: text("slug").notNull().unique(),
-  content: jsonb("content").notNull(),
-  isPublished: boolean("is_published").notNull().default(false),
-  createdAt: timestamp("created_at").notNull().defaultNow(),
-  updatedAt: timestamp("updated_at").notNull().defaultNow(),
-});
-
 // Newsletter Subscriptions
 export const newsletterSubscriptions = pgTable("newsletter_subscriptions", {
   id: serial("id").primaryKey(),
@@ -111,15 +100,6 @@ export const insertNewsletterSubscriptionSchema = createInsertSchema(newsletterS
   email: true,
 });
 
-// Pages schema for insertions
-export const insertPageSchema = createInsertSchema(pages).omit({
-  id: true,
-  createdAt: true,
-  updatedAt: true,
-}).extend({
-  content: z.record(z.string(), z.any()),
-});
-
 // Types for TypeScript
 export type User = typeof users.$inferSelect;
 export type InsertUser = z.infer<typeof insertUserSchema>;
@@ -135,7 +115,3 @@ export type InsertNewsletterSubscription = z.infer<typeof insertNewsletterSubscr
 
 export type PageView = typeof pageViews.$inferSelect;
 export type UserSession = typeof userSessions.$inferSelect;
-
-// Page types
-export type Page = typeof pages.$inferSelect;
-export type InsertPage = z.infer<typeof insertPageSchema>;

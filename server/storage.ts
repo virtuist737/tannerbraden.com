@@ -10,7 +10,6 @@ import {
   pageViews,
   userSessions,
   newsletterSubscriptions,
-  pages,
   type User,
   type InsertUser,
   type BlogPost,
@@ -21,8 +20,6 @@ import {
   type InsertNewsletterSubscription,
   type PageView,
   type UserSession,
-  type Page,
-  type InsertPage,
 } from "@shared/schema";
 
 const PostgresSessionStore = connectPg(session);
@@ -60,14 +57,6 @@ export interface IStorage {
 
   // Session store for authentication
   sessionStore: session.Store;
-
-  // Page operations
-  createPage(page: InsertPage): Promise<Page>;
-  getPage(id: number): Promise<Page | undefined>;
-  getPageBySlug(slug: string): Promise<Page | undefined>;
-  listPages(): Promise<Page[]>;
-  updatePage(id: number, updates: Partial<InsertPage>): Promise<Page | undefined>;
-  deletePage(id: number): Promise<boolean>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -200,46 +189,6 @@ export class DatabaseStorage implements IStorage {
       .update(userSessions)
       .set({ endTime })
       .where(eq(userSessions.sessionId, sessionId));
-  }
-
-  // Page operations
-  async createPage(page: InsertPage): Promise<Page> {
-    const [newPage] = await db.insert(pages).values(page).returning();
-    return newPage;
-  }
-
-  async getPage(id: number): Promise<Page | undefined> {
-    const [page] = await db.select().from(pages).where(eq(pages.id, id));
-    return page;
-  }
-
-  async getPageBySlug(slug: string): Promise<Page | undefined> {
-    const [page] = await db.select().from(pages).where(eq(pages.slug, slug));
-    return page;
-  }
-
-  async listPages(): Promise<Page[]> {
-    return db.select().from(pages).orderBy(pages.createdAt);
-  }
-
-  async updatePage(id: number, updates: Partial<InsertPage>): Promise<Page | undefined> {
-    const [updatedPage] = await db
-      .update(pages)
-      .set({
-        ...updates,
-        updatedAt: new Date(),
-      })
-      .where(eq(pages.id, id))
-      .returning();
-    return updatedPage;
-  }
-
-  async deletePage(id: number): Promise<boolean> {
-    const [deletedPage] = await db
-      .delete(pages)
-      .where(eq(pages.id, id))
-      .returning();
-    return !!deletedPage;
   }
 }
 
