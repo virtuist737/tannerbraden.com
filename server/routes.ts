@@ -15,18 +15,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/blog/:identifier", async (req, res) => {
+  app.get("/api/blog/slug/:slug", async (req, res) => {
     try {
-      let post;
-      // Try to parse as ID first
-      const id = parseInt(req.params.identifier);
-      if (!isNaN(id)) {
-        post = await storage.getBlogPost(id);
-      } else {
-        // If not a valid ID, treat as slug
-        post = await storage.getBlogPostBySlug(req.params.identifier);
+      const post = await storage.getBlogPostBySlug(req.params.slug);
+      if (!post) {
+        return res.status(404).json({ error: "Blog post not found" });
       }
+      res.json(post);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch blog post" });
+    }
+  });
 
+  app.get("/api/blog/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ error: "Invalid blog post ID" });
+      }
+      const post = await storage.getBlogPost(id);
       if (!post) {
         return res.status(404).json({ error: "Blog post not found" });
       }
