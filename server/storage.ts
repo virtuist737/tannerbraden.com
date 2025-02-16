@@ -9,7 +9,7 @@ import {
   pageViews,
   userSessions,
   newsletterSubscriptions,
-  timeline as timelineTable, // Added import for timeline table
+  timeline as timelineTable,
   interests,
   favorites,
   type User,
@@ -23,7 +23,8 @@ import {
   type Timeline,
   type Interest,
   type Favorite,
-  type InsertTimeline, // Added import for InsertTimeline type
+  type InsertTimeline,
+  type InsertInterest, // Added type InsertInterest
 } from "@shared/schema";
 
 const PostgresSessionStore = connectPg(session);
@@ -73,6 +74,12 @@ export interface IStorage {
   createTimeline(timeline: InsertTimeline): Promise<Timeline>;
   updateTimeline(id: number, updates: Partial<InsertTimeline>): Promise<Timeline | undefined>;
   deleteTimeline(id: number): Promise<boolean>;
+
+  // Interest operations
+  getInterest(id: number): Promise<Interest | undefined>;
+  createInterest(interest: InsertInterest): Promise<Interest>;
+  updateInterest(id: number, updates: Partial<InsertInterest>): Promise<Interest | undefined>;
+  deleteInterest(id: number): Promise<boolean>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -277,6 +284,34 @@ export class DatabaseStorage implements IStorage {
       .where(eq(timelineTable.id, id))
       .returning();
     return !!deletedTimeline;
+  }
+
+  // Interest operations
+  async getInterest(id: number): Promise<Interest | undefined> {
+    const [interest] = await db.select().from(interests).where(eq(interests.id, id));
+    return interest;
+  }
+
+  async createInterest(interest: InsertInterest): Promise<Interest> {
+    const [newInterest] = await db.insert(interests).values(interest).returning();
+    return newInterest;
+  }
+
+  async updateInterest(id: number, updates: Partial<InsertInterest>): Promise<Interest | undefined> {
+    const [updatedInterest] = await db
+      .update(interests)
+      .set(updates)
+      .where(eq(interests.id, id))
+      .returning();
+    return updatedInterest;
+  }
+
+  async deleteInterest(id: number): Promise<boolean> {
+    const [deletedInterest] = await db
+      .delete(interests)
+      .where(eq(interests.id, id))
+      .returning();
+    return !!deletedInterest;
   }
 }
 

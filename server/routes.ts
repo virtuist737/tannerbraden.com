@@ -5,6 +5,7 @@ import { insertBlogPostSchema, insertNewsletterSubscriptionSchema, insertTimelin
 import { isAuthenticated } from "./auth";
 import * as UAParser from "ua-parser-js";
 import { upload } from "./lib/upload";
+import {insertInterestSchema} from "@shared/schema" //importing the missing schema
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Timeline Routes
@@ -273,6 +274,65 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(interests);
     } catch (error) {
       res.status(500).json({ error: "Failed to fetch interests" });
+    }
+  });
+
+  app.get("/api/about/interests/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ error: "Invalid interest ID" });
+      }
+      const interest = await storage.getInterest(id);
+      if (!interest) {
+        return res.status(404).json({ error: "Interest not found" });
+      }
+      res.json(interest);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch interest" });
+    }
+  });
+
+  app.post("/api/about/interests", isAuthenticated, async (req, res) => {
+    try {
+      const parsedBody = insertInterestSchema.safeParse(req.body);
+      if (!parsedBody.success) {
+        return res.status(400).json({ error: "Invalid interest data" });
+      }
+
+      const interest = await storage.createInterest(parsedBody.data);
+      res.status(201).json(interest);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to create interest" });
+    }
+  });
+
+  app.patch("/api/about/interests/:id", isAuthenticated, async (req, res) => {
+    try {
+      const parsedBody = insertInterestSchema.partial().safeParse(req.body);
+      if (!parsedBody.success) {
+        return res.status(400).json({ error: "Invalid interest data" });
+      }
+
+      const interest = await storage.updateInterest(parseInt(req.params.id), parsedBody.data);
+      if (!interest) {
+        return res.status(404).json({ error: "Interest not found" });
+      }
+      res.json(interest);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to update interest" });
+    }
+  });
+
+  app.delete("/api/about/interests/:id", isAuthenticated, async (req, res) => {
+    try {
+      const success = await storage.deleteInterest(parseInt(req.params.id));
+      if (!success) {
+        return res.status(404).json({ error: "Interest not found" });
+      }
+      res.status(204).end();
+    } catch (error) {
+      res.status(500).json({ error: "Failed to delete interest" });
     }
   });
 
