@@ -158,46 +158,78 @@ const About = () => {
             className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
           >
             {filteredFavorites?.sort((a, b) => (a.order ?? 0) - (b.order ?? 0)).map((favorite) => (
-              <Card key={favorite.id} className="flex flex-col">
-                {favorite.image && (
-                  <div 
-                    className="aspect-video bg-cover bg-center" 
-                    style={{ backgroundImage: `url(${favorite.image})` }}
-                  />
-                )}
-                <CardHeader>
-                  <div className="flex items-center justify-between">
-                    <CardTitle className="text-xl">{favorite.title}</CardTitle>
-                    <Badge 
-                      variant="secondary"
-                      className={`
-                        ${favorite.category === 'app' ? 'bg-cyan-100 text-cyan-800 dark:bg-cyan-900 dark:text-cyan-300' : ''}
-                        ${favorite.category === 'book' ? 'bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-300' : ''}
-                        ${favorite.category === 'podcast' ? 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300' : ''}
-                        ${favorite.category === 'music' ? 'bg-pink-100 text-pink-800 dark:bg-pink-900 dark:text-pink-300' : ''}
-                        ${favorite.category === 'video games' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300' : ''}
-                      `}
-                    >
-                      {favorite.category}
-                    </Badge>
-                  </div>
-                </CardHeader>
-                <CardContent className="flex-1 flex flex-col">
-                  {favorite.description && (
-                    <p className="text-muted-foreground mb-4">{favorite.description}</p>
+              favorite.link ? (
+                <a
+                  key={favorite.id}
+                  href={favorite.link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block transition-transform hover:scale-[1.02]"
+                >
+                  <Card className="flex flex-col h-full">
+                    {favorite.image && (
+                      <div 
+                        className="aspect-video bg-cover bg-center" 
+                        style={{ backgroundImage: `url(${favorite.image})` }}
+                      />
+                    )}
+                    <CardHeader>
+                      <div className="flex items-center justify-between">
+                        <CardTitle className="text-xl">{favorite.title}</CardTitle>
+                        <Badge 
+                          variant="secondary"
+                          className={`
+                            ${favorite.category === 'app' ? 'bg-cyan-100 text-cyan-800 dark:bg-cyan-900 dark:text-cyan-300' : ''}
+                            ${favorite.category === 'book' ? 'bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-300' : ''}
+                            ${favorite.category === 'podcast' ? 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300' : ''}
+                            ${favorite.category === 'music' ? 'bg-pink-100 text-pink-800 dark:bg-pink-900 dark:text-pink-300' : ''}
+                            ${favorite.category === 'video games' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300' : ''}
+                          `}
+                        >
+                          {favorite.category}
+                        </Badge>
+                      </div>
+                    </CardHeader>
+                    <CardContent className="flex-1">
+                      {favorite.description && (
+                        <p className="text-muted-foreground">{favorite.description}</p>
+                      )}
+                    </CardContent>
+                  </Card>
+                </a>
+              ) : (
+                <Card key={favorite.id} className="flex flex-col h-full">
+                  {/* Same card content for items without links */}
+                  {favorite.image && (
+                    <div 
+                      className="aspect-video bg-cover bg-center" 
+                      style={{ backgroundImage: `url(${favorite.image})` }}
+                    />
                   )}
-                  {favorite.link && (
-                    <a 
-                      href={favorite.link}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-primary hover:underline mt-auto inline-block"
-                    >
-                      Learn more →
-                    </a>
-                  )}
-                </CardContent>
-              </Card>
+                  <CardHeader>
+                    <div className="flex items-center justify-between">
+                      <CardTitle className="text-xl">{favorite.title}</CardTitle>
+                      <Badge 
+                        variant="secondary"
+                        className={`
+                          ${favorite.category === 'app' ? 'bg-cyan-100 text-cyan-800 dark:bg-cyan-900 dark:text-cyan-300' : ''}
+                          ${favorite.category === 'book' ? 'bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-300' : ''}
+                          ${favorite.category === 'podcast' ? 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300' : ''}
+                          ${favorite.category === 'music' ? 'bg-pink-100 text-pink-800 dark:bg-pink-900 dark:text-pink-300' : ''}
+                          ${favorite.category === 'video games' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300' : ''}
+                        `}
+                      >
+                        {favorite.category}
+                      </Badge>
+                    </div>
+                  </CardHeader>
+                  <CardContent className="flex-1">
+                    {favorite.description && (
+                      <p className="text-muted-foreground">{favorite.description}</p>
+                    )}
+                  </CardContent>
+                </Card>
+              )
             ))}
           </motion.div>
         </TabsContent>
