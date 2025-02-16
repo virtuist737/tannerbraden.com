@@ -67,6 +67,36 @@ export const newsletterSubscriptions = pgTable("newsletter_subscriptions", {
   subscribedAt: timestamp("subscribed_at").notNull().defaultNow(),
 });
 
+// Stories table
+export const stories = pgTable("stories", {
+  id: serial("id").primaryKey(),
+  title: text("title").notNull(),
+  content: text("content").notNull(),
+  image: text("image").notNull(),
+  date: timestamp("date").notNull().defaultNow(),
+  order: integer("order").notNull(),
+});
+
+// Interests table
+export const interests = pgTable("interests", {
+  id: serial("id").primaryKey(),
+  title: text("title").notNull(),
+  description: text("description").notNull(),
+  icon: text("icon").notNull(),
+  order: integer("order").notNull(),
+});
+
+// Favorites table
+export const favorites = pgTable("favorites", {
+  id: serial("id").primaryKey(),
+  title: text("title").notNull(),
+  category: text("category").notNull(),
+  description: text("description").notNull(),
+  link: text("link"),
+  image: text("image"),
+  order: integer("order").notNull(),
+});
+
 // Relations
 export const blogPostsRelations = relations(blogPosts, ({ one, many }) => ({
   author: one(users, {
@@ -107,6 +137,19 @@ export const insertNewsletterSubscriptionSchema = createInsertSchema(newsletterS
   email: true,
 });
 
+export const insertStorySchema = createInsertSchema(stories).omit({
+  id: true,
+  date: true,
+});
+
+export const insertInterestSchema = createInsertSchema(interests).omit({
+  id: true,
+});
+
+export const insertFavoriteSchema = createInsertSchema(favorites).omit({
+  id: true,
+});
+
 // Types for TypeScript
 export type User = typeof users.$inferSelect;
 export type InsertUser = z.infer<typeof insertUserSchema>;
@@ -122,3 +165,12 @@ export type InsertNewsletterSubscription = z.infer<typeof insertNewsletterSubscr
 
 export type PageView = typeof pageViews.$inferSelect;
 export type UserSession = typeof userSessions.$inferSelect;
+
+export type Story = typeof stories.$inferSelect;
+export type InsertStory = z.infer<typeof insertStorySchema>;
+
+export type Interest = typeof interests.$inferSelect;
+export type InsertInterest = z.infer<typeof insertInterestSchema>;
+
+export type Favorite = typeof favorites.$inferSelect;
+export type InsertFavorite = z.infer<typeof insertFavoriteSchema>;

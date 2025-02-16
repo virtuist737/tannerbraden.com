@@ -1,15 +1,41 @@
 import { motion } from "framer-motion";
+import { useQuery } from "@tanstack/react-query";
 import {
-  Briefcase,
-  GraduationCap,
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@/components/ui/tabs";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  BookOpen,
   Heart,
   Coffee,
   Code,
-  Palette,
+  Sparkles,
+  type LucideIcon
 } from "lucide-react";
-import Timeline from "@/components/about/Timeline";
+import type { Story, Interest, Favorite } from "@shared/schema";
 
 const About = () => {
+  const { data: stories } = useQuery<Story[]>({
+    queryKey: ["/api/about/stories"],
+  });
+
+  const { data: interests } = useQuery<Interest[]>({
+    queryKey: ["/api/about/interests"],
+  });
+
+  const { data: favorites } = useQuery<Favorite[]>({
+    queryKey: ["/api/about/favorites"],
+  });
+
   return (
     <div className="container py-12 space-y-16">
       {/* Bio Section */}
@@ -30,60 +56,98 @@ const About = () => {
         </motion.div>
       </section>
 
-      {/* Journey Section with Timeline */}
-      <section className="space-y-8">
-        <h2 className="text-3xl font-bold tracking-tighter">My Journey</h2>
-        <Timeline />
-      </section>
+      {/* Tabbed Content */}
+      <Tabs defaultValue="stories" className="space-y-8">
+        <TabsList className="grid w-full grid-cols-3 max-w-[400px] mx-auto">
+          <TabsTrigger value="stories">Stories</TabsTrigger>
+          <TabsTrigger value="interests">Interests</TabsTrigger>
+          <TabsTrigger value="favorites">Favorites</TabsTrigger>
+        </TabsList>
 
-      {/* Skills Section */}
-      <section className="space-y-8">
-        <h2 className="text-3xl font-bold tracking-tighter">What I Do</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          <div className="p-6 border rounded-lg space-y-4">
-            <Code className="h-8 w-8 text-primary" />
-            <h3 className="text-xl font-semibold">Web Development</h3>
-            <p className="text-muted-foreground">
-              Building responsive and performant web applications using modern
-              technologies.
-            </p>
-          </div>
-          <div className="p-6 border rounded-lg space-y-4">
-            <Palette className="h-8 w-8 text-primary" />
-            <h3 className="text-xl font-semibold">UI/UX Design</h3>
-            <p className="text-muted-foreground">
-              Creating intuitive and beautiful user interfaces with attention to
-              detail.
-            </p>
-          </div>
-          <div className="p-6 border rounded-lg space-y-4">
-            <Heart className="h-8 w-8 text-primary" />
-            <h3 className="text-xl font-semibold">Passion Projects</h3>
-            <p className="text-muted-foreground">
-              Working on side projects that push the boundaries of web technology.
-            </p>
-          </div>
-        </div>
-      </section>
+        {/* Stories Tab */}
+        <TabsContent value="stories" className="space-y-8">
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+          >
+            {stories?.map((story) => (
+              <Card key={story.id} className="overflow-hidden">
+                <div 
+                  className="aspect-video bg-cover bg-center" 
+                  style={{ backgroundImage: `url(${story.image})` }}
+                />
+                <CardHeader>
+                  <CardTitle>{story.title}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-muted-foreground">{story.content}</p>
+                </CardContent>
+              </Card>
+            ))}
+          </motion.div>
+        </TabsContent>
 
-      {/* Interests Section */}
-      <section className="space-y-8">
-        <h2 className="text-3xl font-bold tracking-tighter">
-          When I'm Not Coding
-        </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          <div className="flex gap-4">
-            <Coffee className="h-6 w-6 text-primary" />
-            <div>
-              <h3 className="text-xl font-semibold">Coffee Enthusiast</h3>
-              <p className="text-muted-foreground">
-                Always exploring new coffee shops and brewing methods.
-              </p>
-            </div>
-          </div>
-          {/* Add more interests here */}
-        </div>
-      </section>
+        {/* Interests Tab */}
+        <TabsContent value="interests" className="space-y-8">
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+          >
+            {interests?.map((interest) => (
+              <Card key={interest.id}>
+                <CardHeader>
+                  <div className="flex items-center gap-2">
+                    <span className="text-primary">{interest.icon}</span>
+                    <CardTitle>{interest.title}</CardTitle>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-muted-foreground">{interest.description}</p>
+                </CardContent>
+              </Card>
+            ))}
+          </motion.div>
+        </TabsContent>
+
+        {/* Favorites Tab */}
+        <TabsContent value="favorites" className="space-y-8">
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+          >
+            {favorites?.map((favorite) => (
+              <Card key={favorite.id}>
+                {favorite.image && (
+                  <div 
+                    className="aspect-video bg-cover bg-center" 
+                    style={{ backgroundImage: `url(${favorite.image})` }}
+                  />
+                )}
+                <CardHeader>
+                  <CardTitle>{favorite.title}</CardTitle>
+                  <CardDescription>{favorite.category}</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-muted-foreground">{favorite.description}</p>
+                  {favorite.link && (
+                    <a 
+                      href={favorite.link}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-primary hover:underline mt-2 inline-block"
+                    >
+                      Learn more →
+                    </a>
+                  )}
+                </CardContent>
+              </Card>
+            ))}
+          </motion.div>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };
