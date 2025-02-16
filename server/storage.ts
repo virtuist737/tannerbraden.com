@@ -1,39 +1,151 @@
-import { users, type User, type InsertUser } from "@shared/schema";
-
-// modify the interface with any CRUD methods
-// you might need
+import { eq, sql } from "drizzle-orm";
+import { db } from "./db";
+import {
+  users,
+  blogPosts,
+  blogComments,
+  pageViews,
+  userSessions,
+  newsletterSubscriptions,
+  type User,
+  type InsertUser,
+  type BlogPost,
+  type InsertBlogPost,
+  type BlogComment,
+  type InsertBlogComment,
+  type NewsletterSubscription,
+  type InsertNewsletterSubscription,
+  type PageView,
+  type UserSession,
+} from "@shared/schema";
 
 export interface IStorage {
+  // User operations
   getUser(id: number): Promise<User | undefined>;
   getUserByUsername(username: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
+
+  // Blog operations
+  createBlogPost(post: InsertBlogPost): Promise<BlogPost>;
+  getBlogPost(id: number): Promise<BlogPost | undefined>;
+  getBlogPostBySlug(slug: string): Promise<BlogPost | undefined>;
+  listBlogPosts(): Promise<BlogPost[]>;
+
+  // Comments operations
+  createBlogComment(comment: InsertBlogComment): Promise<BlogComment>;
+  getBlogComments(postId: number): Promise<BlogComment[]>;
+
+  // Newsletter operations
+  subscribeToNewsletter(email: string): Promise<NewsletterSubscription>;
+  confirmNewsletterSubscription(email: string): Promise<void>;
+
+  // Analytics operations
+  recordPageView(path: string, userAgent?: string, referrer?: string): Promise<PageView>;
+  getPageViews(startDate: Date, endDate: Date): Promise<PageView[]>;
+
+  // Session operations
+  createUserSession(sessionId: string, userId?: number): Promise<UserSession>;
+  updateUserSession(sessionId: string, endTime: Date): Promise<void>;
 }
 
-export class MemStorage implements IStorage {
-  private users: Map<number, User>;
-  currentId: number;
-
-  constructor() {
-    this.users = new Map();
-    this.currentId = 1;
-  }
-
+export class DatabaseStorage implements IStorage {
+  // User operations
   async getUser(id: number): Promise<User | undefined> {
-    return this.users.get(id);
+    const [user] = await db.select().from(users).where(eq(users.id, id));
+    return user;
   }
 
   async getUserByUsername(username: string): Promise<User | undefined> {
-    return Array.from(this.users.values()).find(
-      (user) => user.username === username,
-    );
+    const [user] = await db.select().from(users).where(eq(users.username, username));
+    return user;
   }
 
   async createUser(insertUser: InsertUser): Promise<User> {
-    const id = this.currentId++;
-    const user: User = { ...insertUser, id };
-    this.users.set(id, user);
+    const [user] = await db.insert(users).values(insertUser).returning();
     return user;
+  }
+
+  // Blog operations
+  async createBlogPost(post: InsertBlogPost): Promise<BlogPost> {
+    const [newPost] = await db.insert(blogPosts).values(post).returning();
+    return newPost;
+  }
+
+  async getBlogPost(id: number): Promise<BlogPost | undefined> {
+    const [post] = await db.select().from(blogPosts).where(eq(blogPosts.id, id));
+    return post;
+  }
+
+  async getBlogPostBySlug(slug: string): Promise<BlogPost | undefined> {
+    const [post] = await db.select().from(blogPosts).where(eq(blogPosts.slug, slug));
+    return post;
+  }
+
+  async listBlogPosts(): Promise<BlogPost[]> {
+    return db.select().from(blogPosts).orderBy(blogPosts.publishedAt);
+  }
+
+  // Comments operations
+  async createBlogComment(comment: InsertBlogComment): Promise<BlogComment> {
+    const [newComment] = await db.insert(blogComments).values(comment).returning();
+    return newComment;
+  }
+
+  async getBlogComments(postId: number): Promise<BlogComment[]> {
+    return db.select().from(blogComments).where(eq(blogComments.postId, postId));
+  }
+
+  // Newsletter operations
+  async subscribeToNewsletter(email: string): Promise<NewsletterSubscription> {
+    const [subscription] = await db
+      .insert(newsletterSubscriptions)
+      .values({ email })
+      .returning();
+    return subscription;
+  }
+
+  async confirmNewsletterSubscription(email: string): Promise<void> {
+    await db
+      .update(newsletterSubscriptions)
+      .set({ isConfirmed: true })
+      .where(eq(newsletterSubscriptions.email, email));
+  }
+
+  // Analytics operations
+  async recordPageView(
+    path: string,
+    userAgent?: string,
+    referrer?: string
+  ): Promise<PageView> {
+    const [pageView] = await db
+      .insert(pageViews)
+      .values({ path, userAgent, referrer })
+      .returning();
+    return pageView;
+  }
+
+  async getPageViews(startDate: Date, endDate: Date): Promise<PageView[]> {
+    return db
+      .select()
+      .from(pageViews)
+      .where(sql`${pageViews.timestamp} BETWEEN ${startDate} AND ${endDate}`);
+  }
+
+  // Session operations
+  async createUserSession(sessionId: string, userId?: number): Promise<UserSession> {
+    const [session] = await db
+      .insert(userSessions)
+      .values({ sessionId, userId })
+      .returning();
+    return session;
+  }
+
+  async updateUserSession(sessionId: string, endTime: Date): Promise<void> {
+    await db
+      .update(userSessions)
+      .set({ endTime })
+      .where(eq(userSessions.sessionId, sessionId));
   }
 }
 
-export const storage = new MemStorage();
+export const storage = new DatabaseStorage();
