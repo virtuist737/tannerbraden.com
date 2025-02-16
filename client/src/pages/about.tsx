@@ -32,10 +32,20 @@ const About = () => {
     queryKey: ["/api/about/favorites"],
   });
 
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const categories = Array.from(new Set(interests?.map(i => i.category) || []));
+  // Separate states for interests and favorites filters
+  const [selectedInterestCategory, setSelectedInterestCategory] = useState<string | null>(null);
+  const [selectedFavoriteCategory, setSelectedFavoriteCategory] = useState<string | null>(null);
+
+  // Separate category lists for interests and favorites
+  const interestCategories = Array.from(new Set(interests?.map(i => i.category) || []));
+  const favoriteCategories = Array.from(new Set(favorites?.map(f => f.category) || []));
+
   const filteredInterests = interests?.filter(
-    interest => !selectedCategory || interest.category === selectedCategory
+    interest => !selectedInterestCategory || interest.category === selectedInterestCategory
+  );
+
+  const filteredFavorites = favorites?.filter(
+    favorite => !selectedFavoriteCategory || favorite.category === selectedFavoriteCategory
   );
 
   return (
@@ -73,19 +83,19 @@ const About = () => {
           <div className="flex flex-wrap gap-2 items-center">
             <Filter className="h-4 w-4 mr-2 text-muted-foreground" />
             <Button
-              variant={selectedCategory === null ? "secondary" : "outline"}
+              variant={selectedInterestCategory === null ? "secondary" : "outline"}
               size="sm"
-              onClick={() => setSelectedCategory(null)}
+              onClick={() => setSelectedInterestCategory(null)}
               className="rounded-full"
             >
               All
             </Button>
-            {categories.map((category) => (
+            {interestCategories.map((category) => (
               <Button
                 key={category}
-                variant={selectedCategory === category ? "secondary" : "outline"}
+                variant={selectedInterestCategory === category ? "secondary" : "outline"}
                 size="sm"
-                onClick={() => setSelectedCategory(category)}
+                onClick={() => setSelectedInterestCategory(category)}
                 className="rounded-full"
               >
                 {category}
@@ -131,19 +141,19 @@ const About = () => {
           <div className="flex flex-wrap gap-2 items-center">
             <Filter className="h-4 w-4 mr-2 text-muted-foreground" />
             <Button
-              variant={selectedCategory === null ? "secondary" : "outline"}
+              variant={selectedFavoriteCategory === null ? "secondary" : "outline"}
               size="sm"
-              onClick={() => setSelectedCategory(null)}
+              onClick={() => setSelectedFavoriteCategory(null)}
               className="rounded-full"
             >
               All
             </Button>
-            {categories.map((category) => (
+            {favoriteCategories.map((category) => (
               <Button
                 key={category}
-                variant={selectedCategory === category ? "secondary" : "outline"}
+                variant={selectedFavoriteCategory === category ? "secondary" : "outline"}
                 size="sm"
-                onClick={() => setSelectedCategory(category)}
+                onClick={() => setSelectedFavoriteCategory(category)}
                 className="rounded-full"
               >
                 {category}
@@ -156,7 +166,7 @@ const About = () => {
             animate={{ opacity: 1 }}
             className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
           >
-            {favorites?.map((favorite) => (
+            {filteredFavorites?.map((favorite) => (
               <Card key={favorite.id}>
                 {favorite.image && (
                   <div 
