@@ -187,14 +187,21 @@ const About = () => {
                     <p className="text-muted-foreground mb-4">{favorite.description}</p>
                   )}
                   {favorite.link && (
-                    <a 
-                      href={favorite.link}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-primary hover:underline mt-auto inline-block"
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      asChild
+                      className="mt-auto"
                     >
-                      Learn more →
-                    </a>
+                      <a
+                        href={favorite.link}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        aria-label="External link"
+                      >
+                        <ExternalLink className="h-4 w-4" />
+                      </a>
+                    </Button>
                   )}
                 </CardContent>
               </Card>
