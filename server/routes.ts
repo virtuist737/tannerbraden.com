@@ -15,9 +15,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/blog/:slug", async (req, res) => {
+  app.get("/api/blog/:identifier", async (req, res) => {
     try {
-      const post = await storage.getBlogPostBySlug(req.params.slug);
+      let post;
+      // Try to parse as ID first
+      const id = parseInt(req.params.identifier);
+      if (!isNaN(id)) {
+        post = await storage.getBlogPost(id);
+      } else {
+        // If not a valid ID, treat as slug
+        post = await storage.getBlogPostBySlug(req.params.identifier);
+      }
+
       if (!post) {
         return res.status(404).json({ error: "Blog post not found" });
       }
