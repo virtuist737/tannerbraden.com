@@ -10,21 +10,10 @@ import {
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import {
-  BookOpen,
-  Heart,
-  Coffee,
-  Code,
-  Sparkles,
-  History,
-  type LucideIcon,
-  Filter,
-  Milestone,
-} from "lucide-react";
+import { Filter } from "lucide-react";
 import type { Timeline, Interest, Favorite } from "@shared/schema";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -44,9 +33,9 @@ const About = () => {
   });
 
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const categories = Array.from(new Set(favorites?.map(f => f.category) || []));
-  const filteredFavorites = favorites?.filter(
-    favorite => !selectedCategory || favorite.category === selectedCategory
+  const categories = Array.from(new Set(interests?.map(i => i.category) || []));
+  const filteredInterests = interests?.filter(
+    interest => !selectedCategory || interest.category === selectedCategory
   );
 
   return (
@@ -60,13 +49,13 @@ const About = () => {
         >
           <h1 className="text-4xl font-bold tracking-tighter mb-4">About Me</h1>
           <p className="text-xl text-muted-foreground">
-            I'm a partnerships and growth specialist with a deep drive to increase the quality of human consciousness. By combining my experience in partner marketing with my passion for building scalable solutions, I work to create meaningful impact through technology and collaboration. My background spans from growing partner programs by 398% to teaching in Taiwan, all while pursuing my mission to reduce suffering and promote human flourishing.
+            I'm a partnerships and growth specialist with a deep drive to increase the quality of human consciousness. By combining my experience in partner marketing with my passion for building scalable solutions, I work to create meaningful impact through technology and collaboration.
           </p>
         </motion.div>
       </section>
 
       {/* Tabbed Content */}
-      <Tabs defaultValue="timeline" className="space-y-8">
+      <Tabs defaultValue="interests" className="space-y-8">
         <TabsList className="grid w-full grid-cols-3 max-w-[400px] mx-auto">
           <TabsTrigger value="timeline">Timeline</TabsTrigger>
           <TabsTrigger value="interests">Interests</TabsTrigger>
@@ -80,34 +69,54 @@ const About = () => {
 
         {/* Interests Tab */}
         <TabsContent value="interests" className="space-y-8">
+          {/* Category Filter */}
+          <div className="flex flex-wrap gap-2 items-center">
+            <Filter className="h-4 w-4 mr-2 text-muted-foreground" />
+            <Button
+              variant={selectedCategory === null ? "secondary" : "outline"}
+              size="sm"
+              onClick={() => setSelectedCategory(null)}
+              className="rounded-full"
+            >
+              All
+            </Button>
+            {categories.map((category) => (
+              <Button
+                key={category}
+                variant={selectedCategory === category ? "secondary" : "outline"}
+                size="sm"
+                onClick={() => setSelectedCategory(category)}
+                className="rounded-full"
+              >
+                {category}
+              </Button>
+            ))}
+          </div>
+
           <motion.div 
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
           >
-            {interests?.map((interest) => (
+            {filteredInterests?.map((interest) => (
               <Card key={interest.id}>
                 <CardHeader>
                   <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <span className="text-primary">{interest.icon}</span>
-                      <CardTitle>{interest.title}</CardTitle>
-                    </div>
+                    <CardTitle>{interest.category}</CardTitle>
                     <Badge 
                       variant="secondary" 
                       className={`
-                        ${interest.category === 'Technology' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300' : ''}
-                        ${interest.category === 'Research' ? 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300' : ''}
-                        ${interest.category === 'Community' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300' : ''}
-                        ${interest.category === 'Design' ? 'bg-pink-100 text-pink-800 dark:bg-pink-900 dark:text-pink-300' : ''}
+                        ${interest.type === 'interests' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300' : ''}
+                        ${interest.type === 'instruments' ? 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300' : ''}
+                        ${interest.type === 'activities' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300' : ''}
                       `}
                     >
-                      {interest.category}
+                      {interest.type}
                     </Badge>
                   </div>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-muted-foreground">{interest.description}</p>
+                  <p className="text-muted-foreground">{interest.item}</p>
                 </CardContent>
               </Card>
             ))}
@@ -145,7 +154,7 @@ const About = () => {
             animate={{ opacity: 1 }}
             className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
           >
-            {filteredFavorites?.map((favorite) => (
+            {favorites?.map((favorite) => (
               <Card key={favorite.id}>
                 {favorite.image && (
                   <div 

@@ -70,11 +70,10 @@ export const timeline = pgTable("timeline", {
 // Interests table
 export const interests = pgTable("interests", {
   id: serial("id").primaryKey(),
-  title: text("title").notNull(),
-  description: text("description").notNull(),
-  icon: text("icon").notNull(),
   category: text("category").notNull(),
-  order: integer("order").notNull(),
+  type: text("type").notNull(),  // 'interests', 'instruments', 'activities'
+  item: text("item").notNull(),
+  sortOrder: integer("sort_order").notNull(),
 });
 
 // Favorites table
@@ -85,7 +84,7 @@ export const favorites = pgTable("favorites", {
   description: text("description"),
   link: text("link"),
   image: text("image"),
-  order: integer("order").notNull(),
+  sortOrder: integer("sort_order").notNull(),
 });
 
 // Relations
