@@ -3,11 +3,11 @@ import { motion } from "framer-motion";
 import { CalendarDays, Clock, Share2, Twitter, Facebook, Linkedin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import type { BlogPost } from "@/components/blog/BlogCard";
+import type { BlogPost } from "@shared/schema";
 import { useQuery } from "@tanstack/react-query";
 import { format } from "date-fns";
 
-const BlogPost = () => {
+const BlogPostPage = () => {
   const { slug } = useParams();
 
   const { data: post, isLoading } = useQuery<BlogPost>({
@@ -46,7 +46,7 @@ const BlogPost = () => {
   }
 
   const shareUrl = window.location.href;
-  const readingTime = post.readingTime || `${Math.ceil((post.content?.length || 0) / 1000)} min read`;
+  const readingTime = `${Math.ceil(post.content.length / 1000)} min read`;
 
   return (
     <div className="container py-12">
@@ -75,17 +75,20 @@ const BlogPost = () => {
           </div>
         </div>
 
-        <div className="aspect-video relative mt-8 overflow-hidden rounded-lg">
-          <img
-            src={post.coverImage}
-            alt={post.title}
-            className="object-cover w-full h-full"
-          />
-        </div>
+        {post.coverImage && (
+          <div className="aspect-video relative mt-8 overflow-hidden rounded-lg">
+            <img
+              src={post.coverImage}
+              alt={post.title}
+              className="object-cover w-full h-full"
+            />
+          </div>
+        )}
 
-        <div className="mt-8 prose prose-gray dark:prose-invert max-w-none">
-          {post.content}
-        </div>
+        <div 
+          className="mt-8 prose prose-gray dark:prose-invert max-w-none"
+          dangerouslySetInnerHTML={{ __html: post.content }}
+        />
 
         {/* Social Share */}
         <div className="mt-8 pt-8 border-t">
@@ -144,4 +147,4 @@ const BlogPost = () => {
   );
 };
 
-export default BlogPost;
+export default BlogPostPage;
