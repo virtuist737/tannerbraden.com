@@ -207,14 +207,14 @@ export class DatabaseStorage implements IStorage {
     return db
       .select()
       .from(interests)
-      .orderBy(interests.order);
+      .orderBy(interests.sortOrder);
   }
 
   async listFavorites(): Promise<Favorite[]> {
     return db
       .select()
       .from(favorites)
-      .orderBy(favorites.order);
+      .orderBy(favorites.sortOrder);
   }
 }
 
