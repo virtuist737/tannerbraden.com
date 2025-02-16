@@ -95,36 +95,11 @@ export function setupAuth(app: Express) {
     }
   });
 
-  app.post("/api/register", async (req, res, next) => {
-    try {
-      if (!req.body.username || !req.body.password) {
-        return res.status(400).json({ error: "Username and password are required" });
-      }
-
-      const existingUser = await storage.getUserByUsername(req.body.username);
-      if (existingUser) {
-        return res.status(400).json({ error: "Username already exists" });
-      }
-
-      const hashedPassword = await hashPassword(req.body.password);
-      const user = await storage.createUser({
-        ...req.body,
-        password: hashedPassword,
-      });
-
-      req.login(user, (err) => {
-        if (err) return next(err);
-        res.status(201).json(user);
-      });
-    } catch (error) {
-      console.error("Registration error:", error);
-      next(error);
-    }
-  });
-
   app.post("/api/login", (req, res, next) => {
-    // Add request body logging for debugging
-    console.log("Login request body:", req.body);
+    console.log("Login attempt:", { 
+      body: req.body,
+      headers: req.headers['content-type']
+    });
 
     if (!req.body.username || !req.body.password) {
       return res.status(400).json({ error: "Username and password are required" });
@@ -148,6 +123,33 @@ export function setupAuth(app: Express) {
     })(req, res, next);
   });
 
+  app.post("/api/register", async (req, res, next) => {
+    try {
+      if (!req.body.username || !req.body.password) {
+        return res.status(400).json({ error: "Username and password are required" });
+      }
+
+      const existingUser = await storage.getUserByUsername(req.body.username);
+      if (existingUser) {
+        return res.status(400).json({ error: "Username already exists" });
+      }
+
+      const hashedPassword = await hashPassword(req.body.password);
+      const user = await storage.createUser({
+        ...req.body,
+        password: hashedPassword,
+      });
+
+      req.login(user, (err) => {
+        if (err) return next(err);
+        res.status(201).json({ user });
+      });
+    } catch (error) {
+      console.error("Registration error:", error);
+      next(error);
+    }
+  });
+
   app.post("/api/logout", (req, res, next) => {
     req.logout((err) => {
       if (err) return next(err);
@@ -157,6 +159,6 @@ export function setupAuth(app: Express) {
 
   app.get("/api/user", (req, res) => {
     if (!req.isAuthenticated()) return res.sendStatus(401);
-    res.json(req.user);
+    res.json({ user: req.user });
   });
 }
