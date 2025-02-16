@@ -7,6 +7,7 @@ import {
   Code,
   Palette,
 } from "lucide-react";
+import Timeline from "@/components/about/Timeline";
 
 const About = () => {
   return (
@@ -29,37 +30,10 @@ const About = () => {
         </motion.div>
       </section>
 
-      {/* Journey Section */}
+      {/* Journey Section with Timeline */}
       <section className="space-y-8">
         <h2 className="text-3xl font-bold tracking-tighter">My Journey</h2>
-        <div className="grid gap-8">
-          <div className="flex gap-4">
-            <div className="flex-shrink-0">
-              <Briefcase className="h-6 w-6 text-primary" />
-            </div>
-            <div>
-              <h3 className="text-xl font-semibold">Senior Developer</h3>
-              <p className="text-muted-foreground">2020 - Present</p>
-              <p className="mt-2">
-                Leading development teams and architecting solutions for complex web
-                applications.
-              </p>
-            </div>
-          </div>
-          <div className="flex gap-4">
-            <div className="flex-shrink-0">
-              <GraduationCap className="h-6 w-6 text-primary" />
-            </div>
-            <div>
-              <h3 className="text-xl font-semibold">Computer Science Degree</h3>
-              <p className="text-muted-foreground">2016 - 2020</p>
-              <p className="mt-2">
-                Studied advanced programming concepts and software engineering
-                principles.
-              </p>
-            </div>
-          </div>
-        </div>
+        <Timeline />
       </section>
 
       {/* Skills Section */}
