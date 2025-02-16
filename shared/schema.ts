@@ -23,15 +23,6 @@ export const blogPosts = pgTable("blog_posts", {
   publishedAt: timestamp("published_at").notNull().defaultNow(),
 });
 
-// Blog comments table
-export const blogComments = pgTable("blog_comments", {
-  id: serial("id").primaryKey(),
-  content: text("content").notNull(),
-  authorId: integer("author_id").references(() => users.id),
-  postId: integer("post_id").references(() => blogPosts.id),
-  createdAt: timestamp("created_at").notNull().defaultNow(),
-});
-
 // Analytics - Page Views with enhanced tracking
 export const pageViews = pgTable("page_views", {
   id: serial("id").primaryKey(),
@@ -40,7 +31,6 @@ export const pageViews = pgTable("page_views", {
   duration: integer("duration"),
   userAgent: text("user_agent"),
   referrer: text("referrer"),
-  // New fields for enhanced analytics
   deviceType: text("device_type"),
   browser: text("browser"),
   platform: text("platform"),
@@ -99,22 +89,10 @@ export const favorites = pgTable("favorites", {
 });
 
 // Relations
-export const blogPostsRelations = relations(blogPosts, ({ one, many }) => ({
+export const blogPostsRelations = relations(blogPosts, ({ one }) => ({
   author: one(users, {
     fields: [blogPosts.authorId],
     references: [users.id],
-  }),
-  comments: many(blogComments),
-}));
-
-export const blogCommentsRelations = relations(blogComments, ({ one }) => ({
-  author: one(users, {
-    fields: [blogComments.authorId],
-    references: [users.id],
-  }),
-  post: one(blogPosts, {
-    fields: [blogComments.postId],
-    references: [blogPosts.id],
   }),
 }));
 
@@ -127,11 +105,6 @@ export const insertUserSchema = createInsertSchema(users).pick({
 export const insertBlogPostSchema = createInsertSchema(blogPosts).omit({
   id: true,
   publishedAt: true,
-});
-
-export const insertBlogCommentSchema = createInsertSchema(blogComments).omit({
-  id: true,
-  createdAt: true,
 });
 
 export const insertNewsletterSubscriptionSchema = createInsertSchema(newsletterSubscriptions).pick({
@@ -156,9 +129,6 @@ export type InsertUser = z.infer<typeof insertUserSchema>;
 
 export type BlogPost = typeof blogPosts.$inferSelect;
 export type InsertBlogPost = z.infer<typeof insertBlogPostSchema>;
-
-export type BlogComment = typeof blogComments.$inferSelect;
-export type InsertBlogComment = z.infer<typeof insertBlogCommentSchema>;
 
 export type NewsletterSubscription = typeof newsletterSubscriptions.$inferSelect;
 export type InsertNewsletterSubscription = z.infer<typeof insertNewsletterSubscriptionSchema>;
