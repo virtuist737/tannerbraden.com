@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { ResponsiveContainer, LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip } from "recharts";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Eye, Clock, MousePointer, PenSquare, Mail, Smartphone } from "lucide-react";
+import { Eye, Clock, MousePointer, PenSquare, Mail, Smartphone, History, Heart, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
 import { useQuery } from "@tanstack/react-query";
@@ -102,7 +102,7 @@ const Dashboard = () => {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">
-                {metrics.deviceBreakdown?.mobile 
+                {metrics.deviceBreakdown?.mobile
                   ? ((metrics.deviceBreakdown.mobile / metrics.totalViews) * 100).toFixed(0)
                   : 0}%
               </div>
@@ -111,7 +111,7 @@ const Dashboard = () => {
           </Card>
         </div>
 
-        <div className="grid gap-4 grid-cols-1 sm:grid-cols-2">
+        <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
           <Link href="/admin/blog">
             <Card className="hover:bg-accent transition-colors cursor-pointer">
               <CardHeader>
@@ -128,6 +128,52 @@ const Dashboard = () => {
             </Card>
           </Link>
 
+          <Link href="/admin/timeline">
+            <Card className="hover:bg-accent transition-colors cursor-pointer">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <History className="h-5 w-5" />
+                  Timeline Management
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground">
+                  Manage your professional timeline and experiences
+                </p>
+              </CardContent>
+            </Card>
+          </Link>
+
+          <Link href="/admin/interests">
+            <Card className="hover:bg-accent transition-colors cursor-pointer">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Heart className="h-5 w-5" />
+                  Interests Management
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground">
+                  Update and organize your interests and activities
+                </p>
+              </CardContent>
+            </Card>
+          </Link>
+          <Link href="/admin/favorites">
+            <Card className="hover:bg-accent transition-colors cursor-pointer">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Star className="h-5 w-5" />
+                  Favorites Management
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground">
+                  Curate and manage your favorite items
+                </p>
+              </CardContent>
+            </Card>
+          </Link>
           <Link href="/admin/newsletter">
             <Card className="hover:bg-accent transition-colors cursor-pointer">
               <CardHeader>
@@ -155,14 +201,12 @@ const Dashboard = () => {
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart data={pageViews}>
                     <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis 
-                      dataKey="timestamp" 
+                    <XAxis
+                      dataKey="timestamp"
                       tickFormatter={(value) => new Date(value).toLocaleDateString()}
                     />
                     <YAxis />
-                    <Tooltip 
-                      labelFormatter={(value) => new Date(value).toLocaleString()}
-                    />
+                    <Tooltip labelFormatter={(value) => new Date(value).toLocaleString()} />
                     <Line
                       type="monotone"
                       dataKey="count"
