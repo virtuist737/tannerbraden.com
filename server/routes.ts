@@ -1,12 +1,56 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertBlogPostSchema, insertNewsletterSubscriptionSchema } from "@shared/schema";
+import { insertBlogPostSchema, insertNewsletterSubscriptionSchema, insertTimelineSchema } from "@shared/schema";
 import { isAuthenticated } from "./auth";
 import * as UAParser from "ua-parser-js";
 import { upload } from "./lib/upload";
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Timeline Routes
+  app.post("/api/timeline", isAuthenticated, async (req, res) => {
+    try {
+      const parsedBody = insertTimelineSchema.safeParse(req.body);
+      if (!parsedBody.success) {
+        return res.status(400).json({ error: "Invalid timeline data" });
+      }
+
+      const timeline = await storage.createTimeline(parsedBody.data);
+      res.status(201).json(timeline);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to create timeline entry" });
+    }
+  });
+
+  app.patch("/api/timeline/:id", isAuthenticated, async (req, res) => {
+    try {
+      const parsedBody = insertTimelineSchema.partial().safeParse(req.body);
+      if (!parsedBody.success) {
+        return res.status(400).json({ error: "Invalid timeline data" });
+      }
+
+      const timeline = await storage.updateTimeline(parseInt(req.params.id), parsedBody.data);
+      if (!timeline) {
+        return res.status(404).json({ error: "Timeline entry not found" });
+      }
+      res.json(timeline);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to update timeline entry" });
+    }
+  });
+
+  app.delete("/api/timeline/:id", isAuthenticated, async (req, res) => {
+    try {
+      const success = await storage.deleteTimeline(parseInt(req.params.id));
+      if (!success) {
+        return res.status(404).json({ error: "Timeline entry not found" });
+      }
+      res.status(204).end();
+    } catch (error) {
+      res.status(500).json({ error: "Failed to delete timeline entry" });
+    }
+  });
+
   // Blog Routes
   app.get("/api/blog", async (req, res) => {
     try {

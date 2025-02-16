@@ -9,7 +9,7 @@ import {
   pageViews,
   userSessions,
   newsletterSubscriptions,
-  timeline,
+  timeline as timelineTable, // Added import for timeline table
   interests,
   favorites,
   type User,
@@ -22,7 +22,8 @@ import {
   type UserSession,
   type Timeline,
   type Interest,
-  type Favorite
+  type Favorite,
+  type InsertTimeline, // Added import for InsertTimeline type
 } from "@shared/schema";
 
 const PostgresSessionStore = connectPg(session);
@@ -67,6 +68,11 @@ export interface IStorage {
   updateTimelineImage(id: number, imageUrl: string): Promise<Timeline>;
   updateInterestImage(id: number, imageUrl: string): Promise<Interest>;
   updateFavoriteImage(id: number, imageUrl: string): Promise<Favorite>;
+
+  // Timeline management methods
+  createTimeline(timeline: InsertTimeline): Promise<Timeline>;
+  updateTimeline(id: number, updates: Partial<InsertTimeline>): Promise<Timeline | undefined>;
+  deleteTimeline(id: number): Promise<boolean>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -204,8 +210,8 @@ export class DatabaseStorage implements IStorage {
   async listTimeline(): Promise<Timeline[]> {
     return db
       .select()
-      .from(timeline)
-      .orderBy(timeline.date);
+      .from(timelineTable)
+      .orderBy(timelineTable.date);
   }
 
   async listInterests(): Promise<Interest[]> {
@@ -225,9 +231,9 @@ export class DatabaseStorage implements IStorage {
   // Image update methods
   async updateTimelineImage(id: number, imageUrl: string): Promise<Timeline> {
     const [updated] = await db
-      .update(timeline)
+      .update(timelineTable)
       .set({ imageUrl })
-      .where(eq(timeline.id, id))
+      .where(eq(timelineTable.id, id))
       .returning();
     return updated;
   }
@@ -248,6 +254,29 @@ export class DatabaseStorage implements IStorage {
       .where(eq(favorites.id, id))
       .returning();
     return updated;
+  }
+
+  // Timeline management implementation
+  async createTimeline(timeline: InsertTimeline): Promise<Timeline> {
+    const [newTimeline] = await db.insert(timelineTable).values(timeline).returning();
+    return newTimeline;
+  }
+
+  async updateTimeline(id: number, updates: Partial<InsertTimeline>): Promise<Timeline | undefined> {
+    const [updatedTimeline] = await db
+      .update(timelineTable)
+      .set(updates)
+      .where(eq(timelineTable.id, id))
+      .returning();
+    return updatedTimeline;
+  }
+
+  async deleteTimeline(id: number): Promise<boolean> {
+    const [deletedTimeline] = await db
+      .delete(timelineTable)
+      .where(eq(timelineTable.id, id))
+      .returning();
+    return !!deletedTimeline;
   }
 }
 
