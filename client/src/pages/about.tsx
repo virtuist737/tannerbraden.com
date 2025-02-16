@@ -1,17 +1,61 @@
 import { motion } from "framer-motion";
+import { useQuery } from "@tanstack/react-query";
 import {
+  BookOpen,
+  Brain,
   Briefcase,
-  GraduationCap,
-  Heart,
   Coffee,
-  Code,
-  Palette,
+  Heart,
+  LibraryBig,
+  Shapes,
+  Trophy,
 } from "lucide-react";
+import { Helmet } from 'react-helmet-async';
 import Timeline from "@/components/about/Timeline";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import type {
+  LifeStory,
+  Philosophy,
+  Experience,
+  Hobby,
+} from "@shared/schema";
 
 const About = () => {
+  const { data: lifeStory } = useQuery<LifeStory[]>({
+    queryKey: ["/api/content/life-story"],
+  });
+
+  const { data: philosophy } = useQuery<Philosophy[]>({
+    queryKey: ["/api/content/philosophy"],
+  });
+
+  const { data: experience } = useQuery<Experience[]>({
+    queryKey: ["/api/content/experience"],
+  });
+
+  const { data: hobbies } = useQuery<Hobby[]>({
+    queryKey: ["/api/content/hobbies"],
+  });
+
   return (
     <div className="container py-12 space-y-16">
+      <Helmet>
+        <title>About Me - My Journey and Philosophy</title>
+        <meta name="description" content="Learn about my journey, philosophy, and what drives me in my professional and personal life." />
+      </Helmet>
+
       {/* Bio Section */}
       <section className="max-w-4xl mx-auto space-y-8">
         <motion.div
@@ -21,67 +65,123 @@ const About = () => {
         >
           <h1 className="text-4xl font-bold tracking-tighter mb-4">About Me</h1>
           <p className="text-xl text-muted-foreground">
-            I'm a passionate web developer with a love for creating beautiful,
-            functional, and user-friendly websites. With several years of
-            experience in the industry, I've worked on a wide range of projects
-            that have helped me develop a deep understanding of modern web
-            technologies.
+            {lifeStory?.[0]?.content || "Loading my story..."}
           </p>
         </motion.div>
       </section>
 
       {/* Journey Section with Timeline */}
-      <section className="space-y-8">
+      <section id="journey" className="space-y-8">
         <h2 className="text-3xl font-bold tracking-tighter">My Journey</h2>
-        <Timeline />
+        <div className="grid gap-6">
+          {lifeStory?.map((story, index) => (
+            <motion.div
+              key={story.id}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: index * 0.1 }}
+            >
+              <Card>
+                <CardHeader>
+                  <CardTitle>{story.title}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-muted-foreground">{story.content}</p>
+                </CardContent>
+              </Card>
+            </motion.div>
+          ))}
+        </div>
       </section>
 
-      {/* Skills Section */}
-      <section className="space-y-8">
-        <h2 className="text-3xl font-bold tracking-tighter">What I Do</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          <div className="p-6 border rounded-lg space-y-4">
-            <Code className="h-8 w-8 text-primary" />
-            <h3 className="text-xl font-semibold">Web Development</h3>
-            <p className="text-muted-foreground">
-              Building responsive and performant web applications using modern
-              technologies.
-            </p>
-          </div>
-          <div className="p-6 border rounded-lg space-y-4">
-            <Palette className="h-8 w-8 text-primary" />
-            <h3 className="text-xl font-semibold">UI/UX Design</h3>
-            <p className="text-muted-foreground">
-              Creating intuitive and beautiful user interfaces with attention to
-              detail.
-            </p>
-          </div>
-          <div className="p-6 border rounded-lg space-y-4">
-            <Heart className="h-8 w-8 text-primary" />
-            <h3 className="text-xl font-semibold">Passion Projects</h3>
-            <p className="text-muted-foreground">
-              Working on side projects that push the boundaries of web technology.
-            </p>
-          </div>
+      {/* Philosophy Section */}
+      <section id="philosophy" className="space-y-8">
+        <h2 className="text-3xl font-bold tracking-tighter">My Philosophy</h2>
+        <Accordion type="single" collapsible className="w-full">
+          {philosophy?.map((item) => (
+            <AccordionItem key={item.id} value={item.category}>
+              <AccordionTrigger className="text-xl font-semibold">
+                {item.title}
+              </AccordionTrigger>
+              <AccordionContent>
+                <div className="prose dark:prose-invert max-w-none">
+                  {item.content.split('\n').map((paragraph, idx) => (
+                    <p key={idx} className="text-muted-foreground">{paragraph}</p>
+                  ))}
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+          ))}
+        </Accordion>
+      </section>
+
+      {/* Professional Experience */}
+      <section id="experience" className="space-y-8">
+        <h2 className="text-3xl font-bold tracking-tighter">Professional Experience</h2>
+        <div className="grid gap-6">
+          {experience?.map((role, index) => (
+            <motion.div
+              key={`${role.company}-${role.role}`}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: index * 0.1 }}
+            >
+              <Card>
+                <CardHeader>
+                  <CardTitle>{role.company}</CardTitle>
+                  <CardDescription>
+                    {role.role} • {role.period}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {role.responsibilities && role.responsibilities.length > 0 && (
+                    <div>
+                      <h4 className="font-semibold mb-2">Key Responsibilities:</h4>
+                      <ul className="list-disc list-inside space-y-1">
+                        {role.responsibilities.map((resp, idx) => (
+                          <li key={idx} className="text-muted-foreground">{resp}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                  {role.achievements && role.achievements.length > 0 && (
+                    <div>
+                      <h4 className="font-semibold mb-2">Key Achievements:</h4>
+                      <ul className="list-disc list-inside space-y-1">
+                        {role.achievements.map((achievement, idx) => (
+                          <li key={idx} className="text-muted-foreground">{achievement}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </motion.div>
+          ))}
         </div>
       </section>
 
       {/* Interests Section */}
-      <section className="space-y-8">
+      <section id="interests" className="space-y-8">
         <h2 className="text-3xl font-bold tracking-tighter">
-          When I'm Not Coding
+          Interests & Hobbies
         </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          <div className="flex gap-4">
-            <Coffee className="h-6 w-6 text-primary" />
-            <div>
-              <h3 className="text-xl font-semibold">Coffee Enthusiast</h3>
-              <p className="text-muted-foreground">
-                Always exploring new coffee shops and brewing methods.
-              </p>
-            </div>
-          </div>
-          {/* Add more interests here */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {hobbies?.map((hobby, index) => (
+            <motion.div
+              key={hobby.id}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: index * 0.1 }}
+            >
+              <Card>
+                <CardHeader>
+                  <CardTitle>{hobby.name}</CardTitle>
+                  <CardDescription>{hobby.category}</CardDescription>
+                </CardHeader>
+              </Card>
+            </motion.div>
+          ))}
         </div>
       </section>
     </div>

@@ -10,6 +10,14 @@ import {
   pageViews,
   userSessions,
   newsletterSubscriptions,
+  lifeStory,
+  lifePurpose,
+  personalityTraits,
+  personalityWeaknesses,
+  philosophy,
+  experience,
+  recommendations,
+  hobbies,
   type User,
   type InsertUser,
   type BlogPost,
@@ -20,6 +28,18 @@ import {
   type InsertNewsletterSubscription,
   type PageView,
   type UserSession,
+  type LifeStory,
+  type InsertLifeStory,
+  type LifePurpose,
+  type InsertLifePurpose,
+  type PersonalityTrait,
+  type InsertPersonalityTrait,
+  type Philosophy,
+  type InsertPhilosophy,
+  type Experience,
+  type InsertExperience,
+  type Recommendation,
+  type Hobby
 } from "@shared/schema";
 
 const PostgresSessionStore = connectPg(session);
@@ -58,6 +78,24 @@ export interface IStorage {
 
   // Session store for authentication
   sessionStore: session.Store;
+
+  // Content operations
+  listLifeStories(): Promise<LifeStory[]>;
+  getLifePurpose(): Promise<LifePurpose | undefined>;
+  listPersonalityTraits(): Promise<PersonalityTrait[]>;
+  listPersonalityWeaknesses(): Promise<string[]>;
+  listPhilosophy(): Promise<Philosophy[]>;
+  listExperience(): Promise<Experience[]>;
+  listRecommendations(): Promise<Recommendation[]>;
+  listHobbies(): Promise<Hobby[]>;
+
+  // Content management operations
+  createLifeStory(story: InsertLifeStory): Promise<LifeStory>;
+  createLifePurpose(purpose: InsertLifePurpose): Promise<LifePurpose>;
+  createPersonalityTrait(trait: InsertPersonalityTrait): Promise<PersonalityTrait>;
+  createPhilosophy(philosophy: InsertPhilosophy): Promise<Philosophy>;
+  createExperience(experience: InsertExperience): Promise<Experience>;
+  createPersonalityWeakness(weakness: { weakness: string }): Promise<{ id: number; weakness: string }>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -199,6 +237,75 @@ export class DatabaseStorage implements IStorage {
       .update(userSessions)
       .set({ endTime })
       .where(eq(userSessions.sessionId, sessionId));
+  }
+
+  // Content operations
+  async listLifeStories(): Promise<LifeStory[]> {
+    return db.select().from(lifeStory).orderBy(lifeStory.order);
+  }
+
+  async getLifePurpose(): Promise<LifePurpose | undefined> {
+    const [purpose] = await db.select().from(lifePurpose);
+    return purpose;
+  }
+
+  async listPersonalityTraits(): Promise<PersonalityTrait[]> {
+    return db.select().from(personalityTraits);
+  }
+
+  async listPersonalityWeaknesses(): Promise<string[]> {
+    const weaknesses = await db.select().from(personalityWeaknesses);
+    return weaknesses.map((w) => w.weakness);
+  }
+
+  async listPhilosophy(): Promise<Philosophy[]> {
+    return db.select().from(philosophy);
+  }
+
+  async listExperience(): Promise<Experience[]> {
+    return db.select().from(experience).orderBy(sql`${experience.period} DESC`);
+  }
+
+  async listRecommendations(): Promise<Recommendation[]> {
+    return db.select().from(recommendations);
+  }
+
+  async listHobbies(): Promise<Hobby[]> {
+    return db.select().from(hobbies);
+  }
+
+  // Content management operations
+  async createLifeStory(story: InsertLifeStory): Promise<LifeStory> {
+    const [newStory] = await db.insert(lifeStory).values(story).returning();
+    return newStory;
+  }
+
+  async createLifePurpose(purpose: InsertLifePurpose): Promise<LifePurpose> {
+    const [newPurpose] = await db.insert(lifePurpose).values(purpose).returning();
+    return newPurpose;
+  }
+
+  async createPersonalityTrait(trait: InsertPersonalityTrait): Promise<PersonalityTrait> {
+    const [newTrait] = await db.insert(personalityTraits).values(trait).returning();
+    return newTrait;
+  }
+
+  async createPhilosophy(philosophy: InsertPhilosophy): Promise<Philosophy> {
+    const [newPhilosophy] = await db.insert(philosophy).values(philosophy).returning();
+    return newPhilosophy;
+  }
+
+  async createExperience(exp: InsertExperience): Promise<Experience> {
+    const [newExperience] = await db.insert(experience).values(exp).returning();
+    return newExperience;
+  }
+
+  async createPersonalityWeakness(data: { weakness: string }): Promise<{ id: number; weakness: string }> {
+    const [newWeakness] = await db
+      .insert(personalityWeaknesses)
+      .values(data)
+      .returning();
+    return newWeakness;
   }
 }
 
