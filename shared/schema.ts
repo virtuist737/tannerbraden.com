@@ -10,71 +10,7 @@ export const users = pgTable("users", {
   password: text("password").notNull(),
 });
 
-// Life Story sections
-export const lifeStory = pgTable("life_story", {
-  id: serial("id").primaryKey(),
-  title: text("title").notNull(),
-  content: text("content").notNull(),
-  order: integer("order").notNull(),
-});
-
-// Life Purpose
-export const lifePurpose = pgTable("life_purpose", {
-  id: serial("id").primaryKey(),
-  summary: text("summary").notNull(),
-  opportunities: text("opportunities").array(),
-});
-
-// Personality
-export const personalityTraits = pgTable("personality_traits", {
-  id: serial("id").primaryKey(),
-  category: text("category").notNull(), // 'bigFive' or 'mbti'
-  name: text("name").notNull(),
-  description: text("description").notNull(),
-});
-
-export const personalityWeaknesses = pgTable("personality_weaknesses", {
-  id: serial("id").primaryKey(),
-  weakness: text("weakness").notNull(),
-});
-
-// Philosophy
-export const philosophy = pgTable("philosophy", {
-  id: serial("id").primaryKey(),
-  category: text("category").notNull(), // 'virtues', 'freeWill', 'religion'
-  title: text("title"),
-  content: text("content").notNull(),
-});
-
-// Professional Experience
-export const experience = pgTable("experience", {
-  id: serial("id").primaryKey(),
-  company: text("company").notNull(),
-  role: text("role").notNull(),
-  type: text("type").notNull(),
-  period: text("period").notNull(),
-  duration: text("duration"),
-  responsibilities: text("responsibilities").array(),
-  achievements: text("achievements").array(),
-});
-
-// Recommendations
-export const recommendations = pgTable("recommendations", {
-  id: serial("id").primaryKey(),
-  category: text("category").notNull(), // 'books', 'apps', 'music', 'podcasts'
-  name: text("name").notNull(),
-  description: text("description"),
-  subcategory: text("subcategory"), // e.g., 'fantasy', 'sciFi' for books
-});
-
-// Hobbies
-export const hobbies = pgTable("hobbies", {
-  id: serial("id").primaryKey(),
-  category: text("category").notNull(),
-  name: text("name").notNull(),
-});
-
-// Blog posts table (existing)
+// Blog posts table
 export const blogPosts = pgTable("blog_posts", {
   id: serial("id").primaryKey(),
   slug: text("slug").notNull().unique(),
@@ -171,34 +107,6 @@ export const insertNewsletterSubscriptionSchema = createInsertSchema(newsletterS
   email: true,
 });
 
-export const insertLifeStorySchema = createInsertSchema(lifeStory).omit({
-  id: true,
-});
-
-export const insertLifePurposeSchema = createInsertSchema(lifePurpose).omit({
-  id: true,
-});
-
-export const insertPersonalityTraitSchema = createInsertSchema(personalityTraits).omit({
-  id: true,
-});
-
-export const insertPhilosophySchema = createInsertSchema(philosophy).omit({
-  id: true,
-});
-
-export const insertExperienceSchema = createInsertSchema(experience).omit({
-  id: true,
-});
-
-export const insertRecommendationSchema = createInsertSchema(recommendations).omit({
-  id: true,
-});
-
-export const insertHobbySchema = createInsertSchema(hobbies).omit({
-  id: true,
-});
-
 // Types for TypeScript
 export type User = typeof users.$inferSelect;
 export type InsertUser = z.infer<typeof insertUserSchema>;
@@ -214,24 +122,3 @@ export type InsertNewsletterSubscription = z.infer<typeof insertNewsletterSubscr
 
 export type PageView = typeof pageViews.$inferSelect;
 export type UserSession = typeof userSessions.$inferSelect;
-
-export type LifeStory = typeof lifeStory.$inferSelect;
-export type InsertLifeStory = z.infer<typeof insertLifeStorySchema>;
-
-export type LifePurpose = typeof lifePurpose.$inferSelect;
-export type InsertLifePurpose = z.infer<typeof insertLifePurposeSchema>;
-
-export type PersonalityTrait = typeof personalityTraits.$inferSelect;
-export type InsertPersonalityTrait = z.infer<typeof insertPersonalityTraitSchema>;
-
-export type Philosophy = typeof philosophy.$inferSelect;
-export type InsertPhilosophy = z.infer<typeof insertPhilosophySchema>;
-
-export type Experience = typeof experience.$inferSelect;
-export type InsertExperience = z.infer<typeof insertExperienceSchema>;
-
-export type Recommendation = typeof recommendations.$inferSelect;
-export type InsertRecommendation = z.infer<typeof insertRecommendationSchema>;
-
-export type Hobby = typeof hobbies.$inferSelect;
-export type InsertHobby = z.infer<typeof insertHobbySchema>;
