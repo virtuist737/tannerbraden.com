@@ -52,7 +52,7 @@ const Dashboard = () => {
   );
 
   return (
-    <div className="container px-4 py-6 sm:py-8 md:py-12">
+    <div className="py-6 sm:py-8 md:py-12">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}

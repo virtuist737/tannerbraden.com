@@ -40,12 +40,14 @@ function App() {
     <HelmetProvider>
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
-          <div className="min-h-screen flex flex-col">
-            <Navbar />
-            <main className="flex-grow">
-              <Router />
-            </main>
-            {location !== "/404" && <Footer />}
+          <div className="min-h-screen flex flex-col bg-background">
+            <div className="max-w-screen-2xl w-full mx-auto px-6 sm:px-8 lg:px-12">
+              <Navbar />
+              <main className="flex-grow">
+                <Router />
+              </main>
+              {location !== "/404" && <Footer />}
+            </div>
           </div>
           <Toaster />
         </AuthProvider>
