@@ -157,7 +157,7 @@ const About = () => {
             animate={{ opacity: 1 }}
             className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
           >
-            {filteredFavorites?.sort((a, b) => (a.order ?? 0) - (b.order ?? 0)).map((favorite) => (
+            {filteredFavorites?.sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0)).map((favorite) => (
               favorite.link ? (
                 <a
                   key={favorite.id}
@@ -199,7 +199,6 @@ const About = () => {
                 </a>
               ) : (
                 <Card key={favorite.id} className="flex flex-col h-full">
-                  {/* Same card content for items without links */}
                   {favorite.image && (
                     <div 
                       className="aspect-video bg-cover bg-center" 

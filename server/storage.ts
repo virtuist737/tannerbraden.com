@@ -62,6 +62,11 @@ export interface IStorage {
   listTimeline(): Promise<Timeline[]>;
   listInterests(): Promise<Interest[]>;
   listFavorites(): Promise<Favorite[]>;
+
+  // Image update methods
+  updateTimelineImage(id: number, imageUrl: string): Promise<Timeline>;
+  updateInterestImage(id: number, imageUrl: string): Promise<Interest>;
+  updateFavoriteImage(id: number, imageUrl: string): Promise<Favorite>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -215,6 +220,34 @@ export class DatabaseStorage implements IStorage {
       .select()
       .from(favorites)
       .orderBy(favorites.sortOrder);
+  }
+
+  // Image update methods
+  async updateTimelineImage(id: number, imageUrl: string): Promise<Timeline> {
+    const [updated] = await db
+      .update(timeline)
+      .set({ imageUrl })
+      .where(eq(timeline.id, id))
+      .returning();
+    return updated;
+  }
+
+  async updateInterestImage(id: number, imageUrl: string): Promise<Interest> {
+    const [updated] = await db
+      .update(interests)
+      .set({ imageUrl })
+      .where(eq(interests.id, id))
+      .returning();
+    return updated;
+  }
+
+  async updateFavoriteImage(id: number, imageUrl: string): Promise<Favorite> {
+    const [updated] = await db
+      .update(favorites)
+      .set({ image: imageUrl })
+      .where(eq(favorites.id, id))
+      .returning();
+    return updated;
   }
 }
 

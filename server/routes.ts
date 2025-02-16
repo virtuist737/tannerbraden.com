@@ -4,6 +4,7 @@ import { storage } from "./storage";
 import { insertBlogPostSchema, insertNewsletterSubscriptionSchema } from "@shared/schema";
 import { isAuthenticated } from "./auth";
 import * as UAParser from "ua-parser-js";
+import { upload } from "./lib/upload";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Blog Routes
@@ -203,6 +204,70 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(favorites);
     } catch (error) {
       res.status(500).json({ error: "Failed to fetch favorites" });
+    }
+  });
+
+  // Image Upload Routes
+  app.post("/api/upload/timeline/:id", isAuthenticated, upload.single("image"), async (req, res) => {
+    try {
+      if (!req.file) {
+        return res.status(400).json({ error: "No image file provided" });
+      }
+
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ error: "Invalid timeline ID" });
+      }
+
+      const imageUrl = (req.file as any).path; // Cloudinary URL
+      await storage.updateTimelineImage(id, imageUrl);
+
+      res.json({ imageUrl });
+    } catch (error) {
+      console.error("Error uploading timeline image:", error);
+      res.status(500).json({ error: "Failed to upload image" });
+    }
+  });
+
+  app.post("/api/upload/interest/:id", isAuthenticated, upload.single("image"), async (req, res) => {
+    try {
+      if (!req.file) {
+        return res.status(400).json({ error: "No image file provided" });
+      }
+
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ error: "Invalid interest ID" });
+      }
+
+      const imageUrl = (req.file as any).path; // Cloudinary URL
+      await storage.updateInterestImage(id, imageUrl);
+
+      res.json({ imageUrl });
+    } catch (error) {
+      console.error("Error uploading interest image:", error);
+      res.status(500).json({ error: "Failed to upload image" });
+    }
+  });
+
+  app.post("/api/upload/favorite/:id", isAuthenticated, upload.single("image"), async (req, res) => {
+    try {
+      if (!req.file) {
+        return res.status(400).json({ error: "No image file provided" });
+      }
+
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ error: "Invalid favorite ID" });
+      }
+
+      const imageUrl = (req.file as any).path; // Cloudinary URL
+      await storage.updateFavoriteImage(id, imageUrl);
+
+      res.json({ imageUrl });
+    } catch (error) {
+      console.error("Error uploading favorite image:", error);
+      res.status(500).json({ error: "Failed to upload image" });
     }
   });
 

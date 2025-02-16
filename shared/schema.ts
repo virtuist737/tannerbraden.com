@@ -57,26 +57,28 @@ export const newsletterSubscriptions = pgTable("newsletter_subscriptions", {
   subscribedAt: timestamp("subscribed_at").notNull().defaultNow(),
 });
 
-// Timeline table
+// Timeline table - adding imageUrl
 export const timeline = pgTable("timeline", {
   id: serial("id").primaryKey(),
   title: text("title").notNull(),
   content: text("content").notNull(),
-  date: text("date").notNull(), // Changed from timestamp to text for YYYY-MM-DD format
+  date: text("date").notNull(),
   icon: text("icon").notNull(),
   category: text("category").notNull(),
+  imageUrl: text("image_url"), // New field
 });
 
-// Interests table
+// Interests table - adding imageUrl
 export const interests = pgTable("interests", {
   id: serial("id").primaryKey(),
   category: text("category").notNull(),
-  type: text("type").notNull(),  // 'interests', 'instruments', 'activities'
+  type: text("type").notNull(),
   item: text("item").notNull(),
   sortOrder: integer("sort_order").notNull(),
+  imageUrl: text("image_url"), // New field
 });
 
-// Favorites table
+// Favorites table remains unchanged since it already has an image field
 export const favorites = pgTable("favorites", {
   id: serial("id").primaryKey(),
   title: text("title").notNull(),
@@ -112,6 +114,8 @@ export const insertNewsletterSubscriptionSchema = createInsertSchema(newsletterS
 
 export const insertInterestSchema = createInsertSchema(interests).omit({
   id: true,
+}).extend({
+  imageUrl: z.string().optional(),
 });
 
 export const insertFavoriteSchema = createInsertSchema(favorites).omit({
@@ -120,6 +124,8 @@ export const insertFavoriteSchema = createInsertSchema(favorites).omit({
 
 export const insertTimelineSchema = createInsertSchema(timeline).omit({
   id: true,
+}).extend({
+  imageUrl: z.string().optional(),
 });
 
 // Types for TypeScript
