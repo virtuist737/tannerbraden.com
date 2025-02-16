@@ -1,0 +1,58 @@
+// src/content/lifeStory.js (continued)
+export const lifeStoryContinued = {
+  sections: [
+    {
+      title: "Falling in Love",
+      content: `In the whirlwind of my hectic college life, where making friends felt like trying to catch a shooting star, I stumbled upon something even more dazzling—the love of my life.
+
+Picture this: I'm singing in a choir during my second semester of college and in walks Rebekah, a burst of radiance in human form. She wasn't just beautiful; she was the whole package—kind, talented, humble, and fun. Cupid's aim was spot-on because I fell head-over-heels faster than you can say "love at first note."
+
+Now, I must admit, I was a bit of a lousy suitor. Dates? Ha, what are those? I didn't have time for traditional courting, but I did the best I could with homework marathons, tag-team cooking capers, and stealing every precious spare minute to be together.
+
+Fast forward a mere two months, and there I was, asking Rebekah to be my exclusive girlfriend. And in a blink of six months, with a speed that would make even The Flash raise an eyebrow, I popped the big question.
+
+But this wasn't your run-of-the-mill dinner-and-ring affair. Oh no, I pulled out all the stops. I rallied a battalion of friends and family and together we transformed the Utah State University Bell Tower into a love-filled wonderland. Lights, pictures, the whole shebang.
+
+And because I believe in going big or going home, I spent months crafting a heartstring-tugging masterpiece—"Time and Eternity." This wasn't just any song; it was an ode to our journey and my unwavering desire to traverse the sands of time with her.
+
+Now, here comes the masterstroke: I slyly orchestrated a covert mission to lure her into the bell tower at night, all under the guise of a clandestine escapade. Little did she know, a symphony of lights and the sweet strains of "Time and Eternity" awaited her. I strummed the guitar, sang out my serenade, and then I dropped to one knee and unveiled the ring.
+
+Rebekah was a special girl that deserved a special proposal, and I think I delivered just that. Thankfully, she said yes!
+
+Rebekah and I tied the knot on 3/3/2018, and let me tell you, the journey has been nothing short of an epic adventure. Back when I proposed, I knew she was amazing, but I didn't fully grasp my sheer luck of having her love.
+
+She's been my anchor through stormy seas, the queen of patience in the face of my many quirks, and a true beacon of love and forgiveness. We've weathered tempests, navigated uncharted waters, and sailed through the chaos of unexpected upheavals. Yet, through it all, her love has been a steady lighthouse guiding us home.
+
+So here I am, head over heels, eternally grateful to share my life with this incredible woman. She's not just my partner in crime; she's the co-author of this wild, beautiful story we're living.`
+    },
+    {
+      title: "Faith Deconstruction",
+      content: `Less than a year into our marriage, I found myself in the midst of one of those "unexpected upheavals". A series of conversations with some truly admirable individuals shook the foundations of my religious beliefs, exposing cracks and inconsistencies that demanded my attention. Cue the existential crisis: "What do I actually believe, and why?"
+
+Buckle up, because the next six months saw me on a deep dive into the murky waters of self-discovery. I immersed myself in religious texts, delved into the intricacies of philosophy (specifically epistemology), and had heart-to-heart interviews with thinkers from all walks of life. The result? A Cartesian dismantling of my belief system. Out with the old, in with a fresh start on the mother of all questions: "What do I value?"
+
+The journey wasn't a stroll in the park. It was a trek through pain, fear, and confusion. But emerge I did with a clear vision of my values, beliefs, and the reasoning behind them. Religious doctrines were no longer in my playbook. Instead, I followed the example of Benjamin Franklin and crafted ten virtues I aspire to and embraced the scientific method as our best toolkit for unraveling the mysteries of reality.
+
+I still harbor warm sentiments toward the Mormon religion. It played a significant role in my life, surrounding me with good friends and role models who nudged me toward good decisions and set me on a positive trajectory from the get-go. It's a chapter in my story, one that I appreciate for the good it brought.`
+    },
+    {
+      title: "China Trip",
+      content: `A year into our marriage, the universe handed us a phenomenal opportunity—a month-long stint in China. We stayed in 四川省 (Sichuan Province) where I taught English at local schools while Rebekah finished her degree with a few remaining online classes.
+
+Our home base was a quaint little town named 邛崃 (Qionglai), a locale that gifted us an authentic taste of life in that corner of China. Oh, and let's not forget the jaw-dropping week we spent in 西安 (Xi'an), where we stood face to clay face with the 兵马俑 (Terracotta Army).
+
+Wanderlust? Guilty as charged. This escapade was just the beginning of what we envision to be an endless series of international adventures. It can be eye-opening and inspiring to witness how folks on the other side of the globe live their lives. It's not just about places; it's about the people, the stories, and the shared humanity that binds us all. Here's to many more stamps on our passports and countless tales waiting to unfold!`
+    },
+    {
+      title: "Graduation",
+      content: `The following year unfolded with Rebekah taking on the brave role of a 4th-grade teacher, while I saw my undergraduate rollercoaster through to the end. Even with the crazy curveball of the COVID-19 pandemic, Rebekah provided a year of top-notch learning to her students and graduated Summa Cum Laude with a shiny 3.97 GPA.`
+    },
+    {
+      title: "Parenthood",
+      content: `Fast forward about six months post-graduation, and Rebekah decided that she wanted to be a mother. I was admittedly hesitant, but I agreed knowing that I wanted to be a father eventually and didn't have the heart to deny Rebekah something she'd dreamed of her entire life. I had no idea what I had signed up for.
+
+This journey into parenthood was akin to boarding a rollercoaster without knowing the twists and turns. Rebekah's pregnancy as a nine-month saga of unrelenting nausea. And then the childbirth didn't go well at all, resulting in an emergency cesarean section where our baby boy - Ryker - almost didn't make it. He was then taken to the NICU for a suspenseful nine-day stay.
+
+We braced ourselves for potential lifelong health and mental challenges for Ryker, but thankfully, he emerged with just one major issue—severe, projectile spit up. Picture this: more than 50 spit-ups a day, necessitating a battlefield of towels and my stylish towel-ponchos during Ryker duty.
+
+This plunge into the waters of fatherhood (pun intended) was more than I bargained for; it shattered me into someone unrecognizable from the happy, passionate, and energetic person I used to be. I was severely depressed and anxious for a long time. But with each passing month
