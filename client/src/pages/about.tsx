@@ -20,10 +20,12 @@ import {
   Coffee,
   Code,
   Sparkles,
+  History,
   type LucideIcon,
   Filter,
+  Milestone,
 } from "lucide-react";
-import type { Story, Interest, Favorite } from "@shared/schema";
+import type { Timeline, Interest, Favorite } from "@shared/schema";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 
@@ -38,8 +40,8 @@ const categoryColors = {
 } as const;
 
 const About = () => {
-  const { data: stories } = useQuery<Story[]>({
-    queryKey: ["/api/about/stories"],
+  const { data: timeline } = useQuery<Timeline[]>({
+    queryKey: ["/api/about/timeline"],
   });
 
   const { data: interests } = useQuery<Interest[]>({
@@ -51,11 +53,7 @@ const About = () => {
   });
 
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-
-  // Get unique categories from favorites
   const categories = Array.from(new Set(favorites?.map(f => f.category) || []));
-
-  // Filter favorites based on selected category
   const filteredFavorites = favorites?.filter(
     favorite => !selectedCategory || favorite.category === selectedCategory
   );
@@ -81,33 +79,59 @@ const About = () => {
       </section>
 
       {/* Tabbed Content */}
-      <Tabs defaultValue="stories" className="space-y-8">
+      <Tabs defaultValue="timeline" className="space-y-8">
         <TabsList className="grid w-full grid-cols-3 max-w-[400px] mx-auto">
-          <TabsTrigger value="stories">Stories</TabsTrigger>
+          <TabsTrigger value="timeline">Timeline</TabsTrigger>
           <TabsTrigger value="interests">Interests</TabsTrigger>
           <TabsTrigger value="favorites">Favorites</TabsTrigger>
         </TabsList>
 
-        {/* Stories Tab */}
-        <TabsContent value="stories" className="space-y-8">
+        {/* Timeline Tab */}
+        <TabsContent value="timeline" className="space-y-8">
           <motion.div 
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+            className="relative max-w-2xl mx-auto"
           >
-            {stories?.map((story) => (
-              <Card key={story.id} className="overflow-hidden">
-                <div 
-                  className="aspect-video bg-cover bg-center" 
-                  style={{ backgroundImage: `url(${story.image})` }}
-                />
-                <CardHeader>
-                  <CardTitle>{story.title}</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-muted-foreground">{story.content}</p>
-                </CardContent>
-              </Card>
+            {/* Vertical line */}
+            <div className="absolute left-8 top-0 bottom-0 w-0.5 bg-border" />
+
+            {/* Timeline items */}
+            {timeline?.map((event, index) => (
+              <motion.div
+                key={event.id}
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: index * 0.1 }}
+                className="relative pl-20 pb-10"
+              >
+                {/* Timeline dot */}
+                <div className="absolute left-[29px] w-4 h-4 rounded-full bg-primary" />
+
+                <Card>
+                  <CardHeader>
+                    <div className="flex items-center gap-2">
+                      <span className="text-2xl text-primary">
+                        {event.icon}
+                      </span>
+                      <div>
+                        <CardTitle>{event.title}</CardTitle>
+                        <CardDescription>
+                          {new Date(event.date).toLocaleDateString("en-US", {
+                            year: 'numeric',
+                            month: 'long'
+                          })}
+                        </CardDescription>
+                      </div>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-muted-foreground whitespace-pre-wrap">
+                      {event.content}
+                    </p>
+                  </CardContent>
+                </Card>
+              </motion.div>
             ))}
           </motion.div>
         </TabsContent>

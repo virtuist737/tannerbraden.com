@@ -179,12 +179,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // About Page Routes
-  app.get("/api/about/stories", async (req, res) => {
+  app.get("/api/about/timeline", async (req, res) => {
     try {
-      const stories = await storage.listStories();
-      res.json(stories);
+      const timelineEvents = await storage.listTimeline();
+      res.json(timelineEvents);
     } catch (error) {
-      res.status(500).json({ error: "Failed to fetch stories" });
+      res.status(500).json({ error: "Failed to fetch timeline" });
     }
   });
 

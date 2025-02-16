@@ -10,6 +10,9 @@ import {
   pageViews,
   userSessions,
   newsletterSubscriptions,
+  timeline,
+  interests,
+  favorites,
   type User,
   type InsertUser,
   type BlogPost,
@@ -20,12 +23,7 @@ import {
   type InsertNewsletterSubscription,
   type PageView,
   type UserSession,
-} from "@shared/schema";
-import {
-  stories,
-  interests,
-  favorites,
-  type Story,
+  type Timeline,
   type Interest,
   type Favorite
 } from "@shared/schema";
@@ -68,7 +66,7 @@ export interface IStorage {
   sessionStore: session.Store;
 
   // About page methods
-  listStories(): Promise<Story[]>;
+  listTimeline(): Promise<Timeline[]>;
   listInterests(): Promise<Interest[]>;
   listFavorites(): Promise<Favorite[]>;
 }
@@ -215,11 +213,11 @@ export class DatabaseStorage implements IStorage {
   }
 
   // About page methods
-  async listStories(): Promise<Story[]> {
+  async listTimeline(): Promise<Timeline[]> {
     return db
       .select()
-      .from(stories)
-      .orderBy(stories.order);
+      .from(timeline)
+      .orderBy(timeline.date);
   }
 
   async listInterests(): Promise<Interest[]> {

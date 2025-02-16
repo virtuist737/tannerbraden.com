@@ -67,13 +67,14 @@ export const newsletterSubscriptions = pgTable("newsletter_subscriptions", {
   subscribedAt: timestamp("subscribed_at").notNull().defaultNow(),
 });
 
-// Stories table
-export const stories = pgTable("stories", {
+// Timeline table
+export const timeline = pgTable("timeline", {
   id: serial("id").primaryKey(),
   title: text("title").notNull(),
   content: text("content").notNull(),
-  image: text("image").notNull(),
-  date: timestamp("date").notNull().defaultNow(),
+  date: timestamp("date").notNull(),
+  icon: text("icon").notNull(),
+  category: text("category").notNull(),
   order: integer("order").notNull(),
 });
 
@@ -138,16 +139,15 @@ export const insertNewsletterSubscriptionSchema = createInsertSchema(newsletterS
   email: true,
 });
 
-export const insertStorySchema = createInsertSchema(stories).omit({
-  id: true,
-  date: true,
-});
-
 export const insertInterestSchema = createInsertSchema(interests).omit({
   id: true,
 });
 
 export const insertFavoriteSchema = createInsertSchema(favorites).omit({
+  id: true,
+});
+
+export const insertTimelineSchema = createInsertSchema(timeline).omit({
   id: true,
 });
 
@@ -167,11 +167,11 @@ export type InsertNewsletterSubscription = z.infer<typeof insertNewsletterSubscr
 export type PageView = typeof pageViews.$inferSelect;
 export type UserSession = typeof userSessions.$inferSelect;
 
-export type Story = typeof stories.$inferSelect;
-export type InsertStory = z.infer<typeof insertStorySchema>;
-
 export type Interest = typeof interests.$inferSelect;
 export type InsertInterest = z.infer<typeof insertInterestSchema>;
 
 export type Favorite = typeof favorites.$inferSelect;
 export type InsertFavorite = z.infer<typeof insertFavoriteSchema>;
+
+export type Timeline = typeof timeline.$inferSelect;
+export type InsertTimeline = z.infer<typeof insertTimelineSchema>;
