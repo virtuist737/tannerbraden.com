@@ -35,6 +35,8 @@ export interface IStorage {
   getBlogPost(id: number): Promise<BlogPost | undefined>;
   getBlogPostBySlug(slug: string): Promise<BlogPost | undefined>;
   listBlogPosts(): Promise<BlogPost[]>;
+  updateBlogPost(id: number, updates: Partial<InsertBlogPost>): Promise<BlogPost | undefined>;
+  deleteBlogPost(id: number): Promise<boolean>;
 
   // Comments operations
   createBlogComment(comment: InsertBlogComment): Promise<BlogComment>;
@@ -43,6 +45,7 @@ export interface IStorage {
   // Newsletter operations
   subscribeToNewsletter(email: string): Promise<NewsletterSubscription>;
   confirmNewsletterSubscription(email: string): Promise<void>;
+  listNewsletterSubscribers(): Promise<NewsletterSubscription[]>;
 
   // Analytics operations
   recordPageView(path: string, userAgent?: string, referrer?: string): Promise<PageView>;
@@ -102,6 +105,23 @@ export class DatabaseStorage implements IStorage {
     return db.select().from(blogPosts).orderBy(blogPosts.publishedAt);
   }
 
+  async updateBlogPost(id: number, updates: Partial<InsertBlogPost>): Promise<BlogPost | undefined> {
+    const [updatedPost] = await db
+      .update(blogPosts)
+      .set(updates)
+      .where(eq(blogPosts.id, id))
+      .returning();
+    return updatedPost;
+  }
+
+  async deleteBlogPost(id: number): Promise<boolean> {
+    const [deletedPost] = await db
+      .delete(blogPosts)
+      .where(eq(blogPosts.id, id))
+      .returning();
+    return !!deletedPost;
+  }
+
   // Comments operations
   async createBlogComment(comment: InsertBlogComment): Promise<BlogComment> {
     const [newComment] = await db.insert(blogComments).values(comment).returning();
@@ -126,6 +146,13 @@ export class DatabaseStorage implements IStorage {
       .update(newsletterSubscriptions)
       .set({ isConfirmed: true })
       .where(eq(newsletterSubscriptions.email, email));
+  }
+
+  async listNewsletterSubscribers(): Promise<NewsletterSubscription[]> {
+    return db
+      .select()
+      .from(newsletterSubscriptions)
+      .orderBy(newsletterSubscriptions.createdAt);
   }
 
   // Analytics operations
