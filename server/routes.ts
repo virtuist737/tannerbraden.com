@@ -227,9 +227,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/about/timeline", async (req, res) => {
     try {
       const timelineEvents = await storage.listTimeline();
+      if (!timelineEvents) {
+        return res.status(404).json({ error: "No timeline entries found" });
+      }
       res.json(timelineEvents);
     } catch (error) {
-      res.status(500).json({ error: "Failed to fetch timeline" });
+      console.error("Error fetching timeline:", error);
+      res.status(500).json({ error: "Failed to fetch timeline", details: error.message });
     }
   });
 
