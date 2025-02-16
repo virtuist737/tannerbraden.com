@@ -53,7 +53,7 @@ const Blog = () => {
         <div className="text-center space-y-4">
           <h1 className="text-4xl font-bold tracking-tighter">Blog</h1>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Thoughts, tutorials and insights about web development and design.
+            Stream of consciousness.
           </p>
         </div>
 
