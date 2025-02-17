@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
@@ -8,14 +7,15 @@ import { useAuth } from "@/hooks/use-auth";
 interface ImageUploadProps {
   imageUrl?: string | null;
   entityId: number;
-  entityType: 'timeline' | 'interest' | 'favorite';
+  entityType: 'timeline' | 'interest' | 'favorite' | 'blog' | 'project';
   onSuccess?: (newImageUrl: string) => void;
 }
 
 export const ImageUpload = ({ imageUrl, entityId, entityType, onSuccess }: ImageUploadProps) => {
   const { toast } = useToast();
   const [isUploading, setIsUploading] = useState(false);
-  const { isAuthenticated } = useAuth();
+  const { user } = useAuth();
+  const isAuthenticated = !!user;
 
   const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];

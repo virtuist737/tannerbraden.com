@@ -26,12 +26,13 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { type BlogPost } from "@shared/schema";
+import { ImageUpload } from "@/components/shared/ImageUpload";
 
 const blogFormSchema = insertBlogPostSchema.extend({
   title: z.string().min(1, "Title is required"),
   content: z.string().min(1, "Content is required"),
   excerpt: z.string().min(1, "Excerpt is required"),
-  coverImage: z.string().min(1, "Cover image URL is required"),
+  coverImage: z.string().optional(),
   category: z.string().min(1, "Category is required"),
 });
 
@@ -80,11 +81,9 @@ const BlogForm = ({ initialData, onSubmit, isSubmitting }: BlogFormProps) => {
     },
   });
 
-  // Auto-generate slug when title changes
   const onTitleChange = (title: string) => {
     form.setValue("title", title);
     if (!initialData) {
-      // Only auto-generate slug for new posts
       const slug = slugify(title, { lower: true, strict: true });
       form.setValue("slug", slug);
     }
@@ -131,20 +130,23 @@ const BlogForm = ({ initialData, onSubmit, isSubmitting }: BlogFormProps) => {
           name="coverImage"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Cover Image URL</FormLabel>
+              <FormLabel>Cover Image</FormLabel>
               <FormControl>
-                <Input {...field} />
+                {initialData?.id && (
+                  <ImageUpload
+                    imageUrl={field.value || null}
+                    entityId={initialData.id}
+                    entityType="blog"
+                    onSuccess={(url) => field.onChange(url)}
+                  />
+                )}
+                {!initialData?.id && (
+                  <div className="text-sm text-muted-foreground">
+                    Save the post first to enable image upload
+                  </div>
+                )}
               </FormControl>
               <FormMessage />
-              {field.value && (
-                <div className="aspect-video relative mt-2 overflow-hidden rounded-lg">
-                  <img
-                    src={field.value}
-                    alt="Cover preview"
-                    className="object-cover w-full h-full"
-                  />
-                </div>
-              )}
             </FormItem>
           )}
         />

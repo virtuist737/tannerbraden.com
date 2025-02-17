@@ -1,13 +1,13 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { 
-  insertBlogPostSchema, 
-  insertNewsletterSubscriptionSchema, 
+import {
+  insertBlogPostSchema,
+  insertNewsletterSubscriptionSchema,
   insertTimelineSchema,
-  insertFavoriteSchema, 
+  insertFavoriteSchema,
   insertInterestSchema,
-  insertProjectSchema 
+  insertProjectSchema
 } from "@shared/schema";
 import { isAuthenticated } from "./auth";
 import * as UAParser from "ua-parser-js";
@@ -173,6 +173,36 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(204).end();
     } catch (error) {
       res.status(500).json({ error: "Failed to delete blog post" });
+    }
+  });
+
+  // Add new route for blog post image upload
+  app.post("/api/upload/blog/:id", isAuthenticated, upload.single("image"), async (req, res) => {
+    try {
+      if (!req.file) {
+        return res.status(400).json({ error: "No image file provided" });
+      }
+
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ error: "Invalid blog post ID" });
+      }
+
+      const fileName = `${Date.now()}-${req.file.originalname}`;
+      const filePath = path.join(__dirname, '../client/public/images', fileName);
+
+      await fs.promises.writeFile(filePath, req.file.buffer);
+
+      // Update the blog post's cover image
+      const updatedPost = await storage.updateBlogPost(id, { coverImage: fileName });
+      if (!updatedPost) {
+        return res.status(404).json({ error: "Blog post not found" });
+      }
+
+      res.json({ imageUrl: fileName });
+    } catch (error) {
+      console.error("Error uploading blog post image:", error);
+      res.status(500).json({ error: "Failed to upload image" });
     }
   });
 
@@ -428,7 +458,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const fileName = `${Date.now()}-${req.file.originalname}`;
       const filePath = path.join(__dirname, '../client/public/images', fileName);
-      
+
       await fs.promises.writeFile(filePath, req.file.buffer);
       await storage.updateTimelineImage(id, fileName);
 
@@ -452,7 +482,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const fileName = `${Date.now()}-${req.file.originalname}`;
       const filePath = path.join(__dirname, '../client/public/images', fileName);
-      
+
       await fs.promises.writeFile(filePath, req.file.buffer);
       await storage.updateInterestImage(id, fileName);
 
@@ -476,7 +506,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const fileName = `${Date.now()}-${req.file.originalname}`;
       const filePath = path.join(__dirname, '../client/public/images', fileName);
-      
+
       await fs.promises.writeFile(filePath, req.file.buffer);
       await storage.updateFavoriteImage(id, fileName);
 
@@ -501,11 +531,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/projects", isAuthenticated, async (req, res) => {
     try {
       console.log("Received project data:", JSON.stringify(req.body, null, 2));
-      
+
       const parsedBody = insertProjectSchema.safeParse(req.body);
       if (!parsedBody.success) {
         console.error("Validation errors:", parsedBody.error.errors);
-        return res.status(400).json({ 
+        return res.status(400).json({
           error: "Invalid project data",
           details: parsedBody.error.errors
         });
@@ -518,7 +548,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         error: error instanceof Error ? error.message : error,
         stack: error instanceof Error ? error.stack : undefined
       });
-      res.status(500).json({ 
+      res.status(500).json({
         error: "Failed to create project",
         details: error instanceof Error ? error.message : "Unknown error"
       });
