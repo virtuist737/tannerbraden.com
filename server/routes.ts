@@ -12,6 +12,8 @@ import {
 import { isAuthenticated } from "./auth";
 import * as UAParser from "ua-parser-js";
 import { upload } from "./lib/upload";
+import path from "path";
+import fs from "fs";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Timeline Routes
@@ -448,10 +450,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "Invalid interest ID" });
       }
 
-      const imageUrl = (req.file as any).path; // Cloudinary URL
-      await storage.updateInterestImage(id, imageUrl);
+      const fileName = `${Date.now()}-${req.file.originalname}`;
+      const filePath = path.join(__dirname, '../client/public/images', fileName);
+      
+      await fs.promises.writeFile(filePath, req.file.buffer);
+      await storage.updateInterestImage(id, fileName);
 
-      res.json({ imageUrl });
+      res.json({ imageUrl: fileName });
     } catch (error) {
       console.error("Error uploading interest image:", error);
       res.status(500).json({ error: "Failed to upload image" });
@@ -469,10 +474,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "Invalid favorite ID" });
       }
 
-      const imageUrl = (req.file as any).path; // Cloudinary URL
-      await storage.updateFavoriteImage(id, imageUrl);
+      const fileName = `${Date.now()}-${req.file.originalname}`;
+      const filePath = path.join(__dirname, '../client/public/images', fileName);
+      
+      await fs.promises.writeFile(filePath, req.file.buffer);
+      await storage.updateFavoriteImage(id, fileName);
 
-      res.json({ imageUrl });
+      res.json({ imageUrl: fileName });
     } catch (error) {
       console.error("Error uploading favorite image:", error);
       res.status(500).json({ error: "Failed to upload image" });
