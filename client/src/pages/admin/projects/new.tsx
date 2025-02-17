@@ -82,12 +82,13 @@ export default function NewProject() {
   const onSubmit = (data: InsertProject) => {
     const formattedData = {
       ...data,
-      technologies: Array.isArray(data.technologies) 
-        ? data.technologies.map(tech => tech.trim()).filter(Boolean)
-        : data.technologies.split(',').map(tech => tech.trim()).filter(Boolean),
-      sortOrder: Number(data.sortOrder),
+      technologies: typeof data.technologies === 'string' 
+        ? data.technologies.split(',').map(tech => tech.trim()).filter(Boolean)
+        : data.technologies || [],
+      sortOrder: Number(data.sortOrder) || 0,
+      featured: Boolean(data.featured),
     };
-    console.log("Formatted data:", formattedData); // Debug log
+    console.log("Formatted data:", JSON.stringify(formattedData, null, 2));
     createMutation.mutate(formattedData);
   };
 
