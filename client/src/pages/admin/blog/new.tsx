@@ -5,7 +5,7 @@ import { apiRequest } from "@/lib/queryClient";
 import type { InsertBlogPost } from "@shared/schema";
 import BlogForm from "@/components/blog/BlogForm";
 import { Link } from "wouter"; // Assuming wouter is used for Link
-import { Button } from "@components/ui/button"; // Assuming Button component is from @components/ui/button
+import { Button } from "@/components/ui/button";
 import { ChevronLeft } from "lucide-react"; // Assuming ChevronLeft is from lucide-react
 
 
