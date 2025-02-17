@@ -1,11 +1,16 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertBlogPostSchema, insertNewsletterSubscriptionSchema, insertTimelineSchema } from "@shared/schema";
+import { 
+  insertBlogPostSchema, 
+  insertNewsletterSubscriptionSchema, 
+  insertTimelineSchema,
+  insertFavoriteSchema, 
+  insertInterestSchema 
+} from "@shared/schema";
 import { isAuthenticated } from "./auth";
 import * as UAParser from "ua-parser-js";
 import { upload } from "./lib/upload";
-import {insertInterestSchema} from "@shared/schema" //importing the missing schema
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Timeline Routes
@@ -342,6 +347,66 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(favorites);
     } catch (error) {
       res.status(500).json({ error: "Failed to fetch favorites" });
+    }
+  });
+
+  // Favorites Routes
+  app.get("/api/about/favorites/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ error: "Invalid favorite ID" });
+      }
+      const favorite = await storage.getFavorite(id);
+      if (!favorite) {
+        return res.status(404).json({ error: "Favorite not found" });
+      }
+      res.json(favorite);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch favorite" });
+    }
+  });
+
+  app.post("/api/about/favorites", isAuthenticated, async (req, res) => {
+    try {
+      const parsedBody = insertFavoriteSchema.safeParse(req.body);
+      if (!parsedBody.success) {
+        return res.status(400).json({ error: "Invalid favorite data" });
+      }
+
+      const favorite = await storage.createFavorite(parsedBody.data);
+      res.status(201).json(favorite);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to create favorite" });
+    }
+  });
+
+  app.patch("/api/about/favorites/:id", isAuthenticated, async (req, res) => {
+    try {
+      const parsedBody = insertFavoriteSchema.partial().safeParse(req.body);
+      if (!parsedBody.success) {
+        return res.status(400).json({ error: "Invalid favorite data" });
+      }
+
+      const favorite = await storage.updateFavorite(parseInt(req.params.id), parsedBody.data);
+      if (!favorite) {
+        return res.status(404).json({ error: "Favorite not found" });
+      }
+      res.json(favorite);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to update favorite" });
+    }
+  });
+
+  app.delete("/api/about/favorites/:id", isAuthenticated, async (req, res) => {
+    try {
+      const success = await storage.deleteFavorite(parseInt(req.params.id));
+      if (!success) {
+        return res.status(404).json({ error: "Favorite not found" });
+      }
+      res.status(204).end();
+    } catch (error) {
+      res.status(500).json({ error: "Failed to delete favorite" });
     }
   });
 

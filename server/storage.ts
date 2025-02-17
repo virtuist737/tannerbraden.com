@@ -24,7 +24,8 @@ import {
   type Interest,
   type Favorite,
   type InsertTimeline,
-  type InsertInterest, // Added type InsertInterest
+  type InsertInterest,
+  type InsertFavorite, // Added type InsertFavorite
 } from "@shared/schema";
 
 const PostgresSessionStore = connectPg(session);
@@ -80,6 +81,12 @@ export interface IStorage {
   createInterest(interest: InsertInterest): Promise<Interest>;
   updateInterest(id: number, updates: Partial<InsertInterest>): Promise<Interest | undefined>;
   deleteInterest(id: number): Promise<boolean>;
+
+  // Add Favorite operations
+  getFavorite(id: number): Promise<Favorite | undefined>;
+  createFavorite(favorite: InsertFavorite): Promise<Favorite>;
+  updateFavorite(id: number, updates: Partial<InsertFavorite>): Promise<Favorite | undefined>;
+  deleteFavorite(id: number): Promise<boolean>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -312,6 +319,34 @@ export class DatabaseStorage implements IStorage {
       .where(eq(interests.id, id))
       .returning();
     return !!deletedInterest;
+  }
+
+  // Favorite operations
+  async getFavorite(id: number): Promise<Favorite | undefined> {
+    const [favorite] = await db.select().from(favorites).where(eq(favorites.id, id));
+    return favorite;
+  }
+
+  async createFavorite(favorite: InsertFavorite): Promise<Favorite> {
+    const [newFavorite] = await db.insert(favorites).values(favorite).returning();
+    return newFavorite;
+  }
+
+  async updateFavorite(id: number, updates: Partial<InsertFavorite>): Promise<Favorite | undefined> {
+    const [updatedFavorite] = await db
+      .update(favorites)
+      .set(updates)
+      .where(eq(favorites.id, id))
+      .returning();
+    return updatedFavorite;
+  }
+
+  async deleteFavorite(id: number): Promise<boolean> {
+    const [deletedFavorite] = await db
+      .delete(favorites)
+      .where(eq(favorites.id, id))
+      .returning();
+    return !!deletedFavorite;
   }
 }
 
