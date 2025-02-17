@@ -41,16 +41,27 @@ export default function NewProject() {
 
   const createMutation = useMutation({
     mutationFn: async (data: InsertProject) => {
-      console.log("Submitting data:", data); // Debug log
-      const response = await apiRequest("/api/projects", {
-        method: "POST",
-        body: JSON.stringify(data),
-      });
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || "Failed to create project");
+      console.log("Submitting data:", JSON.stringify(data, null, 2));
+      try {
+        const response = await apiRequest("/api/projects", {
+          method: "POST",
+          body: JSON.stringify(data),
+        });
+        const responseData = await response.json();
+        
+        if (!response.ok) {
+          console.error("Server response:", {
+            status: response.status,
+            statusText: response.statusText,
+            data: responseData
+          });
+          throw new Error(responseData.error || "Failed to create project");
+        }
+        return responseData;
+      } catch (error) {
+        console.error("Project creation error:", error);
+        throw error;
       }
-      return response.json();
     },
     onSuccess: () => {
       toast({

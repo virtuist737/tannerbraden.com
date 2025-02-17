@@ -489,16 +489,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/projects", isAuthenticated, async (req, res) => {
     try {
+      console.log("Received project data:", JSON.stringify(req.body, null, 2));
+      
       const parsedBody = insertProjectSchema.safeParse(req.body);
       if (!parsedBody.success) {
-        return res.status(400).json({ error: "Invalid project data" });
+        console.error("Validation errors:", parsedBody.error.errors);
+        return res.status(400).json({ 
+          error: "Invalid project data",
+          details: parsedBody.error.errors
+        });
       }
 
       const project = await storage.createProject(parsedBody.data);
       res.status(201).json(project);
     } catch (error) {
-      console.error("Error creating project:", error);
-      res.status(500).json({ error: "Failed to create project" });
+      console.error("Error creating project:", {
+        error: error instanceof Error ? error.message : error,
+        stack: error instanceof Error ? error.stack : undefined
+      });
+      res.status(500).json({ 
+        error: "Failed to create project",
+        details: error instanceof Error ? error.message : "Unknown error"
+      });
     }
   });
 
