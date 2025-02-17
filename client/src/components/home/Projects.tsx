@@ -26,7 +26,12 @@ const featuredProjects = [
 const Projects = () => {
   return (
     <section className="container py-24">
-      <div className="space-y-12">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="space-y-12"
+      >
         <div className="text-center space-y-4">
           <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl">
             Featured Projects
@@ -65,21 +70,33 @@ const Projects = () => {
                     ))}
                   </div>
                   <div className="flex gap-4 pt-4">
-                    <Button variant="outline" size="sm" className="gap-2">
-                      <Github className="h-4 w-4" />
-                      Code
-                    </Button>
-                    <Button size="sm" className="gap-2">
-                      <ExternalLink className="h-4 w-4" />
-                      Demo
-                    </Button>
+                    <a
+                      href={project.github}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      <Button variant="outline" size="sm" className="gap-2">
+                        <Github className="h-4 w-4" />
+                        Code
+                      </Button>
+                    </a>
+                    <a
+                      href={project.demo}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      <Button size="sm" className="gap-2">
+                        <ExternalLink className="h-4 w-4" />
+                        Demo
+                      </Button>
+                    </a>
                   </div>
                 </CardContent>
               </Card>
             </motion.div>
           ))}
         </div>
-      </div>
+      </motion.div>
     </section>
   );
 };

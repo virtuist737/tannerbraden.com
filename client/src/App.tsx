@@ -1,4 +1,3 @@
-
 import { Route, Switch } from "wouter";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
@@ -31,7 +30,6 @@ import EditBlogPost from "@/pages/admin/blog/[id]/edit";
 import EditTimelineEntry from "@/pages/admin/timeline/[id]/edit";
 import NewTimelineEntry from "@/pages/admin/timeline/new";
 
-
 export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
@@ -42,24 +40,60 @@ export default function App() {
             <main className="flex-grow">
               <Switch>
                 <Route path="/" component={Home} />
-                <Route path="/about" component={About} />
-                <Route path="/blog" component={Blog} />
-                <Route path="/blog/:slug" component={BlogPost} />
-                <Route path="/contact" component={Contact} />
-                <Route path="/portfolio" component={Portfolio} />
-                <Route path="/auth" component={Auth} />
-                <ProtectedRoute path="/dashboard" component={Dashboard} />
-                <ProtectedRoute path="/admin/interests" component={AdminInterests} />
-                <ProtectedRoute path="/admin/interests/new" component={NewInterest} />
-                <ProtectedRoute path="/admin/interests/:id/edit" component={EditInterest} />
-                <ProtectedRoute path="/admin/blog" component={AdminBlog} />
-                <ProtectedRoute path="/admin/blog/new" component={NewBlogPost} />
-                <ProtectedRoute path="/admin/blog/:id/edit" component={EditBlogPost} />
-                <ProtectedRoute path="/admin/newsletter" component={AdminNewsletter} />
-                <ProtectedRoute path="/admin/timeline" component={AdminTimeline} />
-                <ProtectedRoute path="/admin/timeline/new" component={NewTimelineEntry} />
-                <ProtectedRoute path="/admin/timeline/:id/edit" component={EditTimelineEntry} />
-                <Route component={NotFound} />
+                <Route path="/about">
+                  {(params) => <About {...params} />}
+                </Route>
+                <Route path="/blog">
+                  {(params) => <Blog {...params} />}
+                </Route>
+                <Route path="/blog/:slug">
+                  {(params) => <BlogPost {...params} />}
+                </Route>
+                <Route path="/contact">
+                  {(params) => <Contact {...params} />}
+                </Route>
+                <Route path="/portfolio">
+                  {(params) => <Portfolio {...params} />}
+                </Route>
+                <Route path="/auth">
+                  {(params) => <Auth {...params} />}
+                </Route>
+                <Route path="/dashboard">
+                  {(params) => <Dashboard {...params} />}
+                </Route>
+                <Route path="/admin/interests">
+                  {(params) => <AdminInterests {...params} />}
+                </Route>
+                <Route path="/admin/interests/new">
+                  {(params) => <NewInterest {...params} />}
+                </Route>
+                <Route path="/admin/interests/:id/edit">
+                  {(params) => <EditInterest {...params} />}
+                </Route>
+                <Route path="/admin/blog">
+                  {(params) => <AdminBlog {...params} />}
+                </Route>
+                <Route path="/admin/blog/new">
+                  {(params) => <NewBlogPost {...params} />}
+                </Route>
+                <Route path="/admin/blog/:id/edit">
+                  {(params) => <EditBlogPost {...params} />}
+                </Route>
+                <Route path="/admin/newsletter">
+                  {(params) => <AdminNewsletter {...params} />}
+                </Route>
+                <Route path="/admin/timeline">
+                  {(params) => <AdminTimeline {...params} />}
+                </Route>
+                <Route path="/admin/timeline/new">
+                  {(params) => <NewTimelineEntry {...params} />}
+                </Route>
+                <Route path="/admin/timeline/:id/edit">
+                  {(params) => <EditTimelineEntry {...params} />}
+                </Route>
+                <Route>
+                  {() => <NotFound />}
+                </Route>
               </Switch>
             </main>
             <Footer />

@@ -3,6 +3,8 @@ import { ArrowRight } from "lucide-react";
 import { Link } from "wouter";
 import { Helmet } from 'react-helmet-async';
 import { Button } from "@/components/ui/button";
+import Projects from "@/components/home/Projects";
+import Skills from "@/components/home/Skills";
 
 const Home = () => {
   return (
@@ -60,24 +62,10 @@ const Home = () => {
       </section>
 
       {/* Featured Projects Section */}
-      <section className="container py-24 space-y-8">
-        <h2 className="text-3xl font-bold tracking-tighter text-center">
-          Featured Projects
-        </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {/* Project cards would go here */}
-        </div>
-      </section>
+      <Projects />
 
       {/* Skills Section */}
-      <section className="container py-24 space-y-8 bg-muted/50">
-        <h2 className="text-3xl font-bold tracking-tighter text-center">
-          Skills & Expertise
-        </h2>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-          {/* Skill cards would go here */}
-        </div>
-      </section>
+      <Skills />
 
       {/* Latest Blog Posts */}
       <section className="container py-24 space-y-8">
