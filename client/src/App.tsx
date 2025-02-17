@@ -41,7 +41,7 @@ export default function App() {
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <div className="flex min-h-screen flex-col bg-background">
-          <div className="max-w-screen-2xl w-full mx-auto px-6 sm:px-8 lg:px-12">
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 max-w-screen-2xl">
             <Navbar />
             <main className="flex-grow">
               <Switch>
