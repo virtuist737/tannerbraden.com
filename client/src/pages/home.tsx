@@ -5,8 +5,18 @@ import { Helmet } from 'react-helmet-async';
 import { Button } from "@/components/ui/button";
 import Projects from "@/components/home/Projects";
 import Skills from "@/components/home/Skills";
+import BlogCard from "@/components/blog/BlogCard";
+import { useQuery } from "@tanstack/react-query";
+import type { BlogPost } from "@shared/schema";
 
 const Home = () => {
+  const { data: latestPosts, isLoading: isLoadingPosts } = useQuery<BlogPost[]>({
+    queryKey: ["/api/blog"],
+    select: (posts) => posts
+      .sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime())
+      .slice(0, 3)
+  });
+
   return (
     <div className="flex flex-col min-h-screen">
       <Helmet>
@@ -69,12 +79,56 @@ const Home = () => {
 
       {/* Latest Blog Posts */}
       <section className="container py-24 space-y-8">
-        <h2 className="text-3xl font-bold tracking-tighter text-center">
-          Latest Articles
-        </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {/* Blog post cards would go here */}
-        </div>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="space-y-8"
+        >
+          <div className="text-center space-y-4">
+            <h2 className="text-3xl font-bold tracking-tighter">Latest Articles</h2>
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+              Explore my latest thoughts and insights on technology, partnerships, and human consciousness.
+            </p>
+          </div>
+
+          {isLoadingPosts ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="animate-pulse space-y-4">
+                  <div className="aspect-video bg-muted rounded-lg" />
+                  <div className="space-y-2">
+                    <div className="h-4 bg-muted rounded w-1/4" />
+                    <div className="h-8 bg-muted rounded w-3/4" />
+                    <div className="h-4 bg-muted rounded w-full" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {latestPosts?.map((post, index) => (
+                <motion.div
+                  key={post.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: index * 0.1 }}
+                >
+                  <BlogCard post={post} />
+                </motion.div>
+              ))}
+            </div>
+          )}
+
+          <div className="text-center mt-8">
+            <Link href="/blog">
+              <Button variant="outline" className="gap-2">
+                View All Articles
+                <ArrowRight className="h-4 w-4" />
+              </Button>
+            </Link>
+          </div>
+        </motion.div>
       </section>
     </div>
   );
