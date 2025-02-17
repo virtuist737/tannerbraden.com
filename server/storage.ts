@@ -25,7 +25,9 @@ import {
   type Favorite,
   type InsertTimeline,
   type InsertInterest,
-  type InsertFavorite, // Added type InsertFavorite
+  type InsertFavorite,
+  type Project, // Added
+  type InsertProject, // Added
 } from "@shared/schema";
 
 const PostgresSessionStore = connectPg(session);
@@ -87,6 +89,13 @@ export interface IStorage {
   createFavorite(favorite: InsertFavorite): Promise<Favorite>;
   updateFavorite(id: number, updates: Partial<InsertFavorite>): Promise<Favorite | undefined>;
   deleteFavorite(id: number): Promise<boolean>;
+
+  // Project operations
+  createProject(project: InsertProject): Promise<Project>;
+  getProject(id: number): Promise<Project | undefined>;
+  listProjects(): Promise<Project[]>;
+  updateProject(id: number, updates: Partial<InsertProject>): Promise<Project | undefined>;
+  deleteProject(id: number): Promise<boolean>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -347,6 +356,38 @@ export class DatabaseStorage implements IStorage {
       .where(eq(favorites.id, id))
       .returning();
     return !!deletedFavorite;
+  }
+
+  // Project operations
+  async createProject(project: InsertProject): Promise<Project> {
+    const [newProject] = await db.insert(projects).values(project).returning();
+    return newProject;
+  }
+
+  async getProject(id: number): Promise<Project | undefined> {
+    const [project] = await db.select().from(projects).where(eq(projects.id, id));
+    return project;
+  }
+
+  async listProjects(): Promise<Project[]> {
+    return db.select().from(projects).orderBy(projects.sortOrder);
+  }
+
+  async updateProject(id: number, updates: Partial<InsertProject>): Promise<Project | undefined> {
+    const [updatedProject] = await db
+      .update(projects)
+      .set(updates)
+      .where(eq(projects.id, id))
+      .returning();
+    return updatedProject;
+  }
+
+  async deleteProject(id: number): Promise<boolean> {
+    const [deletedProject] = await db
+      .delete(projects)
+      .where(eq(projects.id, id))
+      .returning();
+    return !!deletedProject;
   }
 }
 

@@ -89,6 +89,20 @@ export const favorites = pgTable("favorites", {
   sortOrder: integer("sort_order").notNull(),
 });
 
+// Add projects table after the existing tables
+export const projects = pgTable("projects", {
+  id: serial("id").primaryKey(),
+  title: text("title").notNull(),
+  description: text("description").notNull(),
+  coverImage: text("cover_image").notNull(),
+  technologies: text("technologies").array().notNull(),
+  githubUrl: text("github_url"),
+  liveUrl: text("live_url"),
+  sortOrder: integer("sort_order").notNull().default(0),
+  featured: boolean("featured").notNull().default(false),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
 // Relations
 export const blogPostsRelations = relations(blogPosts, ({ one }) => ({
   author: one(users, {
@@ -133,6 +147,16 @@ export const insertTimelineSchema = createInsertSchema(timeline).omit({
   imageUrl: z.string().optional(),
 });
 
+// Add after existing schemas
+export const insertProjectSchema = createInsertSchema(projects).omit({
+  id: true,
+  createdAt: true,
+}).extend({
+  technologies: z.array(z.string()),
+  githubUrl: z.string().url().optional(),
+  liveUrl: z.string().url().optional(),
+});
+
 // Types for TypeScript
 export type User = typeof users.$inferSelect;
 export type InsertUser = z.infer<typeof insertUserSchema>;
@@ -154,3 +178,7 @@ export type InsertFavorite = z.infer<typeof insertFavoriteSchema>;
 
 export type Timeline = typeof timeline.$inferSelect;
 export type InsertTimeline = z.infer<typeof insertTimelineSchema>;
+
+// Add after existing types
+export type Project = typeof projects.$inferSelect;
+export type InsertProject = z.infer<typeof insertProjectSchema>;
