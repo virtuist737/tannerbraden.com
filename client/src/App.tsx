@@ -29,6 +29,7 @@ import NewBlogPost from "@/pages/admin/blog/new";
 import EditBlogPost from "@/pages/admin/blog/[id]/edit";
 import EditTimelineEntry from "@/pages/admin/timeline/[id]/edit";
 import NewTimelineEntry from "@/pages/admin/timeline/new";
+import FavoritesList from "@/pages/admin/favorites";
 
 export default function App() {
   return (
