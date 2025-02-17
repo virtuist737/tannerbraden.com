@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import {
   Tabs,
   TabsContent,
@@ -60,11 +61,25 @@ const About = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
+          className="text-center space-y-8"
         >
-          <h1 className="text-4xl font-bold tracking-tighter mb-4">About Me</h1>
-          <p className="text-xl text-muted-foreground">
-            I'm a partnerships and growth specialist with a deep drive to increase the quality of human consciousness. By combining my experience in partner marketing with my passion for building scalable solutions, I work to create meaningful impact through technology and collaboration.
-          </p>
+          <motion.div
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ duration: 0.5 }}
+            className="mx-auto"
+          >
+            <Avatar className="h-40 w-40 mx-auto ring-4 ring-primary/10 ring-offset-4 ring-offset-background">
+              <AvatarImage src="/images/tanner2.0_dark-500x500.png" alt="Tanner Braden" />
+              <AvatarFallback>TB</AvatarFallback>
+            </Avatar>
+          </motion.div>
+          <div>
+            <h1 className="text-4xl font-bold tracking-tighter mb-4">About Me</h1>
+            <p className="text-xl text-muted-foreground">
+              I'm a partnerships and growth specialist with a deep drive to increase the quality of human consciousness. By combining my experience in partner marketing with my passion for building scalable solutions, I work to create meaningful impact through technology and collaboration.
+            </p>
+          </div>
         </motion.div>
       </section>
 

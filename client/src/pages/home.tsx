@@ -3,6 +3,7 @@ import { ArrowRight } from "lucide-react";
 import { Link } from "wouter";
 import { Helmet } from 'react-helmet-async';
 import { Button } from "@/components/ui/button";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import Projects from "@/components/home/Projects";
 import BlogCard from "@/components/blog/BlogCard";
 import { useQuery } from "@tanstack/react-query";
@@ -50,6 +51,17 @@ const Home = () => {
           transition={{ duration: 0.5 }}
           className="max-w-3xl mx-auto text-center"
         >
+          <motion.div 
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ duration: 0.5 }}
+            className="mx-auto mb-8"
+          >
+            <Avatar className="h-32 w-32 mx-auto ring-2 ring-primary/10 ring-offset-2 ring-offset-background">
+              <AvatarImage src="/images/tanner2.0_dark-500x500.png" alt="Tanner Braden" />
+              <AvatarFallback>TB</AvatarFallback>
+            </Avatar>
+          </motion.div>
           <h1 className="text-4xl font-bold tracking-tighter sm:text-5xl md:text-6xl">
             Hi, I'm <span className="text-primary">Tanner</span>
           </h1>
