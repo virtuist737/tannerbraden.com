@@ -76,7 +76,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (isNaN(id)) {
         return res.status(400).json({ error: "Invalid timeline ID" });
       }
-      const timeline = await storage.getTimeline(id);
+      const timelines = await storage.listTimeline();
+      const timeline = timelines.find(t => t.id === id);
       if (!timeline) {
         return res.status(404).json({ error: "Timeline entry not found" });
       }
@@ -267,9 +268,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ error: "No timeline entries found" });
       }
       res.json(timelineEvents);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error fetching timeline:", error);
-      res.status(500).json({ error: "Failed to fetch timeline", details: error.message });
+      res.status(500).json({ error: "Failed to fetch timeline", details: error?.message || 'Unknown error' });
     }
   });
 
