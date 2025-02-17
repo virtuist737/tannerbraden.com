@@ -12,6 +12,7 @@ import {
   timeline as timelineTable,
   interests,
   favorites,
+  projects,
   type User,
   type InsertUser,
   type BlogPost,
@@ -26,8 +27,8 @@ import {
   type InsertTimeline,
   type InsertInterest,
   type InsertFavorite,
-  type Project, // Added
-  type InsertProject, // Added
+  type Project,
+  type InsertProject,
 } from "@shared/schema";
 
 const PostgresSessionStore = connectPg(session);

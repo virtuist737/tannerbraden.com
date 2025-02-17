@@ -6,7 +6,8 @@ import {
   insertNewsletterSubscriptionSchema, 
   insertTimelineSchema,
   insertFavoriteSchema, 
-  insertInterestSchema 
+  insertInterestSchema,
+  insertProjectSchema 
 } from "@shared/schema";
 import { isAuthenticated } from "./auth";
 import * as UAParser from "ua-parser-js";
@@ -472,6 +473,63 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error uploading favorite image:", error);
       res.status(500).json({ error: "Failed to upload image" });
+    }
+  });
+
+  // Projects Routes
+  app.get("/api/projects", async (req, res) => {
+    try {
+      const projects = await storage.listProjects();
+      res.json(projects);
+    } catch (error) {
+      console.error("Error fetching projects:", error);
+      res.status(500).json({ error: "Failed to fetch projects" });
+    }
+  });
+
+  app.post("/api/projects", isAuthenticated, async (req, res) => {
+    try {
+      const parsedBody = insertProjectSchema.safeParse(req.body);
+      if (!parsedBody.success) {
+        return res.status(400).json({ error: "Invalid project data" });
+      }
+
+      const project = await storage.createProject(parsedBody.data);
+      res.status(201).json(project);
+    } catch (error) {
+      console.error("Error creating project:", error);
+      res.status(500).json({ error: "Failed to create project" });
+    }
+  });
+
+  app.patch("/api/projects/:id", isAuthenticated, async (req, res) => {
+    try {
+      const parsedBody = insertProjectSchema.partial().safeParse(req.body);
+      if (!parsedBody.success) {
+        return res.status(400).json({ error: "Invalid project data" });
+      }
+
+      const project = await storage.updateProject(parseInt(req.params.id), parsedBody.data);
+      if (!project) {
+        return res.status(404).json({ error: "Project not found" });
+      }
+      res.json(project);
+    } catch (error) {
+      console.error("Error updating project:", error);
+      res.status(500).json({ error: "Failed to update project" });
+    }
+  });
+
+  app.delete("/api/projects/:id", isAuthenticated, async (req, res) => {
+    try {
+      const success = await storage.deleteProject(parseInt(req.params.id));
+      if (!success) {
+        return res.status(404).json({ error: "Project not found" });
+      }
+      res.status(204).end();
+    } catch (error) {
+      console.error("Error deleting project:", error);
+      res.status(500).json({ error: "Failed to delete project" });
     }
   });
 
