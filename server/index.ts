@@ -18,28 +18,33 @@ app.use('/api', (req, res, next) => {
   next();
 });
 
-// Enhanced request logging middleware
+// Enhanced request logging middleware with better filtering
 app.use((req, res, next) => {
   const start = Date.now();
   const path = req.path;
   const method = req.method;
 
-  // Skip logging for static assets
-  if (path.match(/\.(js|css|png|jpg|jpeg|gif|ico|svg)$/)) {
+  // Skip logging for static assets and dev files
+  if (path.match(/\.(js|css|png|jpg|jpeg|gif|ico|svg|ts|tsx|json|woff|woff2|ttf|otf)$/) || 
+      path.startsWith('/@') || 
+      path.startsWith('/node_modules/') ||
+      path.startsWith('/src/')) {
     return next();
   }
 
-  // Format request details
-  const requestInfo = {
-    method,
-    path,
-    query: Object.keys(req.query).length ? req.query : undefined,
-    body: Object.keys(req.body).length ? req.body : undefined,
-  };
+  // Only log detailed request info for API endpoints
+  if (path.startsWith('/api')) {
+    const requestInfo = {
+      method,
+      path,
+      query: Object.keys(req.query).length ? req.query : undefined,
+      body: Object.keys(req.body).length ? req.body : undefined,
+    };
 
-  // Clean log output for requests
-  console.log(`🌐 ${new Date().toISOString()} | ${method} ${path}`, 
-    Object.keys(requestInfo).length > 2 ? requestInfo : '');
+    // Clean log output for API requests
+    console.log(`🌐 API ${new Date().toISOString()} | ${method} ${path}`, 
+      Object.keys(requestInfo).length > 2 ? requestInfo : '');
+  }
 
   let capturedJsonResponse: Record<string, any> | undefined = undefined;
 
@@ -55,9 +60,11 @@ app.use((req, res, next) => {
       const status = res.statusCode;
       const statusEmoji = status >= 400 ? '❌' : '✅';
 
-      let logLine = `${statusEmoji} ${method} ${path} ${status} ${duration}ms`;
+      // Simplified response logging
+      let logLine = `${statusEmoji} ${method} ${path} [${status}] ${duration}ms`;
 
-      if (capturedJsonResponse && process.env.NODE_ENV === 'development') {
+      // Only show response preview for errors in development
+      if (status >= 400 && process.env.NODE_ENV === 'development' && capturedJsonResponse) {
         const responsePreview = JSON.stringify(capturedJsonResponse).slice(0, 100);
         logLine += ` :: ${responsePreview}${responsePreview.length >= 100 ? '...' : ''}`;
       }
@@ -100,7 +107,7 @@ app.use((req, res, next) => {
   }
 
   const PORT = process.env.PORT || 5000;
-  server.listen(PORT, "0.0.0.0", () => {
+  server.listen(PORT, () => {
     log(`🚀 Server started on port ${PORT}`);
   });
 })();
