@@ -48,7 +48,7 @@ const Home = () => {
             I help companies grow through partnerships while working to increase empathy, kindness, and human flourishing at scale.
           </p>
           <div className="flex items-center justify-center gap-4 mt-8">
-            <Link href="/portfolio">
+            <Link href="/solarislabs">
               <Button className="gap-2">
                 My Mission
                 <ArrowRight className="h-4 w-4" />
