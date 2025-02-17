@@ -67,16 +67,39 @@ const TimelineComponent = () => {
   if (!timeline) return null;
 
   return (
-    <div className="relative container max-w-7xl mx-auto px-4 py-16">
-      <div className="absolute left-1/2 transform -translate-x-[1px] h-full w-[2px] bg-gradient-to-b from-primary/5 via-primary to-primary/5" />
+    <div className="relative container max-w-7xl mx-auto px-4 py-8 md:py-16">
+      {/* Timeline line - hidden on mobile, shown on md and up */}
+      <div className="hidden md:block absolute left-1/2 transform -translate-x-[1px] h-full w-[2px] bg-gradient-to-b from-primary/5 via-primary to-primary/5" />
 
-      <div className="relative">
+      <div className="relative space-y-8 md:space-y-16">
         {timeline.map((event, index) => {
           const isEven = index % 2 === 0;
 
           return (
-            <div key={event.id} className="mb-16">
-              <div className="relative grid grid-cols-[1fr,auto,1fr] gap-8">
+            <div key={event.id}>
+              {/* Mobile layout - stack everything vertically */}
+              <div className="block md:hidden">
+                <motion.div
+                  variants={cardVariants}
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={{ once: true, margin: "-50px" }}
+                  className="flex flex-col items-center"
+                >
+                  <div className="w-4 h-4 mb-4">
+                    <div className="w-3 h-3 rounded-full bg-primary shadow-[0_0_0_4px_rgba(var(--primary)/0.1)]" />
+                  </div>
+                  <TimelineCard 
+                    event={event} 
+                    expandedIndex={expandedIndex} 
+                    index={index} 
+                    setExpandedIndex={setExpandedIndex}
+                  />
+                </motion.div>
+              </div>
+
+              {/* Desktop layout - alternating sides */}
+              <div className="hidden md:grid md:grid-cols-[1fr,auto,1fr] md:gap-8">
                 {/* Left side content */}
                 <div className={isEven ? 'pr-4' : ''}>
                   {isEven && (
@@ -88,7 +111,12 @@ const TimelineComponent = () => {
                       viewport={{ once: true, margin: "-100px" }}
                       className="flex justify-end"
                     >
-                      <TimelineCard event={event} expandedIndex={expandedIndex} index={index} setExpandedIndex={setExpandedIndex} />
+                      <TimelineCard 
+                        event={event} 
+                        expandedIndex={expandedIndex} 
+                        index={index} 
+                        setExpandedIndex={setExpandedIndex} 
+                      />
                     </motion.div>
                   )}
                 </div>
@@ -117,7 +145,12 @@ const TimelineComponent = () => {
                       viewport={{ once: true, margin: "-100px" }}
                       className="flex justify-start"
                     >
-                      <TimelineCard event={event} expandedIndex={expandedIndex} index={index} setExpandedIndex={setExpandedIndex} />
+                      <TimelineCard 
+                        event={event} 
+                        expandedIndex={expandedIndex} 
+                        index={index} 
+                        setExpandedIndex={setExpandedIndex} 
+                      />
                     </motion.div>
                   )}
                 </div>
@@ -155,7 +188,7 @@ const TimelineCard: React.FC<CardProps> = ({ event, expandedIndex, index, setExp
   };
 
   return (
-    <div className="bg-card border rounded-xl p-6 shadow-lg hover:shadow-xl transition-shadow duration-300 max-w-xl">
+    <div className="bg-card border rounded-xl p-4 md:p-6 shadow-lg hover:shadow-xl transition-shadow duration-300 w-full md:max-w-xl">
       <div className="flex items-center gap-3 mb-2">
         <div className="flex items-center justify-center w-10 h-10 rounded-full bg-primary/10 text-primary">
           {getIcon(event.icon)}
