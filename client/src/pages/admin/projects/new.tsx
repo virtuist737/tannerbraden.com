@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Switch } from "@/components/ui/switch";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { insertProjectSchema, type InsertProject } from "@shared/schema";
@@ -40,6 +41,7 @@ export default function NewProject() {
 
   const createMutation = useMutation({
     mutationFn: async (data: InsertProject) => {
+      console.log("Submitting data:", data); // Debug log
       const response = await apiRequest("/api/projects", {
         method: "POST",
         body: JSON.stringify(data),
@@ -67,10 +69,14 @@ export default function NewProject() {
   });
 
   const onSubmit = (data: InsertProject) => {
-    createMutation.mutate({
+    // Ensure technologies is properly formatted as an array
+    const formattedData = {
       ...data,
-      technologies: data.technologies.map(tech => tech.trim()),
-    });
+      technologies: data.technologies.map(tech => tech.trim()).filter(Boolean),
+      sortOrder: Number(data.sortOrder),
+    };
+    console.log("Formatted data:", formattedData); // Debug log
+    createMutation.mutate(formattedData);
   };
 
   return (
@@ -146,9 +152,9 @@ export default function NewProject() {
                       <FormControl>
                         <Input
                           {...field}
-                          value={field.value.join(", ")}
+                          value={Array.isArray(field.value) ? field.value.join(", ") : ""}
                           onChange={(e) =>
-                            field.onChange(e.target.value.split(",").map((t) => t.trim()))
+                            field.onChange(e.target.value.split(",").map((t) => t.trim()).filter(Boolean))
                           }
                         />
                       </FormControl>
@@ -198,13 +204,34 @@ export default function NewProject() {
                         <Input
                           type="number"
                           {...field}
-                          onChange={(e) => field.onChange(parseInt(e.target.value))}
+                          onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
                         />
                       </FormControl>
                       <FormDescription>
                         Lower numbers will appear first
                       </FormDescription>
                       <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="featured"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                      <div className="space-y-0.5">
+                        <FormLabel className="text-base">Featured Project</FormLabel>
+                        <FormDescription>
+                          Featured projects will be highlighted on the homepage
+                        </FormDescription>
+                      </div>
+                      <FormControl>
+                        <Switch
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                        />
+                      </FormControl>
                     </FormItem>
                   )}
                 />
