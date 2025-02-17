@@ -21,7 +21,7 @@ const SolarisLabs = () => {
       >
         <div className="text-center space-y-4">
           <img 
-            src="/attached_assets/solaris-labs-logo-500x500.png" 
+            src="/images/solaris-labs-logo-500x500.png" 
             alt="Solaris Labs Logo" 
             className="w-24 h-24 mx-auto mb-4"
           />
