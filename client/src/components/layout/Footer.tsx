@@ -9,17 +9,19 @@ const Footer = () => {
           <div>
             <h3 className="text-lg font-semibold mb-4">Navigation</h3>
             <div className="flex flex-col space-y-2">
-              <Link href="/" className="text-muted-foreground hover:text-primary">
-                Home
+              <Link href="/">
+                <a className="text-muted-foreground hover:text-primary">Home</a>
               </Link>
-              <Link href="/about" className="text-muted-foreground hover:text-primary">
-                About
+              <Link href="/about">
+                <a className="text-muted-foreground hover:text-primary">About</a>
               </Link>
-              <Link href="/portfolio" className="text-muted-foreground hover:text-primary">
-                Portfolio
+              <Link href="/portfolio">
+                <a className="text-muted-foreground hover:text-primary">
+                  Portfolio
+                </a>
               </Link>
-              <Link href="/blog" className="text-muted-foreground hover:text-primary">
-                Blog
+              <Link href="/blog">
+                <a className="text-muted-foreground hover:text-primary">Blog</a>
               </Link>
             </div>
           </div>
