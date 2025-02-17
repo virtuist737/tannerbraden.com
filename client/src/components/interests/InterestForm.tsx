@@ -51,12 +51,12 @@ const TYPES = [
 const InterestForm = ({ initialData, onSubmit, isSubmitting }: InterestFormProps) => {
   const form = useForm<z.infer<typeof interestFormSchema>>({
     resolver: zodResolver(interestFormSchema),
-    defaultValues: initialData || {
-      item: "",
-      category: "",
-      type: "",
-      sortOrder: 0,
-      imageUrl: "",
+    defaultValues: {
+      item: initialData?.item ?? "",
+      category: initialData?.category ?? "",
+      type: initialData?.type ?? "",
+      sortOrder: initialData?.sortOrder ?? 0,
+      imageUrl: initialData?.imageUrl ?? "",
     },
   });
 
@@ -83,23 +83,23 @@ const InterestForm = ({ initialData, onSubmit, isSubmitting }: InterestFormProps
           render={({ field }) => (
             <FormItem>
               <FormLabel>Category</FormLabel>
-              <Select
-                onValueChange={field.onChange}
-                defaultValue={field.value}
-              >
-                <FormControl>
+              <FormControl>
+                <Select
+                  onValueChange={field.onChange}
+                  defaultValue={field.value}
+                >
                   <SelectTrigger>
                     <SelectValue placeholder="Select a category" />
                   </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  {CATEGORIES.map((category) => (
-                    <SelectItem key={category} value={category}>
-                      {category}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+                  <SelectContent>
+                    {CATEGORIES.map((category) => (
+                      <SelectItem key={category} value={category}>
+                        {category}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </FormControl>
               <FormMessage />
             </FormItem>
           )}
@@ -111,23 +111,23 @@ const InterestForm = ({ initialData, onSubmit, isSubmitting }: InterestFormProps
           render={({ field }) => (
             <FormItem>
               <FormLabel>Type</FormLabel>
-              <Select
-                onValueChange={field.onChange}
-                defaultValue={field.value}
-              >
-                <FormControl>
+              <FormControl>
+                <Select
+                  onValueChange={field.onChange}
+                  defaultValue={field.value}
+                >
                   <SelectTrigger>
                     <SelectValue placeholder="Select a type" />
                   </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  {TYPES.map((type) => (
-                    <SelectItem key={type} value={type}>
-                      {type}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+                  <SelectContent>
+                    {TYPES.map((type) => (
+                      <SelectItem key={type} value={type}>
+                        {type}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </FormControl>
               <FormMessage />
             </FormItem>
           )}
@@ -151,20 +151,30 @@ const InterestForm = ({ initialData, onSubmit, isSubmitting }: InterestFormProps
           )}
         />
 
-        {initialData && (
-          <ImageUpload
-            imageUrl={initialData.imageUrl}
-            entityId={initialData.id}
-            entityType="interest"
-            onSuccess={(imageUrl) => form.setValue("imageUrl", imageUrl)}
-          />
-        )}
+        <FormField
+          control={form.control}
+          name="imageUrl"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Image</FormLabel>
+              <FormControl>
+                {initialData?.id && (
+                  <ImageUpload
+                    imageUrl={field.value}
+                    entityId={initialData.id}
+                    entityType="interest"
+                    onSuccess={(imageUrl) => field.onChange(imageUrl)}
+                  />
+                )}
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
-        <div className="flex justify-end">
-          <Button type="submit" disabled={isSubmitting}>
-            {isSubmitting ? "Saving..." : initialData ? "Update Interest" : "Create Interest"}
-          </Button>
-        </div>
+        <Button type="submit" disabled={isSubmitting}>
+          {isSubmitting ? "Saving..." : initialData ? "Update Interest" : "Create Interest"}
+        </Button>
       </form>
     </Form>
   );

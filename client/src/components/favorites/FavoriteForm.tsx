@@ -38,7 +38,6 @@ export function FavoriteForm({ defaultValues = defaultFavorite, onSubmit, isSubm
   });
 
   const handleSubmit = (data: InsertFavorite) => {
-    // Ensure sortOrder is a number
     const formattedData = {
       ...data,
       sortOrder: Number(data.sortOrder),
@@ -127,13 +126,26 @@ export function FavoriteForm({ defaultValues = defaultFavorite, onSubmit, isSubm
           )}
         />
 
-        {defaultValues?.id && (
-          <ImageUpload
-            imageUrl={defaultValues.image}
-            entityId={defaultValues.id}
-            entityType="favorite"
-          />
-        )}
+        <FormField
+          control={form.control}
+          name="image"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Image</FormLabel>
+              <FormControl>
+                {defaultValues?.id && (
+                  <ImageUpload
+                    imageUrl={defaultValues.image}
+                    entityId={defaultValues.id}
+                    entityType="favorite"
+                    onSuccess={(url) => field.onChange(url)}
+                  />
+                )}
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
         <Button type="submit" disabled={isSubmitting}>
           {isSubmitting ? "Saving..." : "Save"}
