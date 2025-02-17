@@ -69,10 +69,11 @@ export default function NewProject() {
   });
 
   const onSubmit = (data: InsertProject) => {
-    // Ensure technologies is properly formatted as an array
     const formattedData = {
       ...data,
-      technologies: data.technologies.map(tech => tech.trim()).filter(Boolean),
+      technologies: Array.isArray(data.technologies) 
+        ? data.technologies.map(tech => tech.trim()).filter(Boolean)
+        : data.technologies.split(',').map(tech => tech.trim()).filter(Boolean),
       sortOrder: Number(data.sortOrder),
     };
     console.log("Formatted data:", formattedData); // Debug log
