@@ -25,18 +25,30 @@ const defaultFavorite: Partial<InsertFavorite> = {
   category: "",
   description: "",
   link: "",
-  sortOrder: 1,
+  sortOrder: 0,
 };
 
 export function FavoriteForm({ defaultValues = defaultFavorite, onSubmit, isSubmitting }: Props) {
   const form = useForm<InsertFavorite>({
     resolver: zodResolver(insertFavoriteSchema),
-    defaultValues,
+    defaultValues: {
+      ...defaultFavorite,
+      ...defaultValues,
+    },
   });
+
+  const handleSubmit = (data: InsertFavorite) => {
+    // Ensure sortOrder is a number
+    const formattedData = {
+      ...data,
+      sortOrder: Number(data.sortOrder),
+    };
+    onSubmit(formattedData);
+  };
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-8">
         <FormField
           control={form.control}
           name="title"
@@ -72,7 +84,7 @@ export function FavoriteForm({ defaultValues = defaultFavorite, onSubmit, isSubm
             <FormItem>
               <FormLabel>Description</FormLabel>
               <FormControl>
-                <Textarea {...field} />
+                <Textarea {...field} value={field.value || ''} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -86,7 +98,7 @@ export function FavoriteForm({ defaultValues = defaultFavorite, onSubmit, isSubm
             <FormItem>
               <FormLabel>Link</FormLabel>
               <FormControl>
-                <Input {...field} type="url" />
+                <Input {...field} type="url" value={field.value || ''} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -96,18 +108,26 @@ export function FavoriteForm({ defaultValues = defaultFavorite, onSubmit, isSubm
         <FormField
           control={form.control}
           name="sortOrder"
-          render={({ field }) => (
+          render={({ field: { value, onChange, ...field } }) => (
             <FormItem>
               <FormLabel>Sort Order</FormLabel>
               <FormControl>
-                <Input {...field} type="number" />
+                <Input
+                  {...field}
+                  type="number"
+                  value={value}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    onChange(val ? parseInt(val, 10) : 0);
+                  }}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
 
-        {defaultValues.id && (
+        {defaultValues?.id && (
           <ImageUpload
             imageUrl={defaultValues.image}
             entityId={defaultValues.id}
