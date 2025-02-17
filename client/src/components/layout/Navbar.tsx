@@ -12,7 +12,7 @@ interface NavItem {
 const navItems: NavItem[] = [
   { href: "/", label: "Home" },
   { href: "/about", label: "About" },
-  { href: "/portfolio", label: "Portfolio" },
+  { href: "/solarislabs", label: "Solaris Labs" },
   { href: "/blog", label: "Blog" },
   { href: "/contact", label: "Contact" },
 ];
