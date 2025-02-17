@@ -30,6 +30,7 @@ import EditBlogPost from "@/pages/admin/blog/[id]/edit";
 import EditTimelineEntry from "@/pages/admin/timeline/[id]/edit";
 import NewTimelineEntry from "@/pages/admin/timeline/new";
 import FavoritesList from "@/pages/admin/favorites";
+import EditFavorite from "@/pages/admin/favorites/[id]/edit";
 
 export default function App() {
   return (
