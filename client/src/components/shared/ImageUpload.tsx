@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
@@ -56,7 +57,7 @@ export const ImageUpload = ({ imageUrl, entityId, entityType, onSuccess }: Image
       {imageUrl ? (
         <div className="relative aspect-video w-full overflow-hidden rounded-lg">
           <img
-            src={imageUrl}
+            src={imageUrl.startsWith('/') ? imageUrl : `/images/${imageUrl}`}
             alt="Uploaded content"
             className="object-cover w-full h-full"
           />

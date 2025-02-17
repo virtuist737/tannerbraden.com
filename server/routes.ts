@@ -424,10 +424,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "Invalid timeline ID" });
       }
 
-      const imageUrl = (req.file as any).path; // Cloudinary URL
-      await storage.updateTimelineImage(id, imageUrl);
+      const fileName = `${Date.now()}-${req.file.originalname}`;
+      const filePath = path.join(__dirname, '../client/public/images', fileName);
+      
+      await fs.promises.writeFile(filePath, req.file.buffer);
+      await storage.updateTimelineImage(id, fileName);
 
-      res.json({ imageUrl });
+      res.json({ imageUrl: fileName });
     } catch (error) {
       console.error("Error uploading timeline image:", error);
       res.status(500).json({ error: "Failed to upload image" });
