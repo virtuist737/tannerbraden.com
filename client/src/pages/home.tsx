@@ -57,7 +57,7 @@ const Home = () => {
             transition={{ duration: 0.5 }}
             className="mx-auto mb-8"
           >
-            <Avatar className="h-32 w-32 mx-auto ring-2 ring-primary/10 ring-offset-2 ring-offset-background">
+            <Avatar className="h-32 w-32 mx-auto ring-2 ring-primary/10 ring-offset-2 ring-offset-background shadow-[0_0_15px_rgba(59,130,246,0.5)]">
               <AvatarImage src="/images/tanner2.0_dark-500x500.png" alt="Tanner Braden" />
               <AvatarFallback>TB</AvatarFallback>
             </Avatar>
