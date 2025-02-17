@@ -32,6 +32,9 @@ import NewTimelineEntry from "@/pages/admin/timeline/new";
 import FavoritesList from "@/pages/admin/favorites";
 import NewFavorite from "@/pages/admin/favorites/new";
 import EditFavorite from "@/pages/admin/favorites/[id]/edit";
+import AdminProjects from "@/pages/admin/projects";
+import NewProject from "@/pages/admin/projects/new";
+import EditProject from "@/pages/admin/projects/[id]/edit";
 
 export default function App() {
   return (
@@ -63,6 +66,9 @@ export default function App() {
                 <ProtectedRoute path="/admin/favorites" component={FavoritesList} />
                 <ProtectedRoute path="/admin/favorites/new" component={NewFavorite} />
                 <ProtectedRoute path="/admin/favorites/:id/edit" component={EditFavorite} />
+                <ProtectedRoute path="/admin/projects" component={AdminProjects} />
+                <ProtectedRoute path="/admin/projects/new" component={NewProject} />
+                <ProtectedRoute path="/admin/projects/:id/edit" component={EditProject} />
                 <Route component={NotFound} />
               </Switch>
             </main>

@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { ResponsiveContainer, LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip } from "recharts";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Eye, Clock, MousePointer, PenSquare, Mail, Smartphone, History, Heart, Star } from "lucide-react";
+import { Eye, Clock, MousePointer, PenSquare, Mail, Smartphone, History, Heart, Star, Code } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
 import { useQuery } from "@tanstack/react-query";
@@ -170,6 +170,21 @@ const Dashboard = () => {
               <CardContent>
                 <p className="text-sm text-muted-foreground">
                   Curate and manage your favorite items
+                </p>
+              </CardContent>
+            </Card>
+          </Link>
+          <Link href="/admin/projects">
+            <Card className="hover:bg-accent transition-colors cursor-pointer">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Code className="h-5 w-5" />
+                  Projects Management
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground">
+                  Manage and showcase your projects
                 </p>
               </CardContent>
             </Card>
