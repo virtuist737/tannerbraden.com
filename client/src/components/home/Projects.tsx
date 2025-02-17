@@ -3,27 +3,23 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Github, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
-
-const featuredProjects = [
-  {
-    title: "E-commerce Platform",
-    description: "A modern e-commerce solution with real-time inventory and payment processing",
-    image: "https://images.unsplash.com/photo-1661956602116-aa6865609028?w=800&auto=format&fit=crop&q=60",
-    tech: ["React", "Node.js", "Stripe", "MongoDB"],
-    github: "https://github.com",
-    demo: "https://demo.com"
-  },
-  {
-    title: "Task Management App",
-    description: "Collaborative task management with real-time updates and team features",
-    image: "https://images.unsplash.com/photo-1554200876-56c2f25224fa?w=800&auto=format&fit=crop&q=60",
-    tech: ["Next.js", "TypeScript", "Prisma", "PostgreSQL"],
-    github: "https://github.com",
-    demo: "https://demo.com"
-  }
-];
+import { useQuery } from "@tanstack/react-query";
+import type { Project } from "@shared/schema";
 
 const Projects = () => {
+  const { data: projects, isLoading } = useQuery<Project[]>({
+    queryKey: ["/api/projects"],
+    select: (data) => data.filter((project) => project.featured)
+  });
+
+  if (isLoading) {
+    return (
+      <section className="container py-24">
+        <div className="text-center">Loading projects...</div>
+      </section>
+    );
+  }
+
   return (
     <section className="container py-24">
       <motion.div
@@ -42,9 +38,9 @@ const Projects = () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {featuredProjects.map((project, index) => (
+          {projects?.map((project, index) => (
             <motion.div
-              key={project.title}
+              key={project.id}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: index * 0.1 }}
@@ -53,7 +49,7 @@ const Projects = () => {
                 <CardHeader className="p-0">
                   <div className="aspect-video relative overflow-hidden">
                     <img
-                      src={project.image}
+                      src={project.coverImage}
                       alt={project.title}
                       className="object-cover w-full h-full transition-transform hover:scale-105"
                     />
@@ -63,33 +59,37 @@ const Projects = () => {
                   <CardTitle>{project.title}</CardTitle>
                   <p className="text-muted-foreground">{project.description}</p>
                   <div className="flex flex-wrap gap-2">
-                    {project.tech.map((tech) => (
+                    {project.technologies.map((tech) => (
                       <Badge key={tech} variant="secondary">
                         {tech}
                       </Badge>
                     ))}
                   </div>
                   <div className="flex gap-4 pt-4">
-                    <a
-                      href={project.github}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      <Button variant="outline" size="sm" className="gap-2">
-                        <Github className="h-4 w-4" />
-                        Code
-                      </Button>
-                    </a>
-                    <a
-                      href={project.demo}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      <Button size="sm" className="gap-2">
-                        <ExternalLink className="h-4 w-4" />
-                        Demo
-                      </Button>
-                    </a>
+                    {project.githubUrl && (
+                      <a
+                        href={project.githubUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        <Button variant="outline" size="sm" className="gap-2">
+                          <Github className="h-4 w-4" />
+                          Code
+                        </Button>
+                      </a>
+                    )}
+                    {project.liveUrl && (
+                      <a
+                        href={project.liveUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        <Button size="sm" className="gap-2">
+                          <ExternalLink className="h-4 w-4" />
+                          Demo
+                        </Button>
+                      </a>
+                    )}
                   </div>
                 </CardContent>
               </Card>
