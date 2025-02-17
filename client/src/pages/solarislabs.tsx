@@ -20,6 +20,11 @@ const SolarisLabs = () => {
         className="space-y-8"
       >
         <div className="text-center space-y-4">
+          <img 
+            src="/attached_assets/solaris-labs-logo-500x500.png" 
+            alt="Solaris Labs Logo" 
+            className="w-24 h-24 mx-auto mb-4"
+          />
           <h1 className="text-4xl font-bold tracking-tighter">Solaris Labs</h1>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
             Innovating at the intersection of technology and human flourishing. Explore our projects and initiatives.
