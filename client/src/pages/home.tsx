@@ -4,7 +4,6 @@ import { Link } from "wouter";
 import { Helmet } from 'react-helmet-async';
 import { Button } from "@/components/ui/button";
 import Projects from "@/components/home/Projects";
-import Skills from "@/components/home/Skills";
 import BlogCard from "@/components/blog/BlogCard";
 import { useQuery } from "@tanstack/react-query";
 import type { BlogPost } from "@shared/schema";
@@ -73,9 +72,6 @@ const Home = () => {
 
       {/* Featured Projects Section */}
       <Projects />
-
-      {/* Skills Section */}
-      <Skills />
 
       {/* Latest Blog Posts */}
       <section className="container py-24 space-y-8">
