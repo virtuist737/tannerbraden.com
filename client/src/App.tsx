@@ -104,3 +104,11 @@ export default function App() {
     </QueryClientProvider>
   );
 }
+import FavoritesList from "./pages/admin/favorites";
+import NewFavorite from "./pages/admin/favorites/new";
+import EditFavorite from "./pages/admin/favorites/[id]/edit";
+
+// Add these routes in your Switch or Route component:
+<Route path="/admin/favorites" component={FavoritesList} />
+<Route path="/admin/favorites/new" component={NewFavorite} />
+<Route path="/admin/favorites/:id/edit" component={EditFavorite} />
