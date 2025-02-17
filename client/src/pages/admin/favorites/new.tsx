@@ -10,11 +10,20 @@ export default function NewFavorite() {
   const { toast } = useToast();
 
   const mutation = useMutation({
-    mutationFn: (data: InsertFavorite) =>
-      apiRequest("/api/about/favorites", {
+    mutationFn: async (data: InsertFavorite) => {
+      const response = await apiRequest("/api/about/favorites", {
         method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify(data),
-      }),
+      });
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || "Failed to create favorite");
+      }
+      return response.json();
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/about/favorites"] });
       toast({
@@ -23,10 +32,10 @@ export default function NewFavorite() {
       });
       setLocation("/admin/favorites");
     },
-    onError: () => {
+    onError: (error: Error) => {
       toast({
         title: "Error",
-        description: "Failed to create favorite. Please try again.",
+        description: error.message,
         variant: "destructive",
       });
     },

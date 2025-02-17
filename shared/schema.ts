@@ -118,8 +118,13 @@ export const insertInterestSchema = createInsertSchema(interests).omit({
   imageUrl: z.string().optional(),
 });
 
-export const insertFavoriteSchema = createInsertSchema(favorites).omit({
-  id: true,
+export const insertFavoriteSchema = createInsertSchema(favorites).extend({
+  title: z.string().min(1, "Title is required"),
+  category: z.string().min(1, "Category is required"),
+  sortOrder: z.number().int().nonnegative(),
+  description: z.string().optional().nullable(),
+  link: z.string().url().optional().nullable(),
+  image: z.string().optional().nullable(),
 });
 
 export const insertTimelineSchema = createInsertSchema(timeline).omit({
