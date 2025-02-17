@@ -41,11 +41,20 @@ export default function NewProject() {
 
   const createMutation = useMutation({
     mutationFn: async (data: InsertProject) => {
-      console.log("Submitting data:", JSON.stringify(data, null, 2));
+      const formattedData = {
+        ...data,
+        technologies: Array.isArray(data.technologies) ? data.technologies : [],
+        sortOrder: Number(data.sortOrder) || 0,
+        featured: Boolean(data.featured)
+      };
+      console.log("Submitting data:", JSON.stringify(formattedData, null, 2));
       try {
         const response = await apiRequest("/api/projects", {
           method: "POST",
-          body: JSON.stringify(data),
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(formattedData),
         });
         const responseData = await response.json();
         
