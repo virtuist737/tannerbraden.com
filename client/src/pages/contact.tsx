@@ -13,7 +13,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { Mail, MessageSquare, Phone } from "lucide-react";
+import { Linkedin, Twitter } from "lucide-react";
 
 const contactFormSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
@@ -58,29 +58,26 @@ const Contact = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
           {/* Contact Information */}
           <div className="space-y-8">
-            <h2 className="text-2xl font-semibold">Contact Information</h2>
+            <h2 className="text-2xl font-semibold">Connect With Me</h2>
             <div className="space-y-6">
-              <div className="flex items-center gap-4">
-                <Mail className="h-6 w-6 text-primary" />
-                <div>
-                  <h3 className="font-medium">Email</h3>
-                  <p className="text-muted-foreground">contact@example.com</p>
-                </div>
-              </div>
-              <div className="flex items-center gap-4">
-                <Phone className="h-6 w-6 text-primary" />
-                <div>
-                  <h3 className="font-medium">Phone</h3>
-                  <p className="text-muted-foreground">+1 (555) 123-4567</p>
-                </div>
-              </div>
-              <div className="flex items-center gap-4">
-                <MessageSquare className="h-6 w-6 text-primary" />
-                <div>
-                  <h3 className="font-medium">Social Media</h3>
-                  <p className="text-muted-foreground">@username</p>
-                </div>
-              </div>
+              <a
+                href="https://linkedin.com/in/tannerbraden"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-4 text-muted-foreground hover:text-primary transition-colors"
+              >
+                <Linkedin className="h-6 w-6" />
+                <span>LinkedIn</span>
+              </a>
+              <a
+                href="https://x.com/tannerlbraden"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-4 text-muted-foreground hover:text-primary transition-colors"
+              >
+                <Twitter className="h-6 w-6" />
+                <span>X (Twitter)</span>
+              </a>
             </div>
           </div>
 
