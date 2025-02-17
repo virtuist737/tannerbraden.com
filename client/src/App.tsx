@@ -91,6 +91,15 @@ export default function App() {
                 <Route path="/admin/timeline/:id/edit">
                   {(params) => <EditTimelineEntry {...params} />}
                 </Route>
+                <Route path="/admin/favorites">
+                  {(params) => <FavoritesList {...params} />}
+                </Route>
+                <Route path="/admin/favorites/new">
+                  {(params) => <NewFavorite {...params} />}
+                </Route>
+                <Route path="/admin/favorites/:id/edit">
+                  {(params) => <EditFavorite {...params} />}
+                </Route>
                 <Route>
                   {() => <NotFound />}
                 </Route>
@@ -104,11 +113,3 @@ export default function App() {
     </QueryClientProvider>
   );
 }
-import FavoritesList from "./pages/admin/favorites";
-import NewFavorite from "./pages/admin/favorites/new";
-import EditFavorite from "./pages/admin/favorites/[id]/edit";
-
-// Add these routes in your Switch or Route component:
-<Route path="/admin/favorites" component={FavoritesList} />
-<Route path="/admin/favorites/new" component={NewFavorite} />
-<Route path="/admin/favorites/:id/edit" component={EditFavorite} />
