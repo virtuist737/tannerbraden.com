@@ -451,11 +451,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "Invalid favorite ID" });
       }
 
-      console.log('Update favorite request:', { id, body: req.body });
-      
       const parsedBody = insertFavoriteSchema.partial().safeParse(req.body);
       if (!parsedBody.success) {
-        console.error('Validation error:', parsedBody.error);
         return res.status(400).json({ error: "Invalid favorite data", details: parsedBody.error });
       }
 
@@ -463,10 +460,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!favorite) {
         return res.status(404).json({ error: "Favorite not found" });
       }
-      res.json(favorite);
+
+      return res.status(200).json(favorite);
     } catch (error) {
       console.error('Error updating favorite:', error);
-      res.status(500).json({ error: "Failed to update favorite", details: error instanceof Error ? error.message : 'Unknown error' });
+      return res.status(500).json({ error: "Failed to update favorite" });
     }
   });
 
