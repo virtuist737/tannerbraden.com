@@ -446,18 +446,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.patch("/api/about/favorites/:id", isAuthenticated, async (req, res) => {
     try {
-      const parsedBody = insertFavoriteSchema.partial().safeParse(req.body);
-      if (!parsedBody.success) {
-        return res.status(400).json({ error: "Invalid favorite data" });
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ error: "Invalid favorite ID" });
       }
 
-      const favorite = await storage.updateFavorite(parseInt(req.params.id), parsedBody.data);
+      console.log('Update favorite request:', { id, body: req.body });
+      
+      const parsedBody = insertFavoriteSchema.partial().safeParse(req.body);
+      if (!parsedBody.success) {
+        console.error('Validation error:', parsedBody.error);
+        return res.status(400).json({ error: "Invalid favorite data", details: parsedBody.error });
+      }
+
+      const favorite = await storage.updateFavorite(id, parsedBody.data);
       if (!favorite) {
         return res.status(404).json({ error: "Favorite not found" });
       }
       res.json(favorite);
     } catch (error) {
-      res.status(500).json({ error: "Failed to update favorite" });
+      console.error('Error updating favorite:', error);
+      res.status(500).json({ error: "Failed to update favorite", details: error instanceof Error ? error.message : 'Unknown error' });
     }
   });
 
