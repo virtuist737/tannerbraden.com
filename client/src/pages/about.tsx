@@ -156,6 +156,7 @@ const About = () => {
                     />
                   ))}
                 </Masonry>
+              </div>
             )}
           </TabsContent>
 
