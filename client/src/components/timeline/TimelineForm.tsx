@@ -19,9 +19,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
-import { type Timeline } from "@shared/schema";
+import type { Timeline } from "@shared/schema";
 import { ImageUpload } from "@/components/shared/ImageUpload";
+import { lazy, Suspense } from "react";
+
+const MarkdownEditor = lazy(() => import("@uiw/react-markdown-editor"));
 
 const timelineFormSchema = insertTimelineSchema.extend({
   title: z.string().min(1, "Title is required"),
@@ -39,10 +41,14 @@ interface TimelineFormProps {
 
 const CATEGORIES = ["Education", "Work", "Achievement", "Project"];
 const ICONS = [
-  { value: "graduation-cap", label: "Graduation Cap" },
-  { value: "briefcase", label: "Briefcase" },
-  { value: "award", label: "Award" },
-  { value: "code", label: "Code" },
+  { value: "👶", label: "Baby" },
+  { value: "🎵", label: "Music" },
+  { value: "✈️", label: "Travel" },
+  { value: "🎓", label: "Education" },
+  { value: "💼", label: "Work" },
+  { value: "🏆", label: "Achievement" },
+  { value: "💻", label: "Code" },
+  { value: "🧠", label: "Learning" },
 ];
 
 const TimelineForm = ({ initialData, onSubmit, isSubmitting }: TimelineFormProps) => {
@@ -52,7 +58,7 @@ const TimelineForm = ({ initialData, onSubmit, isSubmitting }: TimelineFormProps
       title: initialData?.title ?? "",
       content: initialData?.content ?? "",
       date: initialData?.date ?? "",
-      icon: initialData?.icon ?? "graduation-cap",
+      icon: initialData?.icon ?? "👶",
       category: initialData?.category ?? "",
       imageUrl: initialData?.imageUrl ?? undefined,
     },
@@ -129,7 +135,7 @@ const TimelineForm = ({ initialData, onSubmit, isSubmitting }: TimelineFormProps
                 <SelectContent>
                   {ICONS.map((icon) => (
                     <SelectItem key={icon.value} value={icon.value}>
-                      {icon.label}
+                      {icon.label} {icon.value}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -144,9 +150,19 @@ const TimelineForm = ({ initialData, onSubmit, isSubmitting }: TimelineFormProps
           name="content"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Content</FormLabel>
+              <FormLabel>Content (Markdown supported)</FormLabel>
               <FormControl>
-                <Textarea {...field} />
+                <div className="border rounded-md">
+                  <Suspense fallback={<div className="h-[400px] flex items-center justify-center">Loading editor...</div>}>
+                    <MarkdownEditor
+                      value={field.value}
+                      onChange={field.onChange}
+                      enableScroll={false}
+                      height="400px"
+                      className="overflow-hidden"
+                    />
+                  </Suspense>
+                </div>
               </FormControl>
               <FormMessage />
             </FormItem>

@@ -11,6 +11,8 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 interface CardProps {
   event: Timeline;
@@ -19,8 +21,8 @@ interface CardProps {
 
 const expandVariants = {
   collapsed: { height: 0, opacity: 0 },
-  expanded: { 
-    height: "auto", 
+  expanded: {
+    height: "auto",
     opacity: 1,
     transition: {
       height: {
@@ -95,7 +97,7 @@ const TimelineComponent = () => {
                     <div className="absolute left-[24px] w-4 h-4 mt-[22px]">
                       <div className="w-3 h-3 rounded-full bg-primary shadow-[0_0_0_4px_rgba(var(--primary)/0.1)]" />
                     </div>
-                    <TimelineCard 
+                    <TimelineCard
                       event={event}
                       onClick={() => setSelectedEvent(event)}
                     />
@@ -115,7 +117,7 @@ const TimelineComponent = () => {
                         viewport={{ once: true, margin: "-100px" }}
                         className="flex justify-end"
                       >
-                        <TimelineCard 
+                        <TimelineCard
                           event={event}
                           onClick={() => setSelectedEvent(event)}
                         />
@@ -147,7 +149,7 @@ const TimelineComponent = () => {
                         viewport={{ once: true, margin: "-100px" }}
                         className="flex justify-start"
                       >
-                        <TimelineCard 
+                        <TimelineCard
                           event={event}
                           onClick={() => setSelectedEvent(event)}
                         />
@@ -192,9 +194,9 @@ const TimelineComponent = () => {
                   </div>
                 )}
                 <div className="prose prose-primary dark:prose-invert max-w-none">
-                  {selectedEvent.content.split('\n\n').map((paragraph, index) => (
-                    <p key={index}>{paragraph}</p>
-                  ))}
+                  <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                    {selectedEvent.content}
+                  </ReactMarkdown>
                 </div>
               </ScrollArea>
             </>
