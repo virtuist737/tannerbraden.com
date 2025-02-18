@@ -155,20 +155,22 @@ const About = () => {
                   >
                     <Card className="w-full overflow-hidden hover:shadow-lg transition-shadow duration-300">
                       <div className="w-full h-48 relative">
-                        {interest.imageUrl ? (
-                          <img
-                            src={interest.imageUrl}
-                            alt={interest.item}
-                            className="w-full h-full object-cover"
-                            loading="lazy"
-                            onError={(e) => {
-                              e.currentTarget.src = '/images/placeholder.png';
-                            }}
-                          />
+                        {interest.image ? (
+                          <a href={interest.link || '#'} target="_blank" rel="noopener noreferrer">
+                            <img
+                              src={interest.image}
+                              alt={interest.title}
+                              className="w-full h-full object-cover"
+                              loading="lazy"
+                              onError={(e) => {
+                                e.currentTarget.src = '/images/placeholder.png';
+                              }}
+                            />
+                          </a>
                         ) : (
                           <div className="w-full h-full">
                             <ImageUpload
-                              imageUrl={interest.imageUrl}
+                              imageUrl={interest.image}
                               entityId={interest.id}
                               entityType="interest"
                               onSuccess={() => handleImageUploadSuccess('interests')}
@@ -178,22 +180,25 @@ const About = () => {
                       </div>
                       <CardHeader>
                         <div className="flex items-center justify-between">
-                          <CardTitle className="text-xl">{interest.item}</CardTitle>
-                          <Badge
-                            variant="secondary"
-                            className={`
-                              ${interest.type === 'interests' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300' : ''}
-                              ${interest.type === 'instruments' ? 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300' : ''}
-                              ${interest.type === 'activities' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300' : ''}
-                            `}
-                          >
-                            {interest.type}
+                          <CardTitle className="text-xl">
+                            {interest.link ? (
+                              <a href={interest.link} target="_blank" rel="noopener noreferrer" className="hover:text-primary">
+                                {interest.title}
+                              </a>
+                            ) : (
+                              interest.title
+                            )}
+                          </CardTitle>
+                          <Badge variant="secondary">
+                            {interest.category}
                           </Badge>
                         </div>
                       </CardHeader>
-                      <CardContent>
-                        <p className="text-muted-foreground">Category: {interest.category}</p>
-                      </CardContent>
+                      {interest.description && (
+                        <CardContent>
+                          <p className="text-muted-foreground">{interest.description}</p>
+                        </CardContent>
+                      )}
                     </Card>
                   </motion.div>
                 ))}

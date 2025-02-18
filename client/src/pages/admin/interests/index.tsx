@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Link } from "wouter";
 import { motion } from "framer-motion";
-import { PlusCircle, Trash2, Edit } from "lucide-react";
+import { PlusCircle, Trash2, Edit, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -25,13 +25,6 @@ import { useToast } from "@/hooks/use-toast";
 import { Badge } from "@/components/ui/badge";
 import type { Interest } from "@shared/schema";
 import { apiRequest } from "@/lib/queryClient";
-import Masonry from 'react-masonry-css';
-
-const breakpointColumnsObj = {
-  default: 3,
-  1024: 2,
-  640: 1,
-};
 
 export default function AdminInterests() {
   const { toast } = useToast();
@@ -45,9 +38,6 @@ export default function AdminInterests() {
     mutationFn: async (interestId: number) => {
       await apiRequest(`/api/about/interests/${interestId}`, {
         method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-        },
       });
     },
     onSuccess: () => {
@@ -104,21 +94,25 @@ export default function AdminInterests() {
           </Button>
         </div>
 
-        <Masonry
-          breakpointCols={breakpointColumnsObj}
-          className="flex -ml-4 w-auto"
-          columnClassName="pl-4 bg-clip-padding"
-        >
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {interests?.sort((a, b) => a.sortOrder - b.sortOrder).map((interest) => (
             <motion.div
               key={interest.id}
-              className="mb-4"
+              layout
+              className="w-full"
             >
-              <Card className="transition-shadow hover:shadow-md">
+              <Card className="h-full transition-shadow hover:shadow-md">
                 <CardHeader>
                   <CardTitle className="flex items-start justify-between">
-                    <span>{interest.item}</span>
-                    <div className="flex gap-2">
+                    <span className="truncate">{interest.title}</span>
+                    <div className="flex gap-2 shrink-0">
+                      {interest.link && (
+                        <Button variant="ghost" size="icon" asChild>
+                          <a href={interest.link} target="_blank" rel="noopener noreferrer">
+                            <ExternalLink className="h-4 w-4" />
+                          </a>
+                        </Button>
+                      )}
                       <Button variant="ghost" size="icon" asChild>
                         <Link href={`/admin/interests/${interest.id}/edit`}>
                           <Edit className="h-4 w-4" />
@@ -134,7 +128,7 @@ export default function AdminInterests() {
                           <AlertDialogHeader>
                             <AlertDialogTitle>Delete Interest</AlertDialogTitle>
                             <AlertDialogDescription>
-                              Are you sure you want to delete "{interest.item}"? This action cannot be undone.
+                              Are you sure you want to delete "{interest.title}"? This action cannot be undone.
                             </AlertDialogDescription>
                           </AlertDialogHeader>
                           <AlertDialogFooter>
@@ -150,18 +144,27 @@ export default function AdminInterests() {
                       </AlertDialog>
                     </div>
                   </CardTitle>
-                  <CardDescription className="flex items-center gap-2">
-                    <Badge variant="secondary">{interest.category}</Badge>
-                    <Badge>{interest.type}</Badge>
+                  <CardDescription>
+                    <div className="flex flex-wrap gap-2 mt-2">
+                      <Badge variant="secondary">{interest.category}</Badge>
+                      {interest.image && (
+                        <Badge variant="outline">Has Image</Badge>
+                      )}
+                    </div>
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
+                  {interest.description && (
+                    <p className="text-sm text-muted-foreground line-clamp-2 mb-2">
+                      {interest.description}
+                    </p>
+                  )}
                   <p className="text-sm text-muted-foreground">Sort Order: {interest.sortOrder}</p>
                 </CardContent>
               </Card>
             </motion.div>
           ))}
-        </Masonry>
+        </div>
       </motion.div>
     </div>
   );

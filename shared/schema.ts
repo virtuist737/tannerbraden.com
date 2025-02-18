@@ -68,14 +68,15 @@ export const timeline = pgTable("timeline", {
   imageUrl: text("image_url"), // New field
 });
 
-// Interests table - adding imageUrl
+// Interests table - updated to mirror favorites structure
 export const interests = pgTable("interests", {
   id: serial("id").primaryKey(),
+  title: text("title").notNull(),
   category: text("category").notNull(),
-  type: text("type").notNull(),
-  item: text("item").notNull(),
+  description: text("description"),
+  link: text("link"),
+  image: text("image"), 
   sortOrder: integer("sort_order").notNull(),
-  imageUrl: text("image_url"), // New field
 });
 
 // Favorites table remains unchanged since it already has an image field
@@ -129,7 +130,12 @@ export const insertNewsletterSubscriptionSchema = createInsertSchema(newsletterS
 export const insertInterestSchema = createInsertSchema(interests).omit({
   id: true,
 }).extend({
-  imageUrl: z.string().optional(),
+  title: z.string().min(1, "Title is required"),
+  category: z.string().min(1, "Category is required"),
+  sortOrder: z.number().int().nonnegative(),
+  description: z.string().optional().nullable(),
+  link: z.string().url().optional().nullable(),
+  image: z.string().optional().nullable(), 
 });
 
 export const insertFavoriteSchema = createInsertSchema(favorites).extend({
