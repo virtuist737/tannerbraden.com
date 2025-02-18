@@ -29,7 +29,7 @@ const SolarisLabs = () => {
       >
         <div className="text-center space-y-4">
           <img 
-            src="/images/solaris-labs-logo-500x500.png" 
+            src="https://res.cloudinary.com/dvk20sglr/image/upload/v1739851958/solaris-labs-logo-500x500_nw8qfk.png" 
             alt="Solaris Labs Logo" 
             className="w-24 h-24 mx-auto mb-4"
           />
