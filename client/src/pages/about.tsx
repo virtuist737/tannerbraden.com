@@ -154,24 +154,26 @@ const About = () => {
                     className="mb-6"
                   >
                     <Card className="w-full overflow-hidden hover:shadow-lg transition-shadow duration-300">
-                      <div className="w-full">
+                      <div className="w-full h-48 relative">
                         {interest.imageUrl ? (
                           <img
                             src={interest.imageUrl}
                             alt={interest.item}
-                            className="w-full h-auto object-cover"
+                            className="w-full h-full object-cover"
                             loading="lazy"
                             onError={(e) => {
                               e.currentTarget.src = '/images/placeholder.png';
                             }}
                           />
                         ) : (
-                          <ImageUpload
-                            imageUrl={interest.imageUrl}
-                            entityId={interest.id}
-                            entityType="interest"
-                            onSuccess={() => handleImageUploadSuccess('interests')}
-                          />
+                          <div className="w-full h-full">
+                            <ImageUpload
+                              imageUrl={interest.imageUrl}
+                              entityId={interest.id}
+                              entityType="interest"
+                              onSuccess={() => handleImageUploadSuccess('interests')}
+                            />
+                          </div>
                         )}
                       </div>
                       <CardHeader>
