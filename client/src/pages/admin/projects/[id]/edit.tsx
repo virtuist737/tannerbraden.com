@@ -35,7 +35,7 @@ export default function EditProject() {
     defaultValues: {
       title: "",
       description: "",
-      coverImage: "",
+      imageUrl: "",
       technologies: [],
       githubUrl: "",
       liveUrl: "",
@@ -50,7 +50,7 @@ export default function EditProject() {
       form.reset({
         title: project.title,
         description: project.description,
-        coverImage: project.coverImage,
+        imageUrl: project.imageUrl,
         technologies: project.technologies,
         githubUrl: project.githubUrl || "",
         liveUrl: project.liveUrl || "",
@@ -162,15 +162,15 @@ export default function EditProject() {
 
                 <FormField
                   control={form.control}
-                  name="coverImage"
+                  name="imageUrl"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Cover Image URL</FormLabel>
+                      <FormLabel>Image URL</FormLabel>
                       <FormControl>
                         <Input {...field} />
                       </FormControl>
                       <FormDescription>
-                        Enter the URL of the project cover image
+                        Enter the URL of the project image
                       </FormDescription>
                       <FormMessage />
                     </FormItem>

@@ -30,7 +30,7 @@ export default function NewProject() {
     defaultValues: {
       title: "",
       description: "",
-      coverImage: "",
+      imageUrl: "", // Updated field name
       technologies: [],
       githubUrl: "",
       liveUrl: "",
@@ -57,7 +57,7 @@ export default function NewProject() {
           body: JSON.stringify(formattedData),
         });
         const responseData = await response.json();
-        
+
         if (!response.ok) {
           console.error("Server response:", {
             status: response.status,
@@ -91,7 +91,7 @@ export default function NewProject() {
   const onSubmit = (data: InsertProject) => {
     const formattedData = {
       ...data,
-      technologies: typeof data.technologies === 'string' 
+      technologies: typeof data.technologies === 'string'
         ? data.technologies.split(',').map(tech => tech.trim()).filter(Boolean)
         : data.technologies || [],
       sortOrder: Number(data.sortOrder) || 0,
@@ -150,15 +150,15 @@ export default function NewProject() {
 
                 <FormField
                   control={form.control}
-                  name="coverImage"
+                  name="imageUrl" // Updated field name
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Cover Image URL</FormLabel>
+                      <FormLabel>Image URL</FormLabel>
                       <FormControl>
                         <Input {...field} />
                       </FormControl>
                       <FormDescription>
-                        Enter the URL of the project cover image
+                        Enter the URL of the project image
                       </FormDescription>
                       <FormMessage />
                     </FormItem>

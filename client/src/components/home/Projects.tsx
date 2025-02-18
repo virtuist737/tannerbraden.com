@@ -61,7 +61,7 @@ const Projects = () => {
                 <CardHeader className="p-0">
                   <div className="relative w-full">
                     <img
-                      src={project.coverImage}
+                      src={project.imageUrl}
                       alt={project.title}
                       className="w-full h-auto object-cover"
                       loading="lazy"

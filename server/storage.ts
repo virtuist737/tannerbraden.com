@@ -97,6 +97,7 @@ export interface IStorage {
   listProjects(): Promise<Project[]>;
   updateProject(id: number, updates: Partial<InsertProject>): Promise<Project | undefined>;
   deleteProject(id: number): Promise<boolean>;
+  updateProjectImage(id: number, imageUrl: string): Promise<Project>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -389,6 +390,14 @@ export class DatabaseStorage implements IStorage {
       .where(eq(projects.id, id))
       .returning();
     return !!deletedProject;
+  }
+  async updateProjectImage(id: number, imageUrl: string): Promise<Project> {
+    const [updated] = await db
+      .update(projects)
+      .set({ imageUrl })
+      .where(eq(projects.id, id))
+      .returning();
+    return updated;
   }
 }
 
