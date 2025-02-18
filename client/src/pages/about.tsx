@@ -123,16 +123,19 @@ const About = () => {
             <motion.div 
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-7xl mx-auto px-4"
+              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 auto-rows-auto gap-6 max-w-7xl mx-auto px-4"
             >
               {filteredInterests?.sort((a, b) => a.sortOrder - b.sortOrder).map((interest) => (
                 <Card key={interest.id} className="relative overflow-hidden group hover:shadow-lg transition-shadow">
-                  <ImageUpload
-                    imageUrl={interest.imageUrl}
-                    entityId={interest.id}
-                    entityType="interest"
-                    onSuccess={() => handleImageUploadSuccess('interests')}
-                  />
+                  <div className="w-full">
+                    <ImageUpload
+                      imageUrl={interest.imageUrl}
+                      entityId={interest.id}
+                      entityType="interest"
+                      onSuccess={() => handleImageUploadSuccess('interests')}
+                      className="w-full h-auto object-contain"
+                    />
+                  </div>
                   <CardHeader>
                     <div className="flex items-center justify-between">
                       <CardTitle className="text-xl">{interest.item}</CardTitle>
@@ -152,7 +155,6 @@ const About = () => {
                   <CardContent>
                     <p className="text-sm text-muted-foreground">Category: {interest.category}</p>
                   </CardContent>
-                  <div className="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity" />
                 </Card>
               ))}
             </motion.div>
@@ -185,7 +187,7 @@ const About = () => {
             <motion.div 
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-7xl mx-auto px-4"
+              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 auto-rows-auto gap-6 max-w-7xl mx-auto px-4"
             >
               {filteredFavorites?.sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0)).map((favorite) => (
                 <a
@@ -195,13 +197,16 @@ const About = () => {
                   rel="noopener noreferrer"
                   className="block h-full"
                 >
-                  <Card className="flex flex-col h-full transition-all duration-200 hover:shadow-lg hover:scale-[1.02] cursor-pointer">
-                    <ImageUpload
-                      imageUrl={favorite.image}
-                      entityId={favorite.id}
-                      entityType="favorite"
-                      onSuccess={() => handleImageUploadSuccess('favorites')}
-                    />
+                  <Card className="h-full flex flex-col transition-all duration-200 hover:shadow-lg hover:scale-[1.02] cursor-pointer">
+                    <div className="w-full">
+                      <ImageUpload
+                        imageUrl={favorite.image}
+                        entityId={favorite.id}
+                        entityType="favorite"
+                        onSuccess={() => handleImageUploadSuccess('favorites')}
+                        className="w-full h-auto object-contain"
+                      />
+                    </div>
                     <CardHeader>
                       <div className="flex items-center justify-between">
                         <CardTitle className="text-xl">{favorite.title}</CardTitle>
