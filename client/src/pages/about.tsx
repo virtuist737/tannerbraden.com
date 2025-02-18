@@ -123,7 +123,7 @@ const About = () => {
             <motion.div 
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 auto-rows-auto gap-6 max-w-7xl mx-auto px-4"
+              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-7xl mx-auto px-4"
             >
               {filteredInterests?.sort((a, b) => a.sortOrder - b.sortOrder).map((interest) => (
                 <Card key={interest.id} className="relative overflow-hidden group hover:shadow-lg transition-shadow">
@@ -187,7 +187,7 @@ const About = () => {
             <motion.div 
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 auto-rows-auto gap-6 max-w-7xl mx-auto px-4"
+              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-7xl mx-auto px-4"
             >
               {filteredFavorites?.sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0)).map((favorite) => (
                 <a
