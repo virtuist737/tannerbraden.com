@@ -62,7 +62,7 @@ export default function AdminInterests() {
   if (isLoading) {
     return (
       <div className="container py-8">
-        <div className="grid grid-cols-1 gap-4 auto-rows-auto">
+        <div className="grid grid-cols-1 gap-4">
           {[...Array(3)].map((_, i) => (
             <Card key={i} className="animate-pulse">
               <CardHeader>
@@ -97,9 +97,18 @@ export default function AdminInterests() {
           </Button>
         </div>
 
-        <div className="grid grid-cols-1 auto-rows-auto gap-4">
+        <div className="grid grid-cols-1 gap-4">
           {interests?.sort((a, b) => a.sortOrder - b.sortOrder).map((interest) => (
-            <Card key={interest.id} className="transition-shadow hover:shadow-md">
+            <Card key={interest.id} className="overflow-hidden transition-shadow hover:shadow-md">
+              {interest.imageUrl && (
+                <div className="w-full">
+                  <img
+                    src={interest.imageUrl}
+                    alt={interest.item}
+                    className="w-full h-auto"
+                  />
+                </div>
+              )}
               <CardHeader>
                 <CardTitle className="flex items-start justify-between">
                   <span>{interest.item}</span>
