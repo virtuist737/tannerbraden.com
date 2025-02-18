@@ -236,7 +236,7 @@ const About = () => {
                                   ${favorite.category === 'podcast' ? 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300' : ''}
                                   ${favorite.category === 'music' ? 'bg-pink-100 text-pink-800 dark:bg-pink-900 dark:text-pink-300' : ''}
                                   ${favorite.category === 'video games' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300' : ''}
-                                `}
+                                  `}
                               >
                                 {favorite.category}
                               </Badge>
