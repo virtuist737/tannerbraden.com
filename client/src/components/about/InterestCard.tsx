@@ -26,13 +26,13 @@ export default function InterestCard({ interest, index, onImageUploadSuccess }: 
       transition={{ duration: 0.5, delay: index * 0.1 }}
       className="mb-6"
     >
-      <Card className="relative overflow-hidden group hover:shadow-lg transition-shadow">
-        <div className="w-full relative">
+      <Card className="relative overflow-hidden group hover:shadow-lg transition-shadow flex flex-col">
+        <div className="w-full">
           {interest.imageUrl ? (
             <img 
               src={interest.imageUrl} 
               alt={interest.item} 
-              className="w-full h-auto object-contain"
+              className="w-full h-auto"
               loading="lazy"
               onError={(e) => {
                 e.currentTarget.src = '/images/placeholder.png';
