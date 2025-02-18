@@ -39,9 +39,19 @@ export default function AdminInterests() {
 
   const reorderMutation = useMutation({
     mutationFn: async ({ id, sortOrder }: { id: number; sortOrder: number }) => {
-      await apiRequest(`/api/about/interests/${id}`, {
+      const response = await apiRequest(`/api/about/interests/${id}`, {
         method: "PATCH",
         body: JSON.stringify({ sortOrder }),
+      });
+      if (!response.ok) {
+        throw new Error("Failed to update sort order");
+      }
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to update sort order",
+        variant: "destructive",
       });
     },
   });
@@ -93,8 +103,8 @@ export default function AdminInterests() {
 
   if (isLoading) {
     return (
-      <div className="container py-8">
-        <div className="grid grid-cols-1 gap-4 auto-rows-auto">
+      <div className="container max-w-3xl mx-auto py-8">
+        <div className="space-y-4">
           {[...Array(3)].map((_, i) => (
             <Card key={i} className="animate-pulse">
               <CardHeader>
@@ -112,7 +122,7 @@ export default function AdminInterests() {
   }
 
   return (
-    <div className="container py-8">
+    <div className="container max-w-3xl mx-auto py-8">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -133,14 +143,14 @@ export default function AdminInterests() {
           collisionDetection={closestCenter}
           onDragEnd={handleDragEnd}
         >
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          <div className="space-y-4">
             <SortableContext 
               items={interests?.map(i => i.id) ?? []}
               strategy={verticalListSortingStrategy}
             >
               {interests?.map((interest) => (
                 <SortableItem key={interest.id} id={interest.id}>
-                  <Card className="h-full transition-shadow hover:shadow-md">
+                  <Card className="w-full transition-shadow hover:shadow-md">
                     <CardHeader>
                       <CardTitle className="flex items-start justify-between">
                         <span className="truncate">{interest.title}</span>
@@ -186,7 +196,7 @@ export default function AdminInterests() {
                       <CardDescription>
                         <div className="flex flex-wrap gap-2 mt-2">
                           <Badge variant="secondary">{interest.category}</Badge>
-                          {interest.imageUrl && (
+                          {interest.image && (
                             <Badge variant="outline">Has Image</Badge>
                           )}
                         </div>
