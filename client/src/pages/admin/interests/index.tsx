@@ -25,6 +25,13 @@ import { useToast } from "@/hooks/use-toast";
 import { Badge } from "@/components/ui/badge";
 import type { Interest } from "@shared/schema";
 import { apiRequest } from "@/lib/queryClient";
+import Masonry from 'react-masonry-css';
+
+const breakpointColumnsObj = {
+  default: 3,
+  1024: 2,
+  640: 1,
+};
 
 export default function AdminInterests() {
   const { toast } = useToast();
@@ -97,55 +104,64 @@ export default function AdminInterests() {
           </Button>
         </div>
 
-        <div className="grid grid-cols-1 auto-rows-auto gap-4">
+        <Masonry
+          breakpointCols={breakpointColumnsObj}
+          className="flex -ml-4 w-auto"
+          columnClassName="pl-4 bg-clip-padding"
+        >
           {interests?.sort((a, b) => a.sortOrder - b.sortOrder).map((interest) => (
-            <Card key={interest.id} className="transition-shadow hover:shadow-md">
-              <CardHeader>
-                <CardTitle className="flex items-start justify-between">
-                  <span>{interest.item}</span>
-                  <div className="flex gap-2">
-                    <Button variant="ghost" size="icon" asChild>
-                      <Link href={`/admin/interests/${interest.id}/edit`}>
-                        <Edit className="h-4 w-4" />
-                      </Link>
-                    </Button>
-                    <AlertDialog>
-                      <AlertDialogTrigger asChild>
-                        <Button variant="ghost" size="icon" className="text-destructive">
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </AlertDialogTrigger>
-                      <AlertDialogContent>
-                        <AlertDialogHeader>
-                          <AlertDialogTitle>Delete Interest</AlertDialogTitle>
-                          <AlertDialogDescription>
-                            Are you sure you want to delete "{interest.item}"? This action cannot be undone.
-                          </AlertDialogDescription>
-                        </AlertDialogHeader>
-                        <AlertDialogFooter>
-                          <AlertDialogCancel>Cancel</AlertDialogCancel>
-                          <AlertDialogAction
-                            onClick={() => deleteMutation.mutate(interest.id)}
-                            className="bg-destructive hover:bg-destructive/90"
-                          >
-                            Delete
-                          </AlertDialogAction>
-                        </AlertDialogFooter>
-                      </AlertDialogContent>
-                    </AlertDialog>
-                  </div>
-                </CardTitle>
-                <CardDescription className="flex items-center gap-2">
-                  <Badge variant="secondary">{interest.category}</Badge>
-                  <Badge>{interest.type}</Badge>
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm text-muted-foreground">Sort Order: {interest.sortOrder}</p>
-              </CardContent>
-            </Card>
+            <motion.div
+              key={interest.id}
+              className="mb-4"
+            >
+              <Card className="transition-shadow hover:shadow-md">
+                <CardHeader>
+                  <CardTitle className="flex items-start justify-between">
+                    <span>{interest.item}</span>
+                    <div className="flex gap-2">
+                      <Button variant="ghost" size="icon" asChild>
+                        <Link href={`/admin/interests/${interest.id}/edit`}>
+                          <Edit className="h-4 w-4" />
+                        </Link>
+                      </Button>
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button variant="ghost" size="icon" className="text-destructive">
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Delete Interest</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              Are you sure you want to delete "{interest.item}"? This action cannot be undone.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction
+                              onClick={() => deleteMutation.mutate(interest.id)}
+                              className="bg-destructive hover:bg-destructive/90"
+                            >
+                              Delete
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                    </div>
+                  </CardTitle>
+                  <CardDescription className="flex items-center gap-2">
+                    <Badge variant="secondary">{interest.category}</Badge>
+                    <Badge>{interest.type}</Badge>
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm text-muted-foreground">Sort Order: {interest.sortOrder}</p>
+                </CardContent>
+              </Card>
+            </motion.div>
           ))}
-        </div>
+        </Masonry>
       </motion.div>
     </div>
   );

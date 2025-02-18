@@ -21,6 +21,13 @@ import { Button } from "@/components/ui/button";
 import TimelineComponent from "@/components/about/Timeline";
 import { ImageUpload } from "@/components/shared/ImageUpload";
 import { useQueryClient } from "@tanstack/react-query";
+import Masonry from 'react-masonry-css';
+
+const breakpointColumnsObj = {
+  default: 3,
+  1280: 2,
+  768: 1,
+};
 
 const About = () => {
   const queryClient = useQueryClient();
@@ -120,44 +127,51 @@ const About = () => {
               ))}
             </div>
 
-            <motion.div 
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-7xl mx-auto px-4"
+            <Masonry
+              breakpointCols={breakpointColumnsObj}
+              className="flex -ml-6 w-auto"
+              columnClassName="pl-6 bg-clip-padding"
             >
               {filteredInterests?.sort((a, b) => a.sortOrder - b.sortOrder).map((interest) => (
-                <Card key={interest.id} className="relative overflow-hidden group hover:shadow-lg transition-shadow">
-                  <div className="w-full">
-                    <ImageUpload
-                      imageUrl={interest.imageUrl}
-                      entityId={interest.id}
-                      entityType="interest"
-                      onSuccess={() => handleImageUploadSuccess('interests')}
-                      className="w-full h-auto object-contain"
-                    />
-                  </div>
-                  <CardHeader>
-                    <div className="flex items-center justify-between">
-                      <CardTitle className="text-xl">{interest.item}</CardTitle>
-                      <Badge 
-                        variant="secondary" 
-                        className={`
-                          transition-colors
-                          ${interest.type === 'interests' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300' : ''}
-                          ${interest.type === 'instruments' ? 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300' : ''}
-                          ${interest.type === 'activities' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300' : ''}
-                        `}
-                      >
-                        {interest.type}
-                      </Badge>
+                <motion.div
+                  key={interest.id}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="mb-6"
+                >
+                  <Card className="relative overflow-hidden group hover:shadow-lg transition-shadow">
+                    <div className="w-full">
+                      <ImageUpload
+                        imageUrl={interest.imageUrl}
+                        entityId={interest.id}
+                        entityType="interest"
+                        onSuccess={() => handleImageUploadSuccess('interests')}
+                        className="w-full h-auto"
+                      />
                     </div>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-sm text-muted-foreground">Category: {interest.category}</p>
-                  </CardContent>
-                </Card>
+                    <CardHeader>
+                      <div className="flex items-center justify-between">
+                        <CardTitle className="text-xl">{interest.item}</CardTitle>
+                        <Badge 
+                          variant="secondary" 
+                          className={`
+                            transition-colors
+                            ${interest.type === 'interests' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300' : ''}
+                            ${interest.type === 'instruments' ? 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300' : ''}
+                            ${interest.type === 'activities' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300' : ''}
+                          `}
+                        >
+                          {interest.type}
+                        </Badge>
+                      </div>
+                    </CardHeader>
+                    <CardContent>
+                      <p className="text-sm text-muted-foreground">Category: {interest.category}</p>
+                    </CardContent>
+                  </Card>
+                </motion.div>
               ))}
-            </motion.div>
+            </Masonry>
           </TabsContent>
 
           <TabsContent value="favorites" className="space-y-8">
@@ -184,55 +198,61 @@ const About = () => {
               ))}
             </div>
 
-            <motion.div 
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-7xl mx-auto px-4"
+            <Masonry
+              breakpointCols={breakpointColumnsObj}
+              className="flex -ml-6 w-auto"
+              columnClassName="pl-6 bg-clip-padding"
             >
               {filteredFavorites?.sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0)).map((favorite) => (
-                <a
+                <motion.div
                   key={favorite.id}
-                  href={favorite.link || '#'}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="block"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="mb-6"
                 >
-                  <Card className="w-full overflow-hidden hover:shadow-lg transition-shadow duration-300">
-                    <div className="w-full">
-                      <ImageUpload
-                        imageUrl={favorite.image}
-                        entityId={favorite.id}
-                        entityType="favorite"
-                        onSuccess={() => handleImageUploadSuccess('favorites')}
-                        className="w-full h-auto"
-                      />
-                    </div>
-                    <CardHeader>
-                      <div className="flex items-center justify-between">
-                        <CardTitle className="text-xl">{favorite.title}</CardTitle>
-                        <Badge 
-                          variant="secondary"
-                          className={`
-                            ${favorite.category === 'app' ? 'bg-cyan-100 text-cyan-800 dark:bg-cyan-900 dark:text-cyan-300' : ''}
-                            ${favorite.category === 'book' ? 'bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-300' : ''}
-                            ${favorite.category === 'podcast' ? 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300' : ''}
-                            ${favorite.category === 'music' ? 'bg-pink-100 text-pink-800 dark:bg-pink-900 dark:text-pink-300' : ''}
-                            ${favorite.category === 'video games' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300' : ''}
-                          `}
-                        >
-                          {favorite.category}
-                        </Badge>
+                  <a
+                    href={favorite.link || '#'}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="block"
+                  >
+                    <Card className="w-full overflow-hidden hover:shadow-lg transition-shadow duration-300">
+                      <div className="w-full">
+                        <ImageUpload
+                          imageUrl={favorite.image}
+                          entityId={favorite.id}
+                          entityType="favorite"
+                          onSuccess={() => handleImageUploadSuccess('favorites')}
+                          className="w-full h-auto"
+                        />
                       </div>
-                    </CardHeader>
-                    <CardContent>
-                      {favorite.description && (
-                        <p className="text-muted-foreground">{favorite.description}</p>
-                      )}
-                    </CardContent>
-                  </Card>
-                </a>
+                      <CardHeader>
+                        <div className="flex items-center justify-between">
+                          <CardTitle className="text-xl">{favorite.title}</CardTitle>
+                          <Badge 
+                            variant="secondary"
+                            className={`
+                              ${favorite.category === 'app' ? 'bg-cyan-100 text-cyan-800 dark:bg-cyan-900 dark:text-cyan-300' : ''}
+                              ${favorite.category === 'book' ? 'bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-300' : ''}
+                              ${favorite.category === 'podcast' ? 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300' : ''}
+                              ${favorite.category === 'music' ? 'bg-pink-100 text-pink-800 dark:bg-pink-900 dark:text-pink-300' : ''}
+                              ${favorite.category === 'video games' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300' : ''}
+                            `}
+                          >
+                            {favorite.category}
+                          </Badge>
+                        </div>
+                      </CardHeader>
+                      <CardContent>
+                        {favorite.description && (
+                          <p className="text-muted-foreground">{favorite.description}</p>
+                        )}
+                      </CardContent>
+                    </Card>
+                  </a>
+                </motion.div>
               ))}
-            </motion.div>
+            </Masonry>
           </TabsContent>
         </Tabs>
       </div>

@@ -5,6 +5,13 @@ import { Github, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useQuery } from "@tanstack/react-query";
 import type { Project } from "@shared/schema";
+import Masonry from 'react-masonry-css';
+
+const breakpointColumnsObj = {
+  default: 2,
+  1024: 2,
+  768: 1,
+};
 
 const Projects = () => {
   const { data: projects, isLoading } = useQuery<Project[]>({
@@ -37,21 +44,27 @@ const Projects = () => {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 auto-rows-auto gap-6 md:gap-8">
+        <Masonry
+          breakpointCols={breakpointColumnsObj}
+          className="flex -ml-4 w-auto"
+          columnClassName="pl-4 bg-clip-padding"
+        >
           {projects?.map((project, index) => (
             <motion.div
               key={project.id}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: index * 0.1 }}
+              className="mb-4"
             >
               <Card className="h-full flex flex-col overflow-hidden hover:shadow-lg transition-shadow duration-300">
                 <CardHeader className="p-0">
-                  <div className="relative">
+                  <div className="relative w-full">
                     <img
                       src={project.coverImage}
                       alt={project.title}
-                      className="w-full h-auto object-contain"
+                      className="w-full h-auto object-cover"
+                      loading="lazy"
                     />
                   </div>
                 </CardHeader>
@@ -97,7 +110,7 @@ const Projects = () => {
               </Card>
             </motion.div>
           ))}
-        </div>
+        </Masonry>
       </motion.div>
     </section>
   );
