@@ -6,12 +6,13 @@ import { useAuth } from "@/hooks/use-auth";
 
 interface ImageUploadProps {
   imageUrl?: string | null;
-  entityId: number;
-  entityType: 'timeline' | 'interest' | 'favorite' | 'blog' | 'project';
+  entityId: string | number;
+  entityType: 'timeline' | 'interest' | 'favorite' | 'blog' | 'project' | 'blog-content' | 'timeline-content';
   onSuccess?: (newImageUrl: string) => void;
+  trigger?: React.ReactNode;
 }
 
-export const ImageUpload = ({ imageUrl, entityId, entityType, onSuccess }: ImageUploadProps) => {
+export const ImageUpload = ({ imageUrl, entityId, entityType, onSuccess, trigger }: ImageUploadProps) => {
   const { toast } = useToast();
   const [isUploading, setIsUploading] = useState(false);
   const { user } = useAuth();
@@ -51,6 +52,21 @@ export const ImageUpload = ({ imageUrl, entityId, entityType, onSuccess }: Image
       setIsUploading(false);
     }
   };
+
+  if (trigger) {
+    return (
+      <label className="cursor-pointer">
+        <input
+          type="file"
+          accept="image/*"
+          className="hidden"
+          onChange={handleImageUpload}
+          disabled={isUploading}
+        />
+        {trigger}
+      </label>
+    );
+  }
 
   return (
     <div className="relative group">
