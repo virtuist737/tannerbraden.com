@@ -94,7 +94,7 @@ export const projects = pgTable("projects", {
   id: serial("id").primaryKey(),
   title: text("title").notNull(),
   description: text("description").notNull(),
-  imageUrl: text("image_url").notNull(),
+  coverImage: text("image_url").notNull(),
   technologies: text("technologies").array().notNull(),
   githubUrl: text("github_url"),
   liveUrl: text("live_url"),

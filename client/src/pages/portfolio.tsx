@@ -40,7 +40,7 @@ const Portfolio = () => {
                 <Card>
                   <CardHeader className="relative aspect-video overflow-hidden">
                     <img
-                      src={project.imageUrl}
+                      src={project.coverImage || project.imageUrl}
                       alt={project.title}
                       className="object-cover"
                     />
