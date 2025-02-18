@@ -250,8 +250,7 @@ const About = () => {
                         </Card>
                       </a>
                     </motion.div>
-                  );
-                })}
+                ))}
               </Masonry>
             )}
           </TabsContent>
