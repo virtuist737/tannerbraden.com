@@ -1,6 +1,6 @@
+
 import { motion } from "framer-motion";
 import { useQuery } from "@tanstack/react-query";
-import { useInView } from "react-intersection-observer";
 import Masonry from 'react-masonry-css';
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -42,10 +42,10 @@ const SolarisLabs = () => {
         <Masonry
           breakpointCols={{
             default: 5,
-            1536: 4, // 2xl
-            1280: 3, // xl
-            768: 2,  // md
-            640: 2,  // sm
+            1536: 4,
+            1280: 3,
+            768: 2,
+            640: 2,
           }}
           className="flex -ml-4 w-auto"
           columnClassName="pl-4 bg-clip-padding"
@@ -60,67 +60,66 @@ const SolarisLabs = () => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
               >
-                  <Card className="h-full flex flex-col overflow-hidden hover:shadow-lg transition-shadow duration-300">
-                    <CardHeader className="p-0">
-                      <div className="relative w-full overflow-hidden">
-                        <img
-                          src={project.imageUrl}
-                          alt={project.title}
-                          className="w-full"
-                          loading="lazy"
-                          onError={(e) => {
-                            const target = e.target as HTMLImageElement;
-                            target.src = '/images/placeholder.png';
-                          }}
-                        />
-                      </div>
-                    </CardHeader>
-                    <CardContent className="flex-1 p-4 md:p-6 space-y-4">
-                      <h2 className="text-2xl font-semibold">{project.title}</h2>
-                      <p className="text-muted-foreground">{project.description}</p>
-                      <div className="flex flex-wrap gap-2">
-                        {project.technologies.map((tech) => (
-                          <Badge key={tech} variant="secondary">
-                            {tech}
-                          </Badge>
-                        ))}
-                      </div>
-                      <div className="flex gap-4">
-                        {project.githubUrl && (
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            asChild
-                            className="gap-2"
+                <Card className="h-full flex flex-col overflow-hidden hover:shadow-lg transition-shadow duration-300">
+                  <CardHeader className="p-0">
+                    <div className="relative w-full overflow-hidden">
+                      <img
+                        src={project.imageUrl}
+                        alt={project.title}
+                        className="w-full"
+                        loading="lazy"
+                        onError={(e) => {
+                          const target = e.target as HTMLImageElement;
+                          target.src = '/images/placeholder.png';
+                        }}
+                      />
+                    </div>
+                  </CardHeader>
+                  <CardContent className="flex-1 p-4 md:p-6 space-y-4">
+                    <h2 className="text-2xl font-semibold">{project.title}</h2>
+                    <p className="text-muted-foreground">{project.description}</p>
+                    <div className="flex flex-wrap gap-2">
+                      {project.technologies.map((tech) => (
+                        <Badge key={tech} variant="secondary">
+                          {tech}
+                        </Badge>
+                      ))}
+                    </div>
+                    <div className="flex gap-4">
+                      {project.githubUrl && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          asChild
+                          className="gap-2"
+                        >
+                          <a
+                            href={project.githubUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
                           >
-                            <a
-                              href={project.githubUrl}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                            >
-                              <Github className="h-4 w-4" />
-                              Code
-                            </a>
-                          </Button>
-                        )}
-                        {project.liveUrl && (
-                          <Button size="sm" asChild className="gap-2">
-                            <a
-                              href={project.liveUrl}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                            >
-                              <ExternalLink className="h-4 w-4" />
-                              Live Demo
-                            </a>
-                          </Button>
-                        )}
-                      </div>
-                    </CardContent>
-                  </Card>
-                </motion.div>
-              );
-            })
+                            <Github className="h-4 w-4" />
+                            Code
+                          </a>
+                        </Button>
+                      )}
+                      {project.liveUrl && (
+                        <Button size="sm" asChild className="gap-2">
+                          <a
+                            href={project.liveUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            <ExternalLink className="h-4 w-4" />
+                            Live Demo
+                          </a>
+                        </Button>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            ))
           )}
         </Masonry>
       </motion.div>
