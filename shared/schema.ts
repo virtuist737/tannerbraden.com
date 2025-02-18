@@ -17,7 +17,7 @@ export const blogPosts = pgTable("blog_posts", {
   title: text("title").notNull(),
   content: text("content").notNull(),
   excerpt: text("excerpt").notNull(),
-  coverImage: text("cover_image").notNull(),
+  coverImage: text("cover_image"),  // Remove notNull constraint
   authorId: integer("author_id").references(() => users.id),
   category: text("category").notNull(),
   publishedAt: timestamp("published_at").notNull().defaultNow(),
@@ -121,6 +121,8 @@ export const insertUserSchema = createInsertSchema(users).pick({
 export const insertBlogPostSchema = createInsertSchema(blogPosts).omit({
   id: true,
   publishedAt: true,
+}).extend({
+  coverImage: z.string().optional(),  // Make explicitly optional in zod schema
 });
 
 export const insertNewsletterSubscriptionSchema = createInsertSchema(newsletterSubscriptions).pick({
