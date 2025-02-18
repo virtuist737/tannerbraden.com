@@ -20,7 +20,7 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Ensure images directory exists
+// Update the images directory path to point to the public/images folder
 const imagesDir = path.join(__dirname, '../client/public/images');
 fs.mkdirSync(imagesDir, { recursive: true });
 
@@ -198,12 +198,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: `Invalid ${entityType} ID` });
       }
 
-      const fileName = `${Date.now()}-${req.file.originalname}`;
+      const fileName = `${entityType}-${id}-${Date.now()}-${req.file.originalname}`;
       const filePath = path.join(imagesDir, fileName);
 
       await fs.promises.writeFile(filePath, req.file.buffer);
+
+      // Update the database with just the filename
       await updateFunction(id, fileName);
 
+      // Return just the filename - the frontend will construct the full URL
       res.json({ imageUrl: fileName });
     } catch (error) {
       console.error(`Error uploading ${entityType} image:`, error);

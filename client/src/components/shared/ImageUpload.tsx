@@ -52,12 +52,17 @@ export const ImageUpload = ({ imageUrl, entityId, entityType, onSuccess }: Image
     }
   };
 
+  const getImageUrl = (url: string) => {
+    if (!url) return '';
+    return url.startsWith('http') ? url : `/images/${url}`;
+  };
+
   return (
     <div className="relative group">
       {imageUrl ? (
         <div className="relative w-full overflow-hidden rounded-lg">
           <img
-            src={imageUrl.startsWith('/') ? imageUrl : `/images/${imageUrl}`}
+            src={getImageUrl(imageUrl)}
             alt="Uploaded content"
             className="object-cover w-full h-full"
           />
