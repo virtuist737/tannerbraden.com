@@ -15,7 +15,7 @@ import { insertFavoriteSchema, type InsertFavorite } from "@shared/schema";
 import { ImageUpload } from "@/components/shared/ImageUpload";
 
 interface Props {
-  defaultValues?: Partial<InsertFavorite>;
+  defaultValues?: Partial<InsertFavorite> & { id?: number };
   onSubmit: (data: InsertFavorite) => void;
   isSubmitting?: boolean;
 }
@@ -26,6 +26,7 @@ const defaultFavorite: Partial<InsertFavorite> = {
   description: "",
   link: "",
   sortOrder: 0,
+  image: "",
 };
 
 export function FavoriteForm({ defaultValues = defaultFavorite, onSubmit, isSubmitting }: Props) {
@@ -133,14 +134,12 @@ export function FavoriteForm({ defaultValues = defaultFavorite, onSubmit, isSubm
             <FormItem>
               <FormLabel>Image</FormLabel>
               <FormControl>
-                {defaultValues?.id && (
-                  <ImageUpload
-                    imageUrl={defaultValues.image}
-                    entityId={defaultValues.id}
-                    entityType="favorite"
-                    onSuccess={(url) => field.onChange(url)}
-                  />
-                )}
+                <ImageUpload
+                  imageUrl={field.value}
+                  entityId={defaultValues?.id || 0}
+                  entityType="favorite"
+                  onSuccess={(url) => field.onChange(url)}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -148,7 +147,7 @@ export function FavoriteForm({ defaultValues = defaultFavorite, onSubmit, isSubm
         />
 
         <Button type="submit" disabled={isSubmitting}>
-          {isSubmitting ? "Saving..." : "Save"}
+          {isSubmitting ? "Saving..." : defaultValues?.id ? "Update" : "Create"}
         </Button>
       </form>
     </Form>
