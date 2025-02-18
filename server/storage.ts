@@ -266,7 +266,7 @@ export class DatabaseStorage implements IStorage {
   async updateInterestImage(id: number, imageUrl: string): Promise<Interest> {
     const [updated] = await db
       .update(interests)
-      .set({ imageUrl })
+      .set({ image: imageUrl })
       .where(eq(interests.id, id))
       .returning();
     return updated;
