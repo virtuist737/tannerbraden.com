@@ -1,7 +1,6 @@
 import { motion } from "framer-motion";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
-import { useInView } from "react-intersection-observer";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import {
   Tabs,
@@ -23,7 +22,6 @@ import TimelineComponent from "@/components/about/Timeline";
 import { ImageUpload } from "@/components/shared/ImageUpload";
 import { useQueryClient } from "@tanstack/react-query";
 import Masonry from 'react-masonry-css';
-import InterestCard from "@/components/about/InterestCard";
 
 const breakpointColumnsObj = {
   default: 5,
@@ -153,10 +151,39 @@ const About = () => {
                     transition={{ duration: 0.5, delay: index * 0.1 }}
                     className="mb-6"
                   >
-                    <InterestCard
-                      interest={interest}
-                      onImageUploadSuccess={() => handleImageUploadSuccess('interests')}
-                    />
+                    <Card className="w-full overflow-hidden hover:shadow-lg transition-shadow duration-300">
+                      <div className="w-full">
+                        {interest.image ? (
+                          <img
+                            src={interest.image}
+                            alt={interest.title}
+                            className="w-full h-auto object-cover"
+                            loading="lazy"
+                            onError={(e) => {
+                              e.currentTarget.src = '/images/placeholder.png';
+                            }}
+                          />
+                        ) : (
+                          <ImageUpload
+                            imageUrl={interest.image}
+                            entityId={interest.id}
+                            entityType="interest"
+                            onSuccess={() => handleImageUploadSuccess('interests')}
+                          />
+                        )}
+                      </div>
+                      <CardHeader>
+                        <div className="flex items-center justify-between">
+                          <CardTitle className="text-xl">{interest.title}</CardTitle>
+                          <Badge variant="secondary">{interest.category}</Badge>
+                        </div>
+                      </CardHeader>
+                      {interest.description && (
+                        <CardContent>
+                          <p className="text-muted-foreground">{interest.description}</p>
+                        </CardContent>
+                      )}
+                    </Card>
                   </motion.div>
                 ))}
               </Masonry>
