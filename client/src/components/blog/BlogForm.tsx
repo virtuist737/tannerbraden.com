@@ -105,6 +105,7 @@ const BlogForm = ({ initialData, onSubmit, isSubmitting }: BlogFormProps) => {
   const addImage = async (url: string) => {
     if (editor) {
       editor.chain().focus().setImage({ src: url }).run();
+      editor.chain().focus().insertContent('<p></p>').run();
     }
   };
 

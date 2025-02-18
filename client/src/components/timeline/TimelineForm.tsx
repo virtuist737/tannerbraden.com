@@ -98,6 +98,8 @@ const TimelineForm = ({ initialData, onSubmit, isSubmitting }: TimelineFormProps
   const addImage = async (url: string) => {
     if (editor) {
       editor.chain().focus().setImage({ src: url }).run();
+      // Add a newline after the image for better formatting
+      editor.chain().focus().insertContent('<p></p>').run();
     }
   };
 

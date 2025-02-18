@@ -22,6 +22,26 @@ export const ImageUpload = ({ imageUrl, entityId, entityType, onSuccess, trigger
     const file = event.target.files?.[0];
     if (!file) return;
 
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      toast({
+        title: "Error",
+        description: "Please upload an image file",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Validate file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      toast({
+        title: "Error",
+        description: "Image size should be less than 5MB",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIsUploading(true);
     const formData = new FormData();
     formData.append('image', file);
@@ -33,23 +53,31 @@ export const ImageUpload = ({ imageUrl, entityId, entityType, onSuccess, trigger
       });
 
       if (!response.ok) {
-        throw new Error('Upload failed');
+        const error = await response.json();
+        throw new Error(error.message || 'Upload failed');
       }
 
       const data = await response.json();
+      if (!data.imageUrl) {
+        throw new Error('No image URL returned from server');
+      }
+
       onSuccess?.(data.imageUrl);
       toast({
         title: "Success",
         description: "Image uploaded successfully",
       });
     } catch (error) {
+      console.error('Upload error:', error);
       toast({
         title: "Error",
-        description: "Failed to upload image",
+        description: error instanceof Error ? error.message : "Failed to upload image",
         variant: "destructive",
       });
     } finally {
       setIsUploading(false);
+      // Reset the input
+      event.target.value = '';
     }
   };
 
@@ -63,7 +91,16 @@ export const ImageUpload = ({ imageUrl, entityId, entityType, onSuccess, trigger
           onChange={handleImageUpload}
           disabled={isUploading}
         />
-        {trigger}
+        {isUploading ? (
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            disabled
+          >
+            <Loader2 className="h-4 w-4 animate-spin" />
+          </Button>
+        ) : trigger}
       </label>
     );
   }
