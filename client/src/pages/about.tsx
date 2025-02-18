@@ -195,9 +195,9 @@ const About = () => {
                   href={favorite.link || '#'}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="block h-full"
+                  className="block"
                 >
-                  <Card className="w-full flex flex-col transition-all duration-200 hover:shadow-lg hover:scale-[1.02] cursor-pointer">
+                  <Card className="w-full overflow-hidden hover:shadow-lg transition-shadow duration-300">
                     <div className="w-full">
                       <ImageUpload
                         imageUrl={favorite.image}
@@ -224,7 +224,7 @@ const About = () => {
                         </Badge>
                       </div>
                     </CardHeader>
-                    <CardContent className="flex-1">
+                    <CardContent>
                       {favorite.description && (
                         <p className="text-muted-foreground">{favorite.description}</p>
                       )}
