@@ -406,6 +406,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Add this new route after the existing interests routes
+  app.post("/api/about/interests/reorder", isAuthenticated, async (req, res) => {
+    try {
+      const { updates } = req.body;
+
+      if (!Array.isArray(updates)) {
+        return res.status(400).json({ error: "Updates must be an array" });
+      }
+
+      // Validate each update object
+      for (const update of updates) {
+        if (typeof update.id !== 'number' || typeof update.sortOrder !== 'number') {
+          return res.status(400).json({ error: "Invalid update format" });
+        }
+      }
+
+      // Process all updates sequentially
+      for (const update of updates) {
+        await storage.updateInterest(update.id, { sortOrder: update.sortOrder });
+      }
+
+      // Return success
+      res.json({ message: "Sort order updated successfully" });
+    } catch (error) {
+      console.error("Error updating interests order:", error);
+      res.status(500).json({ error: "Failed to update interests order" });
+    }
+  });
+
   app.get("/api/about/favorites", async (req, res) => {
     try {
       const favorites = await storage.listFavorites();

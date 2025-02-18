@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Link } from "wouter";
 import { motion } from "framer-motion";
-import { PlusCircle, Trash2, Edit, ExternalLink } from "lucide-react";
+import { Plus, Trash2, Edit, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -38,13 +38,17 @@ export default function AdminInterests() {
   });
 
   const reorderMutation = useMutation({
-    mutationFn: async ({ id, sortOrder }: { id: number; sortOrder: number }) => {
-      const response = await apiRequest(`/api/about/interests/${id}`, {
-        method: "PATCH",
-        body: JSON.stringify({ sortOrder }),
+    mutationFn: async (updates: { id: number; sortOrder: number }[]) => {
+      const response = await apiRequest(`/api/about/interests/reorder`, {
+        method: "POST",
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ updates }),
       });
       if (!response.ok) {
-        throw new Error("Failed to update sort order");
+        const error = await response.json();
+        throw new Error(error.message || "Failed to update interests order");
       }
     },
     onError: (error: Error) => {
@@ -53,6 +57,8 @@ export default function AdminInterests() {
         description: error.message || "Failed to update sort order",
         variant: "destructive",
       });
+      // Revert the optimistic update
+      queryClient.invalidateQueries({ queryKey: ["/api/about/interests"] });
     },
   });
 
@@ -68,22 +74,25 @@ export default function AdminInterests() {
     // Update the cache immediately for a smoother experience
     queryClient.setQueryData(["/api/about/interests"], newItems);
 
-    // Update the sortOrder for all affected items
-    newItems.forEach((item, index) => {
-      reorderMutation.mutate({ id: item.id, sortOrder: index });
-    });
+    // Prepare updates for all items with their new sort orders
+    const updates = newItems.map((item, index) => ({
+      id: item.id,
+      sortOrder: index,
+    }));
 
-    toast({
-      title: "Success",
-      description: "Interest order updated",
-    });
+    // Send batch update
+    reorderMutation.mutate(updates);
   };
 
   const deleteMutation = useMutation({
     mutationFn: async (interestId: number) => {
-      await apiRequest(`/api/about/interests/${interestId}`, {
+      const response = await apiRequest(`/api/about/interests/${interestId}`, {
         method: "DELETE",
       });
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || "Failed to delete interest");
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/about/interests"] });
@@ -133,7 +142,7 @@ export default function AdminInterests() {
           <h1 className="text-3xl font-bold tracking-tight">Interests Management</h1>
           <Button asChild>
             <Link href="/admin/interests/new">
-              <PlusCircle className="h-4 w-4 mr-2" />
+              <Plus className="h-4 w-4 mr-2" />
               New Interest
             </Link>
           </Button>
