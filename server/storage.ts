@@ -290,7 +290,7 @@ export class DatabaseStorage implements IStorage {
   async updateTimeline(id: number, updates: Partial<InsertTimeline>): Promise<Timeline | undefined> {
     const [updatedTimeline] = await db
       .update(timelineTable)
-      .set(updates)
+      .set({ ...updates, updatedAt: new Date() })
       .where(eq(timelineTable.id, id))
       .returning();
     return updatedTimeline;

@@ -24,13 +24,54 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import type { Timeline } from "@shared/schema";
 import { apiRequest } from "@/lib/queryClient";
+import { SortableItem } from "@/components/shared/SortableItem";
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from "@dnd-kit/core";
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
 
 export default function AdminTimeline() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
 
   const { data: timeline, isLoading } = useQuery<Timeline[]>({
     queryKey: ["/api/timeline"],
+  });
+
+  const reorderMutation = useMutation({
+    mutationFn: async ({ id, sortOrder }: { id: number; sortOrder: number }) => {
+      await apiRequest(`/api/timeline/${id}`, {
+        method: "PATCH",
+        body: JSON.stringify({ sortOrder }),
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/timeline"] });
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Failed to reorder timeline entries",
+        variant: "destructive",
+      });
+    },
   });
 
   const deleteMutation = useMutation({
@@ -58,6 +99,22 @@ export default function AdminTimeline() {
       });
     },
   });
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+
+    if (!over || active.id === over.id) return;
+
+    const oldIndex = timeline!.findIndex((item) => item.id === active.id);
+    const newIndex = timeline!.findIndex((item) => item.id === over.id);
+
+    const newItems = arrayMove(timeline!, oldIndex, newIndex);
+
+    // Update sort order for all affected items
+    newItems.forEach((item, index) => {
+      reorderMutation.mutate({ id: item.id, sortOrder: index });
+    });
+  };
 
   if (isLoading) {
     return (
@@ -97,54 +154,67 @@ export default function AdminTimeline() {
           </Button>
         </div>
 
-        <div className="grid gap-4">
-          {timeline?.map((entry) => (
-            <Card key={entry.id}>
-              <CardHeader>
-                <CardTitle className="flex items-start justify-between">
-                  <span>{entry.title}</span>
-                  <div className="flex gap-2">
-                    <Button variant="ghost" size="icon" asChild>
-                      <Link href={`/admin/timeline/${entry.id}/edit`}>
-                        <Edit className="h-4 w-4" />
-                      </Link>
-                    </Button>
-                    <AlertDialog>
-                      <AlertDialogTrigger asChild>
-                        <Button variant="ghost" size="icon" className="text-destructive">
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </AlertDialogTrigger>
-                      <AlertDialogContent>
-                        <AlertDialogHeader>
-                          <AlertDialogTitle>Delete Timeline Entry</AlertDialogTitle>
-                          <AlertDialogDescription>
-                            Are you sure you want to delete "{entry.title}"? This action cannot be undone.
-                          </AlertDialogDescription>
-                        </AlertDialogHeader>
-                        <AlertDialogFooter>
-                          <AlertDialogCancel>Cancel</AlertDialogCancel>
-                          <AlertDialogAction
-                            onClick={() => deleteMutation.mutate(entry.id)}
-                            className="bg-destructive hover:bg-destructive/90"
-                          >
-                            Delete
-                          </AlertDialogAction>
-                        </AlertDialogFooter>
-                      </AlertDialogContent>
-                    </AlertDialog>
-                  </div>
-                </CardTitle>
-                <CardDescription>
-                  {entry.date} • {entry.category}
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm text-muted-foreground">{entry.content}</p>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCenter}
+          onDragEnd={handleDragEnd}
+        >
+          <SortableContext
+            items={timeline?.map(entry => entry.id) ?? []}
+            strategy={verticalListSortingStrategy}
+          >
+            <div className="grid gap-4">
+              {timeline?.map((entry) => (
+                <SortableItem key={entry.id} id={entry.id}>
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="flex items-start justify-between">
+                        <span>{entry.title}</span>
+                        <div className="flex gap-2">
+                          <Button variant="ghost" size="icon" asChild>
+                            <Link href={`/admin/timeline/${entry.id}/edit`}>
+                              <Edit className="h-4 w-4" />
+                            </Link>
+                          </Button>
+                          <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                              <Button variant="ghost" size="icon" className="text-destructive">
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                              <AlertDialogHeader>
+                                <AlertDialogTitle>Delete Timeline Entry</AlertDialogTitle>
+                                <AlertDialogDescription>
+                                  Are you sure you want to delete "{entry.title}"? This action cannot be undone.
+                                </AlertDialogDescription>
+                              </AlertDialogHeader>
+                              <AlertDialogFooter>
+                                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                <AlertDialogAction
+                                  onClick={() => deleteMutation.mutate(entry.id)}
+                                  className="bg-destructive hover:bg-destructive/90"
+                                >
+                                  Delete
+                                </AlertDialogAction>
+                              </AlertDialogFooter>
+                            </AlertDialogContent>
+                          </AlertDialog>
+                        </div>
+                      </CardTitle>
+                      <CardDescription>
+                        {entry.date} • {entry.category}
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <p className="text-sm text-muted-foreground">{entry.content}</p>
+                    </CardContent>
+                  </Card>
+                </SortableItem>
+              ))}
+            </div>
+          </SortableContext>
+        </DndContext>
       </motion.div>
     </div>
   );
