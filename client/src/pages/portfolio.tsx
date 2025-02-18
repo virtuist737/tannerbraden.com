@@ -7,7 +7,6 @@ import { useQuery } from "@tanstack/react-query";
 import { useInView } from "react-intersection-observer";
 import type { Project } from "@shared/schema";
 
-// Loading spinner component
 const LoadingSpinner = () => (
   <div className="flex justify-center items-center w-full py-12">
     <Loader2 className="w-8 h-8 animate-spin text-primary" />
@@ -53,13 +52,15 @@ const Portfolio = () => {
                   transition={{ duration: 0.5, delay: index * 0.1 }}
                 >
                   <Card>
-                    <CardHeader className="relative aspect-video overflow-hidden">
-                      <img
-                        src={project.imageUrl}
-                        alt={project.title}
-                        className="object-cover"
-                        loading="lazy"
-                      />
+                    <CardHeader className="p-0">
+                      <div className="relative aspect-video w-full overflow-hidden">
+                        <img
+                          src={project.imageUrl}
+                          alt={project.title}
+                          className="w-full h-full object-cover"
+                          loading="lazy"
+                        />
+                      </div>
                     </CardHeader>
                     <CardContent className="space-y-4 p-6">
                       <h2 className="text-2xl font-semibold">{project.title}</h2>

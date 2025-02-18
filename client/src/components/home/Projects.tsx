@@ -61,11 +61,11 @@ const Projects = () => {
             >
               <Card className="h-full flex flex-col overflow-hidden hover:shadow-lg transition-shadow duration-300">
                 <CardHeader className="p-0">
-                  <div className="relative w-full">
+                  <div className="relative w-full aspect-video">
                     <img
                       src={project.imageUrl}
                       alt={project.title}
-                      className="w-full h-auto object-cover"
+                      className="w-full h-full object-cover"
                       loading="lazy"
                     />
                   </div>
