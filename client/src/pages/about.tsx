@@ -24,11 +24,9 @@ import { useQueryClient } from "@tanstack/react-query";
 import Masonry from 'react-masonry-css';
 
 const breakpointColumnsObj = {
-  default: 5,
-  1536: 4,
-  1280: 3,
-  1024: 2,
-  640: 1,
+  default: 3,
+  1280: 2,
+  768: 1,
 };
 
 const About = () => {
