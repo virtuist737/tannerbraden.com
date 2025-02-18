@@ -47,11 +47,11 @@ const Projects = () => {
             >
               <Card className="h-full flex flex-col overflow-hidden hover:shadow-lg transition-shadow duration-300">
                 <CardHeader className="p-0">
-                  <div className="relative overflow-hidden">
+                  <div className="aspect-video relative overflow-hidden">
                     <img
                       src={project.coverImage}
                       alt={project.title}
-                      className="w-full transition-transform hover:scale-105 duration-300"
+                      className="object-cover w-full h-full transition-transform hover:scale-105 duration-300"
                     />
                   </div>
                 </CardHeader>

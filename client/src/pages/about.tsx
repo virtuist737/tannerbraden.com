@@ -195,7 +195,7 @@ const About = () => {
                   rel="noopener noreferrer"
                   className="block h-full"
                 >
-                  <Card className="flex flex-col transition-all duration-200 hover:shadow-lg hover:scale-[1.02] cursor-pointer">
+                  <Card className="flex flex-col h-full transition-all duration-200 hover:shadow-lg hover:scale-[1.02] cursor-pointer">
                     <ImageUpload
                       imageUrl={favorite.image}
                       entityId={favorite.id}
