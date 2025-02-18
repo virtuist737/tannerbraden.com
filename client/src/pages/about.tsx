@@ -23,6 +23,7 @@ import TimelineComponent from "@/components/about/Timeline";
 import { ImageUpload } from "@/components/shared/ImageUpload";
 import { useQueryClient } from "@tanstack/react-query";
 import Masonry from 'react-masonry-css';
+import InterestCard from "@/components/about/InterestCard";
 
 const breakpointColumnsObj = {
   default: 5,
@@ -32,7 +33,6 @@ const breakpointColumnsObj = {
   640: 2,  // sm
 };
 
-// Loading spinner component
 const LoadingSpinner = () => (
   <div className="flex justify-center items-center w-full py-12">
     <Loader2 className="w-8 h-8 animate-spin text-primary" />
@@ -146,61 +146,12 @@ const About = () => {
                 columnClassName="pl-6 bg-clip-padding"
               >
                 {filteredInterests?.sort((a, b) => a.sortOrder - b.sortOrder).map((interest, index) => (
-                  <motion.div
+                  <InterestCard
                     key={interest.id}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5, delay: index * 0.1 }}
-                    className="mb-6"
-                  >
-                    <Card className="w-full overflow-hidden hover:shadow-lg transition-shadow duration-300">
-                      <div className="w-full">
-                        {interest.image ? (
-                          <a href={interest.link || '#'} target="_blank" rel="noopener noreferrer">
-                            <img
-                              src={interest.image}
-                              alt={interest.title}
-                              className="w-full h-auto object-cover"
-                              loading="lazy"
-                              onError={(e) => {
-                                e.currentTarget.src = '/images/placeholder.png';
-                              }}
-                            />
-                          </a>
-                        ) : (
-                          <div className="w-full">
-                            <ImageUpload
-                              imageUrl={interest.image}
-                              entityId={interest.id}
-                              entityType="interest"
-                              onSuccess={() => handleImageUploadSuccess('interests')}
-                            />
-                          </div>
-                        )}
-                      </div>
-                      <CardHeader>
-                        <div className="flex items-center justify-between">
-                          <CardTitle className="text-xl">
-                            {interest.link ? (
-                              <a href={interest.link} target="_blank" rel="noopener noreferrer" className="hover:text-primary">
-                                {interest.title}
-                              </a>
-                            ) : (
-                              interest.title
-                            )}
-                          </CardTitle>
-                          <Badge variant="secondary">
-                            {interest.category}
-                          </Badge>
-                        </div>
-                      </CardHeader>
-                      {interest.description && (
-                        <CardContent>
-                          <p className="text-muted-foreground">{interest.description}</p>
-                        </CardContent>
-                      )}
-                    </Card>
-                  </motion.div>
+                    interest={interest}
+                    index={index}
+                    onImageUploadSuccess={() => handleImageUploadSuccess('interests')}
+                  />
                 ))}
               </Masonry>
             )}
