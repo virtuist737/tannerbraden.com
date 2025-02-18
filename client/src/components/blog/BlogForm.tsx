@@ -132,19 +132,21 @@ const BlogForm = ({ initialData, onSubmit, isSubmitting }: BlogFormProps) => {
             <FormItem>
               <FormLabel>Cover Image</FormLabel>
               <FormControl>
-                {initialData?.id && (
-                  <ImageUpload
-                    imageUrl={field.value || null}
-                    entityId={initialData.id}
-                    entityType="blog"
-                    onSuccess={(url) => field.onChange(url)}
-                  />
-                )}
-                {!initialData?.id && (
-                  <div className="text-sm text-muted-foreground">
-                    Save the post first to enable image upload
-                  </div>
-                )}
+                <div>
+                  {initialData?.id && (
+                    <ImageUpload
+                      imageUrl={field.value || null}
+                      entityId={initialData.id}
+                      entityType="blog"
+                      onSuccess={(url) => field.onChange(url)}
+                    />
+                  )}
+                  {!initialData?.id && (
+                    <div className="text-sm text-muted-foreground">
+                      Save the post first to enable image upload
+                    </div>
+                  )}
+                </div>
               </FormControl>
               <FormMessage />
             </FormItem>
