@@ -143,7 +143,7 @@ const About = () => {
                 className="flex -ml-6 w-auto"
                 columnClassName="pl-6 bg-clip-padding"
               >
-                {filteredInterests?.sort((a, b) => a.sortOrder - b.sortOrder).map((interest, index) => (
+                {filteredInterests?.sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0)).map((interest, index) => (
                   <motion.div
                     key={interest.id}
                     initial={{ opacity: 0, y: 20 }}
@@ -151,39 +151,57 @@ const About = () => {
                     transition={{ duration: 0.5, delay: index * 0.1 }}
                     className="mb-6"
                   >
-                    <Card className="w-full overflow-hidden hover:shadow-lg transition-shadow duration-300">
-                      <div className="w-full">
-                        {interest.image ? (
-                          <img
-                            src={interest.image}
-                            alt={interest.title}
-                            className="w-full h-auto object-cover"
-                            loading="lazy"
-                            onError={(e) => {
-                              e.currentTarget.src = '/images/placeholder.png';
-                            }}
-                          />
-                        ) : (
-                          <ImageUpload
-                            imageUrl={interest.image}
-                            entityId={interest.id}
-                            entityType="interest"
-                            onSuccess={() => handleImageUploadSuccess('interests')}
-                          />
-                        )}
-                      </div>
-                      <CardHeader>
-                        <div className="flex items-center justify-between">
-                          <CardTitle className="text-xl">{interest.title}</CardTitle>
-                          <Badge variant="secondary">{interest.category}</Badge>
+                    <a
+                      href={interest.link || '#'}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="block"
+                    >
+                      <Card className="w-full overflow-hidden hover:shadow-lg transition-shadow duration-300">
+                        <div className="w-full">
+                          {interest.image ? (
+                            <img
+                              src={interest.image}
+                              alt={interest.title}
+                              className="w-full h-auto object-cover"
+                              loading="lazy"
+                              onError={(e) => {
+                                e.currentTarget.src = '/images/placeholder.png';
+                              }}
+                            />
+                          ) : (
+                            <ImageUpload
+                              imageUrl={interest.image}
+                              entityId={interest.id}
+                              entityType="interest"
+                              onSuccess={() => handleImageUploadSuccess('interests')}
+                            />
+                          )}
                         </div>
-                      </CardHeader>
-                      {interest.description && (
+                        <CardHeader>
+                          <div className="flex items-center justify-between">
+                            <CardTitle className="text-xl">{interest.title}</CardTitle>
+                            <Badge
+                              variant="secondary"
+                              className={`
+                                ${interest.category === 'app' ? 'bg-cyan-100 text-cyan-800 dark:bg-cyan-900 dark:text-cyan-300' : ''}
+                                ${interest.category === 'book' ? 'bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-300' : ''}
+                                ${interest.category === 'podcast' ? 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300' : ''}
+                                ${interest.category === 'music' ? 'bg-pink-100 text-pink-800 dark:bg-pink-900 dark:text-pink-300' : ''}
+                                ${interest.category === 'video games' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300' : ''}
+                              `}
+                            >
+                              {interest.category}
+                            </Badge>
+                          </div>
+                        </CardHeader>
                         <CardContent>
-                          <p className="text-muted-foreground">{interest.description}</p>
+                          {interest.description && (
+                            <p className="text-muted-foreground">{interest.description}</p>
+                          )}
                         </CardContent>
-                      )}
-                    </Card>
+                      </Card>
+                    </a>
                   </motion.div>
                 ))}
               </Masonry>
