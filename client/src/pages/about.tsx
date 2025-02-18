@@ -21,6 +21,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import TimelineComponent from "@/components/about/Timeline";
 import { ImageUpload } from "@/components/shared/ImageUpload";
+import InterestCard from "@/components/about/InterestCard";
 import { useQueryClient } from "@tanstack/react-query";
 import Masonry from 'react-masonry-css';
 
