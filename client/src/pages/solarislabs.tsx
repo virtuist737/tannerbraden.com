@@ -1,4 +1,3 @@
-
 import { motion } from "framer-motion";
 import { useQuery } from "@tanstack/react-query";
 import Masonry from 'react-masonry-css';
@@ -41,11 +40,11 @@ const SolarisLabs = () => {
 
         <Masonry
           breakpointCols={{
-            default: 5,
-            1536: 4,
+            default: 3,
+            1536: 3,
             1280: 3,
             768: 2,
-            640: 2,
+            640: 1,
           }}
           className="flex -ml-4 w-auto"
           columnClassName="pl-4 bg-clip-padding"
