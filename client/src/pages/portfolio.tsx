@@ -1,10 +1,18 @@
 import { motion } from "framer-motion";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Github, ExternalLink } from "lucide-react";
+import { Github, ExternalLink, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useQuery } from "@tanstack/react-query";
+import { useInView } from "react-intersection-observer";
 import type { Project } from "@shared/schema";
+
+// Loading spinner component
+const LoadingSpinner = () => (
+  <div className="flex justify-center items-center w-full py-12">
+    <Loader2 className="w-8 h-8 animate-spin text-primary" />
+  </div>
+);
 
 const Portfolio = () => {
   const { data: projects, isLoading } = useQuery<Project[]>({
@@ -28,68 +36,77 @@ const Portfolio = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {isLoading ? (
-            <p>Loading projects...</p>
+            <LoadingSpinner />
           ) : (
-            projects?.map((project, index) => (
-              <motion.div
-                key={project.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-              >
-                <Card>
-                  <CardHeader className="relative aspect-video overflow-hidden">
-                    <img
-                      src={project.imageUrl}
-                      alt={project.title}
-                      className="object-cover"
-                    />
-                  </CardHeader>
-                  <CardContent className="space-y-4 p-6">
-                    <h2 className="text-2xl font-semibold">{project.title}</h2>
-                    <p className="text-muted-foreground">{project.description}</p>
-                    <div className="flex flex-wrap gap-2">
-                      {project.technologies.map((tech) => (
-                        <Badge key={tech} variant="secondary">
-                          {tech}
-                        </Badge>
-                      ))}
-                    </div>
-                    <div className="flex gap-4">
-                      {project.githubUrl && (
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          asChild
-                          className="gap-2"
-                        >
-                          <a
-                            href={project.githubUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
+            projects?.map((project, index) => {
+              const { ref, inView } = useInView({
+                triggerOnce: true,
+                threshold: 0.1,
+              });
+
+              return (
+                <motion.div
+                  ref={ref}
+                  key={project.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={inView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+                  transition={{ duration: 0.5, delay: index * 0.1 }}
+                >
+                  <Card>
+                    <CardHeader className="relative aspect-video overflow-hidden">
+                      <img
+                        src={project.imageUrl}
+                        alt={project.title}
+                        className="object-cover"
+                        loading="lazy"
+                      />
+                    </CardHeader>
+                    <CardContent className="space-y-4 p-6">
+                      <h2 className="text-2xl font-semibold">{project.title}</h2>
+                      <p className="text-muted-foreground">{project.description}</p>
+                      <div className="flex flex-wrap gap-2">
+                        {project.technologies.map((tech) => (
+                          <Badge key={tech} variant="secondary">
+                            {tech}
+                          </Badge>
+                        ))}
+                      </div>
+                      <div className="flex gap-4">
+                        {project.githubUrl && (
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            asChild
+                            className="gap-2"
                           >
-                            <Github className="h-4 w-4" />
-                            Code
-                          </a>
-                        </Button>
-                      )}
-                      {project.liveUrl && (
-                        <Button size="sm" asChild className="gap-2">
-                          <a
-                            href={project.liveUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                          >
-                            <ExternalLink className="h-4 w-4" />
-                            Live Demo
-                          </a>
-                        </Button>
-                      )}
-                    </div>
-                  </CardContent>
-                </Card>
-              </motion.div>
-            ))
+                            <a
+                              href={project.githubUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                            >
+                              <Github className="h-4 w-4" />
+                              Code
+                            </a>
+                          </Button>
+                        )}
+                        {project.liveUrl && (
+                          <Button size="sm" asChild className="gap-2">
+                            <a
+                              href={project.liveUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                            >
+                              <ExternalLink className="h-4 w-4" />
+                              Live Demo
+                            </a>
+                          </Button>
+                        )}
+                      </div>
+                    </CardContent>
+                  </Card>
+                </motion.div>
+              );
+            })
           )}
         </div>
       </motion.div>
