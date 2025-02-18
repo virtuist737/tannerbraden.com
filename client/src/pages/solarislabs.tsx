@@ -69,11 +69,11 @@ const SolarisLabs = () => {
                 >
                   <Card>
                     <CardHeader className="p-0">
-                      <div className="relative aspect-video w-full overflow-hidden">
+                      <div className="relative w-full overflow-hidden">
                         <img
                           src={project.imageUrl}
                           alt={project.title}
-                          className="w-full h-full object-cover"
+                          className="w-full"
                           loading="lazy"
                           onError={(e) => {
                             const target = e.target as HTMLImageElement;
