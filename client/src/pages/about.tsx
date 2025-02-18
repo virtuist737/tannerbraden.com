@@ -146,12 +146,18 @@ const About = () => {
                 columnClassName="pl-6 bg-clip-padding"
               >
                 {filteredInterests?.sort((a, b) => a.sortOrder - b.sortOrder).map((interest, index) => (
-                  <InterestCard
+                  <motion.div
                     key={interest.id}
-                    interest={interest}
-                    index={index}
-                    onImageUploadSuccess={() => handleImageUploadSuccess('interests')}
-                  />
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, delay: index * 0.1 }}
+                    className="mb-6"
+                  >
+                    <InterestCard
+                      interest={interest}
+                      onImageUploadSuccess={() => handleImageUploadSuccess('interests')}
+                    />
+                  </motion.div>
                 ))}
               </Masonry>
             )}
