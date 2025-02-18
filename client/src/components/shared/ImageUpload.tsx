@@ -55,7 +55,7 @@ export const ImageUpload = ({ imageUrl, entityId, entityType, onSuccess }: Image
   return (
     <div className="relative group">
       {imageUrl ? (
-        <div className="relative aspect-video w-full overflow-hidden rounded-lg">
+        <div className="relative w-full overflow-hidden rounded-lg">
           <img
             src={imageUrl.startsWith('/') ? imageUrl : `/images/${imageUrl}`}
             alt="Uploaded content"
@@ -97,7 +97,7 @@ export const ImageUpload = ({ imageUrl, entityId, entityType, onSuccess }: Image
             onChange={handleImageUpload}
             disabled={isUploading}
           />
-          <div className="aspect-video w-full border-2 border-dashed rounded-lg flex items-center justify-center">
+          <div className="w-full p-8 border-2 border-dashed rounded-lg flex items-center justify-center">
             {isUploading ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
