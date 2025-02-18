@@ -38,7 +38,17 @@ const SolarisLabs = () => {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <Masonry
+          breakpointCols={{
+            default: 5,
+            1536: 4, // 2xl
+            1280: 3, // xl
+            768: 2,  // md
+            640: 2,  // sm
+          }}
+          className="flex -ml-4 w-auto"
+          columnClassName="pl-4 bg-clip-padding"
+        >
           {isLoading ? (
             <LoadingSpinner />
           ) : (
@@ -118,7 +128,7 @@ const SolarisLabs = () => {
               );
             })
           )}
-        </div>
+        </Masonry>
       </motion.div>
     </div>
   );
