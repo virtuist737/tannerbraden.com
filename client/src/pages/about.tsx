@@ -156,7 +156,6 @@ const About = () => {
                     />
                   ))}
                 </Masonry>
-              </motion.div>
             )}
           </TabsContent>
 
