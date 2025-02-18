@@ -1,4 +1,3 @@
-
 import { motion } from "framer-motion";
 import { useInView } from "react-intersection-observer";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -16,6 +15,7 @@ export default function InterestCard({ interest, index, onImageUploadSuccess }: 
   const { ref, inView } = useInView({
     triggerOnce: true,
     threshold: 0.1,
+    delay: 100,
   });
 
   return (

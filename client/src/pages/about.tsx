@@ -141,20 +141,26 @@ const About = () => {
             {interestsLoading ? (
               <LoadingSpinner />
             ) : (
-              <Masonry
-                breakpointCols={breakpointColumnsObj}
-                className="flex -ml-6 w-auto"
-                columnClassName="pl-6 bg-clip-padding"
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.3 }}
               >
-                {filteredInterests?.sort((a, b) => a.sortOrder - b.sortOrder).map((interest, index) => (
-                  <InterestCard
-                    key={interest.id}
-                    interest={interest}
-                    index={index}
-                    onImageUploadSuccess={() => handleImageUploadSuccess('interests')}
-                  />
-                ))}
-              </Masonry>
+                <Masonry
+                  breakpointCols={breakpointColumnsObj}
+                  className="flex -ml-6 w-auto"
+                  columnClassName="pl-6 bg-clip-padding"
+                >
+                  {filteredInterests?.sort((a, b) => a.sortOrder - b.sortOrder).map((interest, index) => (
+                    <InterestCard
+                      key={interest.id}
+                      interest={interest}
+                      index={index}
+                      onImageUploadSuccess={() => handleImageUploadSuccess('interests')}
+                    />
+                  ))}
+                </Masonry>
+              </motion.div>
             )}
           </TabsContent>
 
