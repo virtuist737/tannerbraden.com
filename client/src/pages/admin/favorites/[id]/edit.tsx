@@ -1,3 +1,4 @@
+
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useLocation, useParams } from "wouter";
 import { FavoriteForm } from "@/components/favorites/FavoriteForm";
@@ -10,8 +11,9 @@ export default function EditFavorite() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
 
-  const { data: favorite } = useQuery<Favorite>({
+  const { data: favorite, isLoading } = useQuery<Favorite>({
     queryKey: ["/api/about/favorites", parseInt(id)],
+    queryFn: () => apiRequest(`/api/about/favorites/${id}`).then(res => res.json())
   });
 
   const mutation = useMutation({
@@ -37,7 +39,7 @@ export default function EditFavorite() {
     },
   });
 
-  if (!favorite) return null;
+  if (isLoading || !favorite) return null;
 
   return (
     <div className="container py-10">
