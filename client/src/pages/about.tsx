@@ -141,13 +141,24 @@ const About = () => {
                 >
                   <Card className="relative overflow-hidden group hover:shadow-lg transition-shadow">
                     <div className="w-full">
-                      <ImageUpload
-                        imageUrl={interest.imageUrl}
-                        entityId={interest.id}
-                        entityType="interest"
-                        onSuccess={() => handleImageUploadSuccess('interests')}
-                        className="w-full h-auto"
-                      />
+                      {interest.imageUrl ? (
+                        <img 
+                          src={interest.imageUrl} 
+                          alt={interest.item} 
+                          className="w-full h-auto object-cover"
+                          onError={(e) => {
+                            e.currentTarget.src = '/images/placeholder.png';
+                          }}
+                        />
+                      ) : (
+                        <ImageUpload
+                          imageUrl={interest.imageUrl}
+                          entityId={interest.id}
+                          entityType="interest"
+                          onSuccess={() => handleImageUploadSuccess('interests')}
+                          className="w-full h-auto"
+                        />
+                      )}
                     </div>
                     <CardHeader>
                       <div className="flex items-center justify-between">
@@ -218,13 +229,24 @@ const About = () => {
                   >
                     <Card className="w-full overflow-hidden hover:shadow-lg transition-shadow duration-300">
                       <div className="w-full">
-                        <ImageUpload
-                          imageUrl={favorite.image}
-                          entityId={favorite.id}
-                          entityType="favorite"
-                          onSuccess={() => handleImageUploadSuccess('favorites')}
-                          className="w-full h-auto"
-                        />
+                        {favorite.image ? (
+                          <img 
+                            src={favorite.image} 
+                            alt={favorite.title} 
+                            className="w-full h-auto object-cover"
+                            onError={(e) => {
+                              e.currentTarget.src = '/images/placeholder.png';
+                            }}
+                          />
+                        ) : (
+                          <ImageUpload
+                            imageUrl={favorite.image}
+                            entityId={favorite.id}
+                            entityType="favorite"
+                            onSuccess={() => handleImageUploadSuccess('favorites')}
+                            className="w-full h-auto"
+                          />
+                        )}
                       </div>
                       <CardHeader>
                         <div className="flex items-center justify-between">
