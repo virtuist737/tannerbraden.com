@@ -4,10 +4,9 @@ import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import type { InsertBlogPost } from "@shared/schema";
 import BlogForm from "@/components/blog/BlogForm";
-import { Link } from "wouter"; // Assuming wouter is used for Link
+import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft } from "lucide-react"; // Assuming ChevronLeft is from lucide-react
-
+import { ChevronLeft } from "lucide-react";
 
 export default function NewBlogPost() {
   const { toast } = useToast();
@@ -47,12 +46,12 @@ export default function NewBlogPost() {
   return (
     <div className="container py-8">
       <div className="max-w-4xl mx-auto space-y-8">
-        <Link href="/admin/blog">
-          <Button>
-            <ChevronLeft className="h-4 w-4 mr-2" />
+        <Button variant="ghost" asChild>
+          <Link href="/admin/blog" className="flex items-center gap-2">
+            <ChevronLeft className="h-4 w-4" />
             Back to Blog Posts
-          </Button>
-        </Link>
+          </Link>
+        </Button>
         <h1 className="text-3xl font-bold tracking-tight">Create New Post</h1>
         <BlogForm onSubmit={onSubmit} isSubmitting={createPostMutation.isPending} />
       </div>
