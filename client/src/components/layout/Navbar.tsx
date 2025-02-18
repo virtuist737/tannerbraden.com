@@ -41,11 +41,27 @@ const Navbar = () => {
               </a>
             </Link>
           ))}
+          <a
+            href="https://linkedin.com/in/tannerbraden"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-muted-foreground hover:text-primary"
+          >
+            <Linkedin className="h-5 w-5" />
+          </a>
           <ThemeToggle />
         </div>
 
         {/* Mobile Navigation */}
         <div className="md:hidden flex items-center gap-4">
+          <a
+            href="https://linkedin.com/in/tannerbraden"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-muted-foreground hover:text-primary"
+          >
+            <Linkedin className="h-5 w-5" />
+          </a>
           <ThemeToggle />
           <Button
             variant="ghost"
