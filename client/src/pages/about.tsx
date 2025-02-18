@@ -19,8 +19,8 @@ import type { Timeline, Interest, Favorite } from "@shared/schema";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import TimelineComponent from "@/components/about/Timeline";
-import { useQueryClient } from "@tanstack/react-query";
 import { ImageUpload } from "@/components/shared/ImageUpload";
+import { useQueryClient } from "@tanstack/react-query";
 
 const About = () => {
   const queryClient = useQueryClient();
@@ -123,27 +123,18 @@ const About = () => {
             <motion.div 
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-7xl mx-auto px-4"
+              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 auto-rows-auto gap-6 max-w-7xl mx-auto px-4"
             >
               {filteredInterests?.sort((a, b) => a.sortOrder - b.sortOrder).map((interest) => (
-                <Card key={interest.id} className="flex flex-col hover:shadow-lg transition-shadow">
+                <Card key={interest.id} className="relative overflow-hidden group hover:shadow-lg transition-shadow">
                   <div className="w-full">
-                    {window.location.pathname.startsWith('/admin') ? (
-                      <ImageUpload
-                        imageUrl={interest.imageUrl}
-                        entityId={interest.id}
-                        entityType="interest"
-                        onSuccess={() => handleImageUploadSuccess('interests')}
-                      />
-                    ) : (
-                      interest.imageUrl && (
-                        <img 
-                          src={interest.imageUrl}
-                          alt={interest.item}
-                          className="w-full h-auto"
-                        />
-                      )
-                    )}
+                    <ImageUpload
+                      imageUrl={interest.imageUrl}
+                      entityId={interest.id}
+                      entityType="interest"
+                      onSuccess={() => handleImageUploadSuccess('interests')}
+                      className="w-full h-auto object-contain"
+                    />
                   </div>
                   <CardHeader>
                     <div className="flex items-center justify-between">
@@ -196,7 +187,7 @@ const About = () => {
             <motion.div 
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-7xl mx-auto px-4"
+              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 auto-rows-auto gap-6 max-w-7xl mx-auto px-4"
             >
               {filteredFavorites?.sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0)).map((favorite) => (
                 <a
@@ -204,26 +195,17 @@ const About = () => {
                   href={favorite.link || '#'}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="block"
+                  className="block h-full"
                 >
-                  <Card className="flex flex-col hover:shadow-lg hover:scale-[1.02] transition-all duration-200 cursor-pointer">
+                  <Card className="h-full flex flex-col transition-all duration-200 hover:shadow-lg hover:scale-[1.02] cursor-pointer">
                     <div className="w-full">
-                      {window.location.pathname.startsWith('/admin') ? (
-                        <ImageUpload
-                          imageUrl={favorite.image}
-                          entityId={favorite.id}
-                          entityType="favorite"
-                          onSuccess={() => handleImageUploadSuccess('favorites')}
-                        />
-                      ) : (
-                        favorite.image && (
-                          <img
-                            src={favorite.image}
-                            alt={favorite.title}
-                            className="w-full h-auto"
-                          />
-                        )
-                      )}
+                      <ImageUpload
+                        imageUrl={favorite.image}
+                        entityId={favorite.id}
+                        entityType="favorite"
+                        onSuccess={() => handleImageUploadSuccess('favorites')}
+                        className="w-full h-auto object-contain"
+                      />
                     </div>
                     <CardHeader>
                       <div className="flex items-center justify-between">
