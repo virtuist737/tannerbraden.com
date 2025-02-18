@@ -78,16 +78,15 @@ const TimelineComponent = () => {
           return (
             <div key={event.id}>
               {/* Mobile layout - stack everything vertically */}
-              <div className="block md:hidden relative">
-                <div className="absolute left-1/2 transform -translate-x-[1px] h-full w-[2px] bg-gradient-to-b from-primary/5 via-primary to-primary/5" />
+              <div className="block md:hidden">
                 <motion.div
                   variants={cardVariants}
                   initial="hidden"
                   whileInView="visible"
                   viewport={{ once: true, margin: "-50px" }}
-                  className="flex flex-col items-center relative"
+                  className="flex flex-col items-center"
                 >
-                  <div className="w-4 h-4 mb-4 bg-background relative z-10">
+                  <div className="w-4 h-4 mb-4">
                     <div className="w-3 h-3 rounded-full bg-primary shadow-[0_0_0_4px_rgba(var(--primary)/0.1)]" />
                   </div>
                   <TimelineCard 
