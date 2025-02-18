@@ -27,6 +27,8 @@ import {
 } from "@/components/ui/select";
 import { type BlogPost } from "@shared/schema";
 import { ImageUpload } from "@/components/shared/ImageUpload";
+import { ImagePlus, Link2, Bold, Italic, Heading2, List, ListOrdered, Quote } from "lucide-react";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 const blogFormSchema = insertBlogPostSchema.extend({
   title: z.string().min(1, "Title is required"),
@@ -67,11 +69,22 @@ const BlogForm = ({ initialData, onSubmit, isSubmitting }: BlogFormProps) => {
 
   const editor = useEditor({
     extensions: [
-      StarterKit,
+      StarterKit.configure({
+        heading: {
+          levels: [2, 3, 4],
+        },
+      }),
       Link.configure({
         openOnClick: false,
+        HTMLAttributes: {
+          class: "text-primary underline",
+        },
       }),
-      Image,
+      Image.configure({
+        HTMLAttributes: {
+          class: "rounded-lg max-w-full",
+        },
+      }),
     ],
     content: initialData?.content || "",
     onUpdate: ({ editor }) => {
@@ -86,6 +99,21 @@ const BlogForm = ({ initialData, onSubmit, isSubmitting }: BlogFormProps) => {
     if (!initialData) {
       const slug = slugify(title, { lower: true, strict: true });
       form.setValue("slug", slug);
+    }
+  };
+
+  const addImage = async (url: string) => {
+    if (editor) {
+      editor.chain().focus().setImage({ src: url }).run();
+    }
+  };
+
+  const addLink = () => {
+    if (editor) {
+      const url = window.prompt("URL");
+      if (url) {
+        editor.chain().focus().setLink({ href: url }).run();
+      }
     }
   };
 
@@ -133,19 +161,12 @@ const BlogForm = ({ initialData, onSubmit, isSubmitting }: BlogFormProps) => {
               <FormLabel>Cover Image</FormLabel>
               <FormControl>
                 <div>
-                  {initialData?.id && (
-                    <ImageUpload
-                      imageUrl={field.value || null}
-                      entityId={initialData.id}
-                      entityType="blog"
-                      onSuccess={(url) => field.onChange(url)}
-                    />
-                  )}
-                  {!initialData?.id && (
-                    <div className="text-sm text-muted-foreground">
-                      Save the post first to enable image upload
-                    </div>
-                  )}
+                  <ImageUpload
+                    imageUrl={field.value || null}
+                    entityId={initialData?.id || "temp"}
+                    entityType="blog"
+                    onSuccess={(url) => field.onChange(url)}
+                  />
                 </div>
               </FormControl>
               <FormMessage />
@@ -188,9 +209,142 @@ const BlogForm = ({ initialData, onSubmit, isSubmitting }: BlogFormProps) => {
           </TabsList>
           <TabsContent value="write" className="space-y-4">
             {editor && (
-              <div className="prose prose-stone dark:prose-invert max-w-none">
-                <EditorContent editor={editor} />
-              </div>
+              <>
+                <div className="border rounded-md p-2 flex gap-2 mb-4">
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => editor.chain().focus().toggleBold().run()}
+                          className={editor.isActive("bold") ? "bg-accent" : ""}
+                        >
+                          <Bold className="h-4 w-4" />
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>Bold</TooltipContent>
+                    </Tooltip>
+
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => editor.chain().focus().toggleItalic().run()}
+                          className={editor.isActive("italic") ? "bg-accent" : ""}
+                        >
+                          <Italic className="h-4 w-4" />
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>Italic</TooltipContent>
+                    </Tooltip>
+
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
+                          className={editor.isActive("heading", { level: 2 }) ? "bg-accent" : ""}
+                        >
+                          <Heading2 className="h-4 w-4" />
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>Heading</TooltipContent>
+                    </Tooltip>
+
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => editor.chain().focus().toggleBulletList().run()}
+                          className={editor.isActive("bulletList") ? "bg-accent" : ""}
+                        >
+                          <List className="h-4 w-4" />
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>Bullet List</TooltipContent>
+                    </Tooltip>
+
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => editor.chain().focus().toggleOrderedList().run()}
+                          className={editor.isActive("orderedList") ? "bg-accent" : ""}
+                        >
+                          <ListOrdered className="h-4 w-4" />
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>Numbered List</TooltipContent>
+                    </Tooltip>
+
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => editor.chain().focus().toggleBlockquote().run()}
+                          className={editor.isActive("blockquote") ? "bg-accent" : ""}
+                        >
+                          <Quote className="h-4 w-4" />
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>Quote</TooltipContent>
+                    </Tooltip>
+
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon"
+                          onClick={addLink}
+                          className={editor.isActive("link") ? "bg-accent" : ""}
+                        >
+                          <Link2 className="h-4 w-4" />
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>Add Link</TooltipContent>
+                    </Tooltip>
+
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <div className="inline-block">
+                          <ImageUpload
+                            imageUrl={null}
+                            entityId={initialData?.id || "temp"}
+                            entityType="blog-content"
+                            onSuccess={addImage}
+                            trigger={
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="icon"
+                              >
+                                <ImagePlus className="h-4 w-4" />
+                              </Button>
+                            }
+                          />
+                        </div>
+                      </TooltipTrigger>
+                      <TooltipContent>Add Image</TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                </div>
+                <div className="prose prose-stone dark:prose-invert max-w-none min-h-[400px] border rounded-md p-4">
+                  <EditorContent editor={editor} />
+                </div>
+              </>
             )}
             {form.formState.errors.content && (
               <p className="text-sm font-medium text-destructive">

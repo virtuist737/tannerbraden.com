@@ -21,13 +21,15 @@ const BlogCard = ({ post }: BlogCardProps) => {
     <Link href={`/blog/${post.slug}`}>
       <Card className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer h-full">
         <CardHeader className="p-0">
-          <div className="aspect-video relative overflow-hidden">
-            <img
-              src={post.coverImage}
-              alt={post.title}
-              className="object-cover w-full h-full transition-transform hover:scale-105"
-            />
-          </div>
+          {post.coverImage && (
+            <div className="aspect-video relative overflow-hidden">
+              <img
+                src={post.coverImage}
+                alt={post.title}
+                className="object-cover w-full h-full transition-transform hover:scale-105"
+              />
+            </div>
+          )}
         </CardHeader>
         <CardContent className="p-6 space-y-4">
           <Badge>{post.category}</Badge>
