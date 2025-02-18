@@ -67,7 +67,7 @@ const SolarisLabs = () => {
                   animate={inView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
                   transition={{ duration: 0.5, delay: index * 0.1 }}
                 >
-                  <Card>
+                  <Card className="h-full flex flex-col overflow-hidden hover:shadow-lg transition-shadow duration-300">
                     <CardHeader className="p-0">
                       <div className="relative w-full overflow-hidden">
                         <img
@@ -82,7 +82,7 @@ const SolarisLabs = () => {
                         />
                       </div>
                     </CardHeader>
-                    <CardContent className="space-y-4 p-6">
+                    <CardContent className="flex-1 p-4 md:p-6 space-y-4">
                       <h2 className="text-2xl font-semibold">{project.title}</h2>
                       <p className="text-muted-foreground">{project.description}</p>
                       <div className="flex flex-wrap gap-2">
