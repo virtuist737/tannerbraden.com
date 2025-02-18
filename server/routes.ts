@@ -229,27 +229,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   app.post("/api/upload/favorite/:id", isAuthenticated, upload.single("image"), async (req, res) => {
-    try {
-      if (!req.isAuthenticated()) {
-        return res.status(401).json({ error: "Unauthorized" });
-      }
-
-      if (!req.file) {
-        return res.status(400).json({ error: "No image file provided" });
-      }
-
-      const id = parseInt(req.params.id);
-      if (isNaN(id)) {
-        return res.status(400).json({ error: "Invalid favorite ID" });
-      }
-
-      const cloudinaryUrl = await uploadToCloudinary(req.file, "favorite");
-      await storage.updateFavoriteImage(id, cloudinaryUrl);
-      res.json({ imageUrl: cloudinaryUrl });
-    } catch (error) {
-      console.error("Error uploading favorite image:", error);
-      res.status(500).json({ error: "Failed to upload image" });
-    }
+    await handleImageUpload(req, res, "favorite", storage.updateFavoriteImage);
   });
 
   app.post("/api/upload/project/:id", isAuthenticated, upload.single("image"), async (req, res) => {
