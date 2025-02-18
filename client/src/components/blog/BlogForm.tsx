@@ -55,13 +55,13 @@ const CATEGORIES = [
 const BlogForm = ({ initialData, onSubmit, isSubmitting }: BlogFormProps) => {
   const form = useForm<z.infer<typeof blogFormSchema>>({
     resolver: zodResolver(blogFormSchema),
-    defaultValues: initialData || {
-      title: "",
-      content: "",
-      excerpt: "",
-      coverImage: "",
-      category: "",
-      slug: "",
+    defaultValues: {
+      title: initialData?.title || "",
+      content: initialData?.content || "",
+      excerpt: initialData?.excerpt || "",
+      coverImage: initialData?.coverImage || "",
+      category: initialData?.category || "",
+      slug: initialData?.slug || "",
     },
   });
 
@@ -218,7 +218,7 @@ const BlogForm = ({ initialData, onSubmit, isSubmitting }: BlogFormProps) => {
           )}
         />
 
-        <div className="flex justify-end gap-4">
+        <div className="flex justify-end">
           <Button type="submit" disabled={isSubmitting}>
             {isSubmitting ? "Saving..." : initialData ? "Update Post" : "Create Post"}
           </Button>
