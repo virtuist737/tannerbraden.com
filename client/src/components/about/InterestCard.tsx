@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import { useInView } from "react-intersection-observer";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { ImageUpload } from "@/components/shared/ImageUpload";
 import type { Interest } from "@shared/schema";
 
@@ -28,24 +29,26 @@ export default function InterestCard({ interest, index, onImageUploadSuccess }: 
     >
       <Card className="relative overflow-hidden group hover:shadow-lg transition-shadow flex flex-col">
         <div className="w-full">
-          {interest.imageUrl ? (
-            <img 
-              src={interest.imageUrl} 
-              alt={interest.item} 
-              className="w-full h-auto"
-              loading="lazy"
-              onError={(e) => {
-                e.currentTarget.src = '/images/placeholder.png';
-              }}
-            />
-          ) : (
-            <ImageUpload
-              imageUrl={interest.imageUrl}
-              entityId={interest.id}
-              entityType="interest"
-              onSuccess={onImageUploadSuccess}
-            />
-          )}
+          <AspectRatio ratio={16 / 9}>
+            {interest.imageUrl ? (
+              <img 
+                src={interest.imageUrl} 
+                alt={interest.item} 
+                className="w-full h-full object-cover rounded-t-lg"
+                loading="lazy"
+                onError={(e) => {
+                  e.currentTarget.src = '/images/placeholder.png';
+                }}
+              />
+            ) : (
+              <ImageUpload
+                imageUrl={interest.imageUrl}
+                entityId={interest.id}
+                entityType="interest"
+                onSuccess={onImageUploadSuccess}
+              />
+            )}
+          </AspectRatio>
         </div>
         <CardHeader>
           <div className="flex items-center justify-between">
