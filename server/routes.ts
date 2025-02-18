@@ -14,6 +14,15 @@ import * as UAParser from "ua-parser-js";
 import { upload } from "./lib/upload";
 import path from "path";
 import fs from "fs";
+import { fileURLToPath } from 'url';
+
+// ESM module dirname equivalent
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Ensure images directory exists
+const imagesDir = path.join(__dirname, '../client/public/images');
+fs.mkdirSync(imagesDir, { recursive: true });
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Timeline Routes
@@ -177,7 +186,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Add new route for blog post image upload
-  app.post("/api/upload/blog/:id", isAuthenticated, upload.single("image"), async (req, res) => {
+  // Generic image upload handler
+  const handleImageUpload = async (req: any, res: any, entityType: string, updateFunction: (id: number, imageUrl: string) => Promise<any>) => {
     try {
       if (!req.file) {
         return res.status(400).json({ error: "No image file provided" });
@@ -185,26 +195,45 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const id = parseInt(req.params.id);
       if (isNaN(id)) {
-        return res.status(400).json({ error: "Invalid blog post ID" });
+        return res.status(400).json({ error: `Invalid ${entityType} ID` });
       }
 
       const fileName = `${Date.now()}-${req.file.originalname}`;
-      const filePath = path.join(__dirname, '../client/public/images', fileName);
+      const filePath = path.join(imagesDir, fileName);
 
       await fs.promises.writeFile(filePath, req.file.buffer);
-
-      // Update the blog post's cover image
-      const updatedPost = await storage.updateBlogPost(id, { coverImage: fileName });
-      if (!updatedPost) {
-        return res.status(404).json({ error: "Blog post not found" });
-      }
+      await updateFunction(id, fileName);
 
       res.json({ imageUrl: fileName });
     } catch (error) {
-      console.error("Error uploading blog post image:", error);
+      console.error(`Error uploading ${entityType} image:`, error);
       res.status(500).json({ error: "Failed to upload image" });
     }
+  };
+
+  // Upload routes for different entity types
+  app.post("/api/upload/blog/:id", isAuthenticated, upload.single("image"), async (req, res) => {
+    await handleImageUpload(req, res, "blog", (id, imageUrl) =>
+      storage.updateBlogPost(id, { coverImage: imageUrl })
+    );
   });
+
+  app.post("/api/upload/timeline/:id", isAuthenticated, upload.single("image"), async (req, res) => {
+    await handleImageUpload(req, res, "timeline", storage.updateTimelineImage);
+  });
+
+  app.post("/api/upload/interest/:id", isAuthenticated, upload.single("image"), async (req, res) => {
+    await handleImageUpload(req, res, "interest", storage.updateInterestImage);
+  });
+
+  app.post("/api/upload/favorite/:id", isAuthenticated, upload.single("image"), async (req, res) => {
+    await handleImageUpload(req, res, "favorite", storage.updateFavoriteImage);
+  });
+
+  app.post("/api/upload/project/:id", isAuthenticated, upload.single("image"), async (req, res) => {
+    await handleImageUpload(req, res, "project", storage.updateProjectImage);
+  });
+
 
   // Analytics Routes
   app.post("/api/analytics/pageview", async (req, res) => {
@@ -444,78 +473,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Image Upload Routes
-  app.post("/api/upload/timeline/:id", isAuthenticated, upload.single("image"), async (req, res) => {
-    try {
-      if (!req.file) {
-        return res.status(400).json({ error: "No image file provided" });
-      }
-
-      const id = parseInt(req.params.id);
-      if (isNaN(id)) {
-        return res.status(400).json({ error: "Invalid timeline ID" });
-      }
-
-      const fileName = `${Date.now()}-${req.file.originalname}`;
-      const filePath = path.join(__dirname, '../client/public/images', fileName);
-
-      await fs.promises.writeFile(filePath, req.file.buffer);
-      await storage.updateTimelineImage(id, fileName);
-
-      res.json({ imageUrl: fileName });
-    } catch (error) {
-      console.error("Error uploading timeline image:", error);
-      res.status(500).json({ error: "Failed to upload image" });
-    }
-  });
-
-  app.post("/api/upload/interest/:id", isAuthenticated, upload.single("image"), async (req, res) => {
-    try {
-      if (!req.file) {
-        return res.status(400).json({ error: "No image file provided" });
-      }
-
-      const id = parseInt(req.params.id);
-      if (isNaN(id)) {
-        return res.status(400).json({ error: "Invalid interest ID" });
-      }
-
-      const fileName = `${Date.now()}-${req.file.originalname}`;
-      const filePath = path.join(__dirname, '../client/public/images', fileName);
-
-      await fs.promises.writeFile(filePath, req.file.buffer);
-      await storage.updateInterestImage(id, fileName);
-
-      res.json({ imageUrl: fileName });
-    } catch (error) {
-      console.error("Error uploading interest image:", error);
-      res.status(500).json({ error: "Failed to upload image" });
-    }
-  });
-
-  app.post("/api/upload/favorite/:id", isAuthenticated, upload.single("image"), async (req, res) => {
-    try {
-      if (!req.file) {
-        return res.status(400).json({ error: "No image file provided" });
-      }
-
-      const id = parseInt(req.params.id);
-      if (isNaN(id)) {
-        return res.status(400).json({ error: "Invalid favorite ID" });
-      }
-
-      const fileName = `${Date.now()}-${req.file.originalname}`;
-      const filePath = path.join(__dirname, '../client/public/images', fileName);
-
-      await fs.promises.writeFile(filePath, req.file.buffer);
-      await storage.updateFavoriteImage(id, fileName);
-
-      res.json({ imageUrl: fileName });
-    } catch (error) {
-      console.error("Error uploading favorite image:", error);
-      res.status(500).json({ error: "Failed to upload image" });
-    }
-  });
 
   // Projects Routes
   app.get("/api/projects", async (req, res) => {
