@@ -45,7 +45,7 @@ const SolarisLabs = () => {
                 <Card>
                   <CardHeader className="relative aspect-video overflow-hidden">
                     <img
-                      src={project.coverImage || project.imageUrl}
+                      src={project.coverImage}
                       alt={project.title}
                       className="object-cover"
                     />
