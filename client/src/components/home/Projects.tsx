@@ -37,7 +37,7 @@ const Projects = () => {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 auto-rows-auto gap-6 md:gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
           {projects?.map((project, index) => (
             <motion.div
               key={project.id}
@@ -45,16 +45,14 @@ const Projects = () => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: index * 0.1 }}
             >
-              <Card className="h-full flex flex-col overflow-hidden hover:shadow-lg transition-shadow duration-300">
-                <CardHeader className="p-0">
-                  <div className="relative">
-                    <img
-                      src={project.coverImage}
-                      alt={project.title}
-                      className="w-full h-auto object-contain"
-                    />
-                  </div>
-                </CardHeader>
+              <Card className="flex flex-col hover:shadow-lg transition-shadow duration-300">
+                <div className="w-full">
+                  <img
+                    src={project.coverImage}
+                    alt={project.title}
+                    className="w-full h-auto"
+                  />
+                </div>
                 <CardContent className="flex-1 p-4 md:p-6 space-y-4">
                   <CardTitle className="text-xl md:text-2xl">{project.title}</CardTitle>
                   <p className="text-sm md:text-base text-muted-foreground">{project.description}</p>

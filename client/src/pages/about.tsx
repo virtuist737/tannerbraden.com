@@ -19,7 +19,6 @@ import type { Timeline, Interest, Favorite } from "@shared/schema";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import TimelineComponent from "@/components/about/Timeline";
-import { ImageUpload } from "@/components/shared/ImageUpload";
 import { useQueryClient } from "@tanstack/react-query";
 
 const About = () => {
@@ -123,17 +122,15 @@ const About = () => {
             <motion.div 
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 auto-rows-auto gap-6 max-w-7xl mx-auto px-4"
+              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-7xl mx-auto px-4"
             >
               {filteredInterests?.sort((a, b) => a.sortOrder - b.sortOrder).map((interest) => (
-                <Card key={interest.id} className="relative overflow-hidden group hover:shadow-lg transition-shadow">
+                <Card key={interest.id} className="flex flex-col hover:shadow-lg transition-shadow">
                   <div className="w-full">
-                    <ImageUpload
-                      imageUrl={interest.imageUrl}
-                      entityId={interest.id}
-                      entityType="interest"
-                      onSuccess={() => handleImageUploadSuccess('interests')}
-                      className="w-full h-auto object-contain"
+                    <img 
+                      src={interest.imageUrl || ''}
+                      alt={interest.item}
+                      className="w-full h-auto"
                     />
                   </div>
                   <CardHeader>
@@ -187,7 +184,7 @@ const About = () => {
             <motion.div 
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 auto-rows-auto gap-6 max-w-7xl mx-auto px-4"
+              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-7xl mx-auto px-4"
             >
               {filteredFavorites?.sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0)).map((favorite) => (
                 <a
@@ -195,16 +192,14 @@ const About = () => {
                   href={favorite.link || '#'}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="block h-full"
+                  className="block"
                 >
-                  <Card className="h-full flex flex-col transition-all duration-200 hover:shadow-lg hover:scale-[1.02] cursor-pointer">
+                  <Card className="flex flex-col hover:shadow-lg hover:scale-[1.02] transition-all duration-200 cursor-pointer">
                     <div className="w-full">
-                      <ImageUpload
-                        imageUrl={favorite.image}
-                        entityId={favorite.id}
-                        entityType="favorite"
-                        onSuccess={() => handleImageUploadSuccess('favorites')}
-                        className="w-full h-auto object-contain"
+                      <img
+                        src={favorite.image || ''}
+                        alt={favorite.title}
+                        className="w-full h-auto"
                       />
                     </div>
                     <CardHeader>
