@@ -120,7 +120,6 @@ const SolarisLabs = () => {
                 </Card>
               </motion.div>
             ))
-            ))
           )}
         </Masonry>
       </motion.div>
