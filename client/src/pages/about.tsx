@@ -190,18 +190,11 @@ const About = () => {
                 className="flex -ml-6 w-auto"
                 columnClassName="pl-6 bg-clip-padding"
               >
-                {filteredFavorites?.sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0)).map((favorite, index) => {
-                  const { ref, inView } = useInView({
-                    triggerOnce: true,
-                    threshold: 0.1,
-                  });
-
-                  return (
+                {filteredFavorites?.sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0)).map((favorite, index) => (
                     <motion.div
-                      ref={ref}
                       key={favorite.id}
                       initial={{ opacity: 0, y: 20 }}
-                      animate={inView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
                       transition={{ duration: 0.5, delay: index * 0.1 }}
                       className="mb-6"
                     >
