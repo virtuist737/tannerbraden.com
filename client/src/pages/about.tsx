@@ -100,7 +100,7 @@ const About = () => {
           </motion.div>
         </section>
 
-        <Tabs defaultValue="interests" className="space-y-8">
+        <Tabs defaultValue="timeline" className="space-y-8">
           <div className="flex justify-center">
             <TabsList className="grid w-full grid-cols-3 max-w-[400px]">
               <TabsTrigger value="timeline">Timeline</TabsTrigger>
