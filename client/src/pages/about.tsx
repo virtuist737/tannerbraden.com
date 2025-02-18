@@ -154,13 +154,13 @@ const About = () => {
                     className="mb-6"
                   >
                     <Card className="w-full overflow-hidden hover:shadow-lg transition-shadow duration-300">
-                      <div className="w-full h-48 relative">
+                      <div className="w-full">
                         {interest.image ? (
                           <a href={interest.link || '#'} target="_blank" rel="noopener noreferrer">
                             <img
                               src={interest.image}
                               alt={interest.title}
-                              className="w-full h-full object-cover"
+                              className="w-full h-auto object-cover"
                               loading="lazy"
                               onError={(e) => {
                                 e.currentTarget.src = '/images/placeholder.png';
@@ -168,7 +168,7 @@ const About = () => {
                             />
                           </a>
                         ) : (
-                          <div className="w-full h-full">
+                          <div className="w-full">
                             <ImageUpload
                               imageUrl={interest.image}
                               entityId={interest.id}
