@@ -197,14 +197,14 @@ const About = () => {
                   rel="noopener noreferrer"
                   className="block h-full"
                 >
-                  <Card className="h-full flex flex-col transition-all duration-200 hover:shadow-lg hover:scale-[1.02] cursor-pointer">
+                  <Card className="w-full flex flex-col transition-all duration-200 hover:shadow-lg hover:scale-[1.02] cursor-pointer">
                     <div className="w-full">
                       <ImageUpload
                         imageUrl={favorite.image}
                         entityId={favorite.id}
                         entityType="favorite"
                         onSuccess={() => handleImageUploadSuccess('favorites')}
-                        className="w-full h-auto object-contain"
+                        className="w-full h-auto"
                       />
                     </div>
                     <CardHeader>
