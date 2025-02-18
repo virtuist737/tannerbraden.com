@@ -21,7 +21,6 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import TimelineComponent from "@/components/about/Timeline";
 import { ImageUpload } from "@/components/shared/ImageUpload";
-import InterestCard from "@/components/about/InterestCard";
 import { useQueryClient } from "@tanstack/react-query";
 import Masonry from 'react-masonry-css';
 
@@ -141,22 +140,62 @@ const About = () => {
             {interestsLoading ? (
               <LoadingSpinner />
             ) : (
-              <div>
-                <Masonry
-                  breakpointCols={breakpointColumnsObj}
-                  className="flex -ml-6 w-auto"
-                  columnClassName="pl-6 bg-clip-padding"
-                >
-                  {filteredInterests?.sort((a, b) => a.sortOrder - b.sortOrder).map((interest, index) => (
-                    <InterestCard
-                      key={interest.id}
-                      interest={interest}
-                      index={index}
-                      onImageUploadSuccess={() => handleImageUploadSuccess('interests')}
-                    />
-                  ))}
-                </Masonry>
-              </div>
+              <Masonry
+                breakpointCols={breakpointColumnsObj}
+                className="flex -ml-6 w-auto"
+                columnClassName="pl-6 bg-clip-padding"
+              >
+                {filteredInterests?.sort((a, b) => a.sortOrder - b.sortOrder).map((interest, index) => (
+                  <motion.div
+                    key={interest.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, delay: index * 0.1 }}
+                    className="mb-6"
+                  >
+                    <Card className="w-full overflow-hidden hover:shadow-lg transition-shadow duration-300">
+                      <div className="w-full">
+                        {interest.imageUrl ? (
+                          <img
+                            src={interest.imageUrl}
+                            alt={interest.item}
+                            className="w-full h-auto object-cover"
+                            loading="lazy"
+                            onError={(e) => {
+                              e.currentTarget.src = '/images/placeholder.png';
+                            }}
+                          />
+                        ) : (
+                          <ImageUpload
+                            imageUrl={interest.imageUrl}
+                            entityId={interest.id}
+                            entityType="interest"
+                            onSuccess={() => handleImageUploadSuccess('interests')}
+                          />
+                        )}
+                      </div>
+                      <CardHeader>
+                        <div className="flex items-center justify-between">
+                          <CardTitle className="text-xl">{interest.item}</CardTitle>
+                          <Badge
+                            variant="secondary"
+                            className={`
+                              ${interest.type === 'interests' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300' : ''}
+                              ${interest.type === 'instruments' ? 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300' : ''}
+                              ${interest.type === 'activities' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300' : ''}
+                            `}
+                          >
+                            {interest.type}
+                          </Badge>
+                        </div>
+                      </CardHeader>
+                      <CardContent>
+                        <p className="text-muted-foreground">Category: {interest.category}</p>
+                      </CardContent>
+                    </Card>
+                  </motion.div>
+                ))}
+              </Masonry>
             )}
           </TabsContent>
 
@@ -193,65 +232,65 @@ const About = () => {
                 columnClassName="pl-6 bg-clip-padding"
               >
                 {filteredFavorites?.sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0)).map((favorite, index) => (
-                    <motion.div
-                      key={favorite.id}
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.5, delay: index * 0.1 }}
-                      className="mb-6"
+                  <motion.div
+                    key={favorite.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, delay: index * 0.1 }}
+                    className="mb-6"
+                  >
+                    <a
+                      href={favorite.link || '#'}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="block"
                     >
-                      <a
-                        href={favorite.link || '#'}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="block"
-                      >
-                        <Card className="w-full overflow-hidden hover:shadow-lg transition-shadow duration-300">
-                          <div className="w-full">
-                            {favorite.image ? (
-                              <img 
-                                src={favorite.image} 
-                                alt={favorite.title} 
-                                className="w-full h-auto object-cover"
-                                loading="lazy"
-                                onError={(e) => {
-                                  e.currentTarget.src = '/images/placeholder.png';
-                                }}
-                              />
-                            ) : (
-                              <ImageUpload
-                                imageUrl={favorite.image}
-                                entityId={favorite.id}
-                                entityType="favorite"
-                                onSuccess={() => handleImageUploadSuccess('favorites')}
-                              />
-                            )}
+                      <Card className="w-full overflow-hidden hover:shadow-lg transition-shadow duration-300">
+                        <div className="w-full">
+                          {favorite.image ? (
+                            <img
+                              src={favorite.image}
+                              alt={favorite.title}
+                              className="w-full h-auto object-cover"
+                              loading="lazy"
+                              onError={(e) => {
+                                e.currentTarget.src = '/images/placeholder.png';
+                              }}
+                            />
+                          ) : (
+                            <ImageUpload
+                              imageUrl={favorite.image}
+                              entityId={favorite.id}
+                              entityType="favorite"
+                              onSuccess={() => handleImageUploadSuccess('favorites')}
+                            />
+                          )}
+                        </div>
+                        <CardHeader>
+                          <div className="flex items-center justify-between">
+                            <CardTitle className="text-xl">{favorite.title}</CardTitle>
+                            <Badge
+                              variant="secondary"
+                              className={`
+                                ${favorite.category === 'app' ? 'bg-cyan-100 text-cyan-800 dark:bg-cyan-900 dark:text-cyan-300' : ''}
+                                ${favorite.category === 'book' ? 'bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-300' : ''}
+                                ${favorite.category === 'podcast' ? 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300' : ''}
+                                ${favorite.category === 'music' ? 'bg-pink-100 text-pink-800 dark:bg-pink-900 dark:text-pink-300' : ''}
+                                ${favorite.category === 'video games' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300' : ''}
+                              `}
+                            >
+                              {favorite.category}
+                            </Badge>
                           </div>
-                          <CardHeader>
-                            <div className="flex items-center justify-between">
-                              <CardTitle className="text-xl">{favorite.title}</CardTitle>
-                              <Badge 
-                                variant="secondary"
-                                className={`
-                                  ${favorite.category === 'app' ? 'bg-cyan-100 text-cyan-800 dark:bg-cyan-900 dark:text-cyan-300' : ''}
-                                  ${favorite.category === 'book' ? 'bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-300' : ''}
-                                  ${favorite.category === 'podcast' ? 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300' : ''}
-                                  ${favorite.category === 'music' ? 'bg-pink-100 text-pink-800 dark:bg-pink-900 dark:text-pink-300' : ''}
-                                  ${favorite.category === 'video games' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300' : ''}
-                                  `}
-                              >
-                                {favorite.category}
-                              </Badge>
-                            </div>
-                          </CardHeader>
-                          <CardContent>
-                            {favorite.description && (
-                              <p className="text-muted-foreground">{favorite.description}</p>
-                            )}
-                          </CardContent>
-                        </Card>
-                      </a>
-                    </motion.div>
+                        </CardHeader>
+                        <CardContent>
+                          {favorite.description && (
+                            <p className="text-muted-foreground">{favorite.description}</p>
+                          )}
+                        </CardContent>
+                      </Card>
+                    </a>
+                  </motion.div>
                 ))}
               </Masonry>
             )}
