@@ -1,6 +1,6 @@
 import multer from 'multer';
 
-// Configure memory storage
+// Configure memory storage for temporary file handling
 const storage = multer.memoryStorage();
 
 // Create upload middleware with memory storage

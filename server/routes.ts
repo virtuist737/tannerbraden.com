@@ -15,6 +15,7 @@ import { upload } from "./lib/upload";
 import path from "path";
 import fs from "fs";
 import { fileURLToPath } from 'url';
+import { uploadToCloudinary } from './lib/cloudinary';
 
 // ESM module dirname equivalent
 const __filename = fileURLToPath(import.meta.url);
@@ -198,16 +199,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: `Invalid ${entityType} ID` });
       }
 
-      const fileName = `${entityType}-${id}-${Date.now()}-${req.file.originalname}`;
-      const filePath = path.join(imagesDir, fileName);
+      // Upload to Cloudinary
+      const cloudinaryUrl = await uploadToCloudinary(req.file, entityType);
 
-      await fs.promises.writeFile(filePath, req.file.buffer);
+      // Update the database with the Cloudinary URL
+      await updateFunction(id, cloudinaryUrl);
 
-      // Update the database with just the filename
-      await updateFunction(id, fileName);
-
-      // Return just the filename - the frontend will construct the full URL
-      res.json({ imageUrl: fileName });
+      // Return the Cloudinary URL
+      res.json({ imageUrl: cloudinaryUrl });
     } catch (error) {
       console.error(`Error uploading ${entityType} image:`, error);
       res.status(500).json({ error: "Failed to upload image" });
