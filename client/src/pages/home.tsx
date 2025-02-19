@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, AtSign } from "lucide-react";
 import { Link } from "wouter";
 import { Helmet } from 'react-helmet-async';
 import { Button } from "@/components/ui/button";
