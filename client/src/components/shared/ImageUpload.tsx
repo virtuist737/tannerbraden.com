@@ -1,8 +1,16 @@
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
-import { Loader2, Upload } from "lucide-react";
+import { Loader2, Upload, Image as ImageIcon, X } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface ImageUploadProps {
   imageUrl?: string | null;
@@ -10,62 +18,81 @@ interface ImageUploadProps {
   entityType: 'timeline' | 'interest' | 'favorite' | 'blog' | 'project' | 'blog-content' | 'timeline-content';
   onSuccess?: (newImageUrl: string) => void;
   trigger?: React.ReactNode;
+  multiple?: boolean;
 }
 
-export const ImageUpload = ({ imageUrl, entityId, entityType, onSuccess, trigger }: ImageUploadProps) => {
+export const ImageUpload = ({ imageUrl, entityId, entityType, onSuccess, trigger, multiple = false }: ImageUploadProps) => {
   const { toast } = useToast();
   const [isUploading, setIsUploading] = useState(false);
   const { user } = useAuth();
   const isAuthenticated = !!user;
+  const [uploadedImages, setUploadedImages] = useState<string[]>([]);
+  const [showGallery, setShowGallery] = useState(false);
 
   const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
+    const files = event.target.files;
+    if (!files?.length) return;
 
-    // Validate file type
-    if (!file.type.startsWith('image/')) {
+    const fileArray = Array.from(files);
+    const invalidFiles = fileArray.filter(file => !file.type.startsWith('image/'));
+
+    if (invalidFiles.length > 0) {
       toast({
         title: "Error",
-        description: "Please upload an image file",
+        description: "Please upload only image files",
         variant: "destructive",
       });
       return;
     }
 
-    // Validate file size (max 5MB)
-    if (file.size > 5 * 1024 * 1024) {
+    // Validate file sizes (max 5MB each)
+    const oversizedFiles = fileArray.filter(file => file.size > 5 * 1024 * 1024);
+    if (oversizedFiles.length > 0) {
       toast({
         title: "Error",
-        description: "Image size should be less than 5MB",
+        description: "Each image size should be less than 5MB",
         variant: "destructive",
       });
       return;
     }
 
     setIsUploading(true);
-    const formData = new FormData();
-    formData.append('image', file);
 
     try {
-      const response = await fetch(`/api/upload/${entityType}/${entityId}`, {
-        method: 'POST',
-        body: formData,
+      const uploadPromises = fileArray.map(async (file) => {
+        const formData = new FormData();
+        formData.append('image', file);
+
+        const response = await fetch(`/api/upload/${entityType}/${entityId}`, {
+          method: 'POST',
+          body: formData,
+        });
+
+        if (!response.ok) {
+          const error = await response.json();
+          throw new Error(error.message || 'Upload failed');
+        }
+
+        const data = await response.json();
+        if (!data.imageUrl) {
+          throw new Error('No image URL returned from server');
+        }
+
+        return data.imageUrl;
       });
 
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || 'Upload failed');
+      const urls = await Promise.all(uploadPromises);
+
+      if (multiple) {
+        setUploadedImages(prev => [...prev, ...urls]);
+        urls.forEach(url => onSuccess?.(url));
+      } else {
+        onSuccess?.(urls[0]);
       }
 
-      const data = await response.json();
-      if (!data.imageUrl) {
-        throw new Error('No image URL returned from server');
-      }
-
-      onSuccess?.(data.imageUrl);
       toast({
         title: "Success",
-        description: "Image uploaded successfully",
+        description: `${urls.length} image${urls.length > 1 ? 's' : ''} uploaded successfully`,
       });
     } catch (error) {
       console.error('Upload error:', error);
@@ -76,32 +103,81 @@ export const ImageUpload = ({ imageUrl, entityId, entityType, onSuccess, trigger
       });
     } finally {
       setIsUploading(false);
-      // Reset the input
       event.target.value = '';
     }
   };
 
+  const ImageGallery = () => (
+    <Dialog open={showGallery} onOpenChange={setShowGallery}>
+      <DialogContent className="sm:max-w-[80vw]">
+        <DialogHeader>
+          <DialogTitle>Image Gallery</DialogTitle>
+        </DialogHeader>
+        <ScrollArea className="h-[60vh] w-full p-4">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            {uploadedImages.map((url, index) => (
+              <div key={index} className="relative group">
+                <img
+                  src={url}
+                  alt={`Uploaded content ${index + 1}`}
+                  className="w-full h-40 object-cover rounded-lg cursor-pointer hover:opacity-75 transition-opacity"
+                  onClick={() => {
+                    onSuccess?.(url);
+                    setShowGallery(false);
+                  }}
+                />
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setUploadedImages(prev => prev.filter(img => img !== url));
+                  }}
+                  className="absolute top-2 right-2 p-1 bg-destructive text-destructive-foreground rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              </div>
+            ))}
+          </div>
+        </ScrollArea>
+      </DialogContent>
+    </Dialog>
+  );
+
   if (trigger) {
     return (
-      <label className="cursor-pointer">
-        <input
-          type="file"
-          accept="image/*"
-          className="hidden"
-          onChange={handleImageUpload}
-          disabled={isUploading}
-        />
-        {isUploading ? (
+      <>
+        <label className="cursor-pointer">
+          <input
+            type="file"
+            accept="image/*"
+            multiple={multiple}
+            className="hidden"
+            onChange={handleImageUpload}
+            disabled={isUploading}
+          />
+          {isUploading ? (
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              disabled
+            >
+              <Loader2 className="h-4 w-4 animate-spin" />
+            </Button>
+          ) : trigger}
+        </label>
+        {multiple && uploadedImages.length > 0 && (
           <Button
-            type="button"
             variant="ghost"
             size="icon"
-            disabled
+            onClick={() => setShowGallery(true)}
+            className="ml-2"
           >
-            <Loader2 className="h-4 w-4 animate-spin" />
+            <ImageIcon className="h-4 w-4" />
           </Button>
-        ) : trigger}
-      </label>
+        )}
+        <ImageGallery />
+      </>
     );
   }
 
@@ -120,6 +196,7 @@ export const ImageUpload = ({ imageUrl, entityId, entityType, onSuccess, trigger
                 <input
                   type="file"
                   accept="image/*"
+                  multiple={multiple}
                   className="hidden"
                   onChange={handleImageUpload}
                   disabled={isUploading}
@@ -146,6 +223,7 @@ export const ImageUpload = ({ imageUrl, entityId, entityType, onSuccess, trigger
           <input
             type="file"
             accept="image/*"
+            multiple={multiple}
             className="hidden"
             onChange={handleImageUpload}
             disabled={isUploading}
@@ -159,12 +237,13 @@ export const ImageUpload = ({ imageUrl, entityId, entityType, onSuccess, trigger
             ) : (
               <>
                 <Upload className="mr-2 h-4 w-4" />
-                Upload Image
+                Upload Image{multiple ? 's' : ''}
               </>
             )}
           </div>
         </label>
       ) : null}
+      {multiple && <ImageGallery />}
     </div>
   );
 };

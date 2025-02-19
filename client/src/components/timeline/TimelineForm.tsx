@@ -28,7 +28,7 @@ import type { Timeline } from "@shared/schema";
 import { ImageUpload } from "@/components/shared/ImageUpload";
 import { ImagePlus, Link2, Bold, Italic, Heading2, List, ListOrdered, Quote } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 
 const timelineFormSchema = insertTimelineSchema.extend({
@@ -59,6 +59,7 @@ const ICONS = [
 
 const TimelineForm = ({ initialData, onSubmit, isSubmitting }: TimelineFormProps) => {
   const { toast } = useToast();
+  const [uploadedImages, setUploadedImages] = useState<string[]>([]);
   const form = useForm<z.infer<typeof timelineFormSchema>>({
     resolver: zodResolver(timelineFormSchema),
     defaultValues: {
@@ -409,30 +410,26 @@ const TimelineForm = ({ initialData, onSubmit, isSubmitting }: TimelineFormProps
 
                             <Tooltip>
                               <TooltipTrigger asChild>
-                                <Tooltip>
-                                  <TooltipTrigger asChild>
-                                    <div>
-                                      <ImageUpload
-                                        imageUrl={null}
-                                        entityId={initialData?.id || "temp"}
-                                        entityType="timeline-content"
-                                        onSuccess={addImage}
-                                        trigger={
-                                          <Button
-                                            type="button"
-                                            variant="ghost"
-                                            size="icon"
-                                          >
-                                            <ImagePlus className="h-4 w-4" />
-                                          </Button>
-                                        }
-                                      />
-                                    </div>
-                                  </TooltipTrigger>
-                                  <TooltipContent>Add Image</TooltipContent>
-                                </Tooltip>
+                                <div>
+                                  <ImageUpload
+                                    imageUrl={null}
+                                    entityId={initialData?.id || "temp"}
+                                    entityType="timeline-content"
+                                    onSuccess={addImage}
+                                    multiple={true}
+                                    trigger={
+                                      <Button
+                                        type="button"
+                                        variant="ghost"
+                                        size="icon"
+                                      >
+                                        <ImagePlus className="h-4 w-4" />
+                                      </Button>
+                                    }
+                                  />
+                                </div>
                               </TooltipTrigger>
-                              <TooltipContent>Add Image</TooltipContent>
+                              <TooltipContent>Add Images</TooltipContent>
                             </Tooltip>
                           </TooltipProvider>
                         </div>

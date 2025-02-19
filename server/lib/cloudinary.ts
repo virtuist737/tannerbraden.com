@@ -12,11 +12,18 @@ export const uploadToCloudinary = async (file: Express.Multer.File, folder: stri
     // Convert the buffer to base64
     const b64 = Buffer.from(file.buffer).toString('base64');
     const dataURI = `data:${file.mimetype};base64,${b64}`;
-    
-    // Upload to Cloudinary
+
+    // Upload to Cloudinary with optimization settings
     const result = await cloudinary.uploader.upload(dataURI, {
       folder: `portfolio/${folder}`,
       resource_type: 'auto',
+      quality: 'auto',
+      fetch_format: 'auto',
+      responsive: true,
+      width: 'auto',
+      dpr: 'auto',
+      crop: 'limit',
+      max_width: 2000,
     });
 
     return result.secure_url;
@@ -31,5 +38,13 @@ export const deleteFromCloudinary = async (publicId: string) => {
     await cloudinary.uploader.destroy(publicId);
   } catch (error) {
     console.error('Cloudinary delete error:', error);
+    throw new Error('Failed to delete image from Cloudinary');
   }
+};
+
+export const getPublicIdFromUrl = (url: string): string => {
+  const splitUrl = url.split('/');
+  const filename = splitUrl[splitUrl.length - 1];
+  const publicId = filename.split('.')[0];
+  return publicId;
 };
