@@ -42,14 +42,19 @@ export default function EditProject() {
   const form = useForm<InsertProject>({
     resolver: zodResolver(insertProjectSchema),
     defaultValues: {
-      title: "",
-      description: "",
-      imageUrl: "",
-      technologies: [],
-      buttons: [],
-      sortOrder: 0,
-      featured: false,
+      title: project?.title || "",
+      description: project?.description || "",
+      imageUrl: project?.imageUrl || "",
+      technologies: project?.technologies || [],
+      buttons: project?.buttons || [],
+      sortOrder: project?.sortOrder || 0,
+      featured: project?.featured || false,
     },
+  });
+
+  const { fields: buttonFields, append: appendButton, remove: removeButton } = useFieldArray({
+    control: form.control,
+    name: "buttons",
   });
 
   React.useEffect(() => {
@@ -92,11 +97,6 @@ export default function EditProject() {
         variant: "destructive",
       });
     },
-  });
-
-  const { fields: buttonFields, append: appendButton, remove: removeButton } = useFieldArray({
-    control: form.control,
-    name: "buttons",
   });
 
   const onSubmit = (data: InsertProject) => {
@@ -197,7 +197,7 @@ export default function EditProject() {
                       <FormControl>
                         <Input
                           {...field}
-                          value={field.value.join(", ")}
+                          value={Array.isArray(field.value) ? field.value.join(", ") : ""}
                           onChange={(e) =>
                             field.onChange(e.target.value.split(",").map((t) => t.trim()))
                           }
@@ -206,34 +206,6 @@ export default function EditProject() {
                       <FormDescription>
                         Enter technologies separated by commas (e.g., React, Node.js, PostgreSQL)
                       </FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="githubUrl"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>GitHub URL</FormLabel>
-                      <FormControl>
-                        <Input {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="liveUrl"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Live URL</FormLabel>
-                      <FormControl>
-                        <Input {...field} />
-                      </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
