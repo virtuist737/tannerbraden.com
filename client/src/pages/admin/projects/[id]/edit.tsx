@@ -1,4 +1,3 @@
-
 import React from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useLocation, useParams } from "wouter";
@@ -36,6 +35,10 @@ export default function EditProject() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
 
+  const { data: project, isLoading } = useQuery<Project>({
+    queryKey: [`/api/projects/${id}`],
+  });
+  
   const form = useForm<InsertProject>({
     resolver: zodResolver(insertProjectSchema),
     defaultValues: {
@@ -54,9 +57,21 @@ export default function EditProject() {
     name: "buttons",
   });
 
-  const { data: project, isLoading } = useQuery<Project>({
-    queryKey: [`/api/projects/${id}`],
-  });
+  // Update form values when project data is loaded
+  React.useEffect(() => {
+    if (project) {
+      console.log("Setting form values with project data:", project);
+      form.reset({
+        title: project.title,
+        description: project.description,
+        imageUrl: project.imageUrl,
+        technologies: project.technologies,
+        buttons: project.buttons || [],
+        sortOrder: project.sortOrder,
+        featured: project.featured,
+      });
+    }
+  }, [project, form]);
 
   const updateMutation = useMutation({
     mutationFn: async (data: InsertProject) => {
@@ -85,39 +100,6 @@ export default function EditProject() {
       });
     },
   });
-
-  // Add error state handling after hooks
-  if (!isLoading && !project) {
-    return (
-      <div className="container py-8">
-        <Card>
-          <CardHeader>
-            <CardTitle>Project not found</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Button onClick={() => setLocation("/admin/projects")}>
-              Return to Projects
-            </Button>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
-
-  React.useEffect(() => {
-    if (project) {
-      console.log("Setting form values with project data:", project);
-      form.reset({
-        title: project.title,
-        description: project.description,
-        imageUrl: project.imageUrl,
-        technologies: project.technologies,
-        buttons: project.buttons || [],
-        sortOrder: project.sortOrder,
-        featured: project.featured,
-      });
-    }
-  }, [project, form]);
 
   const onSubmit = (data: InsertProject) => {
     updateMutation.mutate({
@@ -273,6 +255,7 @@ export default function EditProject() {
                   )}
                 />
 
+                {/* Add Custom Buttons Section */}
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
                     <h3 className="text-lg font-medium">Custom Buttons</h3>
