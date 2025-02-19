@@ -83,7 +83,7 @@ export const interests = pgTable("interests", {
   category: text("category").notNull(),
   description: text("description"),
   link: text("link"),
-  image: text("image"), 
+  image: text("image"),
   sortOrder: integer("sort_order").notNull(),
 });
 
@@ -99,14 +99,14 @@ export const favorites = pgTable("favorites", {
 });
 
 // Add projects table after the existing tables
-// Update projects table to include buttons
+// Update projects table to properly handle buttons
 export const projects = pgTable("projects", {
   id: serial("id").primaryKey(),
   title: text("title").notNull(),
   description: text("description").notNull(),
   imageUrl: text("image_url").notNull(),
   technologies: text("technologies").array().notNull(),
-  buttons: jsonb("buttons").notNull().default('[]'),
+  buttons: jsonb("buttons").notNull().$type<Button[]>().default([]), // Properly type the buttons field
   sortOrder: integer("sort_order").notNull().default(0),
   featured: boolean("featured").notNull().default(false),
   createdAt: timestamp("created_at").notNull().defaultNow(),
@@ -145,7 +145,7 @@ export const insertInterestSchema = createInsertSchema(interests).omit({
   sortOrder: z.number().int().nonnegative(),
   description: z.string().optional().nullable(),
   link: z.string().url().optional().nullable(),
-  image: z.string().optional().nullable(), 
+  image: z.string().optional().nullable(),
 });
 
 export const insertFavoriteSchema = createInsertSchema(favorites).extend({
@@ -164,13 +164,13 @@ export const insertTimelineSchema = createInsertSchema(timeline).omit({
 });
 
 // Add after existing schemas
-// Update insertProjectSchema to include buttons
+// Update insertProjectSchema to properly validate buttons
 export const insertProjectSchema = createInsertSchema(projects).omit({
   id: true,
   createdAt: true,
 }).extend({
   technologies: z.array(z.string()),
-  buttons: z.array(buttonSchema),
+  buttons: z.array(buttonSchema).default([]),
 });
 
 // Types for TypeScript

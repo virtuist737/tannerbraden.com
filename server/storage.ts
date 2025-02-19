@@ -376,11 +376,18 @@ export class DatabaseStorage implements IStorage {
   }
 
   async updateProject(id: number, updates: Partial<InsertProject>): Promise<Project | undefined> {
+    // Ensure we're working with valid JSON for the buttons array
+    const sanitizedUpdates = {
+      ...updates,
+      buttons: updates.buttons ? updates.buttons : undefined,
+    };
+
     const [updatedProject] = await db
       .update(projects)
-      .set(updates)
+      .set(sanitizedUpdates)
       .where(eq(projects.id, id))
       .returning();
+
     return updatedProject;
   }
 
