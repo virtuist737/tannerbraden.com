@@ -107,7 +107,9 @@ export const ImageUpload = ({ imageUrl, entityId, entityType, onSuccess, trigger
   };
 
   const handleSelectImage = (url: string) => {
-    onSuccess?.(url);
+    if (onSuccess) {
+      onSuccess(url);
+    }
     setShowGallery(false);
   };
 
