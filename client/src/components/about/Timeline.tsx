@@ -204,11 +204,11 @@ const TimelineCard: React.FC<CardProps> = ({ event, onClick }) => {
       onClick={onClick}
     >
       {event.imageUrl && (
-        <div className="w-full h-40 rounded-lg overflow-hidden">
+        <div className="w-full rounded-lg overflow-hidden">
           <img 
             src={event.imageUrl} 
             alt={event.title}
-            className="w-full h-full object-cover"
+            className="w-full h-auto"
           />
         </div>
       )}
