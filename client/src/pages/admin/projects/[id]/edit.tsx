@@ -36,9 +36,27 @@ export default function EditProject() {
   const { toast } = useToast();
 
   const { data: project, isLoading } = useQuery<Project>({
-    queryKey: ["/api/projects", parseInt(id)],
+    queryKey: [`/api/projects/${id}`],
   });
 
+  // Add error state handling
+  if (!isLoading && !project) {
+    return (
+      <div className="container py-8">
+        <Card>
+          <CardHeader>
+            <CardTitle>Project not found</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Button onClick={() => setLocation("/admin/projects")}>
+              Return to Projects
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+  
   const form = useForm<InsertProject>({
     resolver: zodResolver(insertProjectSchema),
     defaultValues: {
