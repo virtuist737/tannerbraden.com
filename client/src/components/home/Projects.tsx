@@ -47,9 +47,15 @@ const Projects = () => {
         </div>
 
         <Masonry
-          breakpointCols={breakpointColumnsObj}
-          className="flex -ml-4 w-auto"
-          columnClassName="pl-4 bg-clip-padding"
+          breakpointCols={{
+            default: 3,
+            1536: 3,
+            1280: 3,
+            768: 2,
+            640: 1,
+          }}
+          className="my-masonry-grid"
+          columnClassName="my-masonry-grid_column"
         >
           {projects?.map((project, index) => (
             <motion.div
@@ -57,9 +63,8 @@ const Projects = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: index * 0.1 }}
-              className="mb-4"
             >
-              <Card className="h-full flex flex-col overflow-hidden hover:shadow-lg transition-shadow duration-300">
+              <Card className="mb-6 h-full flex flex-col overflow-hidden hover:shadow-lg transition-shadow duration-300">
                 <CardHeader className="p-0">
                   <div className="relative w-full aspect-video">
                     <img
@@ -108,6 +113,18 @@ const Projects = () => {
             </motion.div>
           ))}
         </Masonry>
+
+        <style jsx global>{`
+          .my-masonry-grid {
+            display: flex;
+            width: auto;
+            margin-left: -24px; /* gutter size offset */
+          }
+          .my-masonry-grid_column {
+            padding-left: 24px; /* gutter size */
+            background-clip: padding-box;
+          }
+        `}</style>
       </motion.div>
     </section>
   );
