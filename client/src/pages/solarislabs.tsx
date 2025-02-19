@@ -41,14 +41,14 @@ const SolarisLabs = () => {
 
         <Masonry
           breakpointCols={{
-            default: 3,
-            1536: 3,
+            default: 5,
+            1536: 4,
             1280: 3,
             768: 2,
-            640: 1,
+            640: 2,
           }}
-          className="flex -ml-4 w-auto"
-          columnClassName="pl-4 bg-clip-padding"
+          className="flex -ml-6 w-auto"
+          columnClassName="pl-6 bg-clip-padding"
         >
           {isLoading ? (
             <LoadingSpinner />
