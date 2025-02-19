@@ -104,11 +104,7 @@ const TimelineForm = ({ initialData, onSubmit, isSubmitting }: TimelineFormProps
       editor
         .chain()
         .focus()
-        .setImage({
-          src: url,
-          alt: "Timeline content image",
-        })
-        .insertContent("<p></p>")
+        .insertContent(`[IMAGE:${url}]\n`)
         .run();
 
       setUploadedImages(prev => [...prev, url]);
@@ -164,11 +160,7 @@ const TimelineForm = ({ initialData, onSubmit, isSubmitting }: TimelineFormProps
         editor
           .chain()
           .focus()
-          .setImage({
-            src: data.imageUrl,
-            alt: "Timeline content image",
-          })
-          .insertContent("<p></p>")
+          .insertContent(`[IMAGE:${data.imageUrl}]\n`)
           .run();
       }
 

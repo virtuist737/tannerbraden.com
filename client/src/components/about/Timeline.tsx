@@ -193,10 +193,9 @@ const TimelineComponent = () => {
                     />
                   </div>
                 )}
-                <div 
-                  className="prose prose-primary dark:prose-invert max-w-none"
-                  dangerouslySetInnerHTML={{ __html: selectedEvent.content }}
-                />
+                <div className="prose prose-primary dark:prose-invert max-w-none">
+                  {renderContent(selectedEvent.content)}
+                </div>
               </ScrollArea>
             </>
           )}
@@ -253,6 +252,29 @@ const getIcon = (icon: string) => {
     default:
       return <Briefcase className="h-5 w-5" />;
   }
+};
+
+const renderContent = (content: string) => {
+  const imageRegex = /\[IMAGE:(.*?)\]/g;
+  const parts = content.split(imageRegex);
+
+  return parts.map((part, index) => {
+    if (index % 2 === 1) {
+      // This is an image URL
+      return (
+        <div key={index} className="my-4">
+          <img
+            src={part}
+            alt="Timeline content"
+            className="rounded-lg max-w-full h-auto"
+            loading="lazy"
+          />
+        </div>
+      );
+    }
+    // This is regular content
+    return <div key={index} dangerouslySetInnerHTML={{ __html: part }} />;
+  });
 };
 
 export default TimelineComponent;
