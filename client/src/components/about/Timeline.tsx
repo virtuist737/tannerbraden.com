@@ -200,24 +200,35 @@ const TimelineCard: React.FC<CardProps> = ({ event, onClick }) => {
   return (
     <Button
       variant="outline"
-      className="p-4 md:p-6 h-auto bg-card border rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 w-full md:max-w-xl text-left flex items-center justify-between group"
+      className="p-4 md:p-6 h-auto bg-card border rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 w-full md:max-w-xl text-left flex flex-col gap-4 group"
       onClick={onClick}
     >
-      <div className="flex items-center gap-3">
-        <div className="flex items-center justify-center w-10 h-10 rounded-full bg-primary/10 text-primary">
-          {getIcon(event.icon)}
+      {event.imageUrl && (
+        <div className="w-full h-40 rounded-lg overflow-hidden">
+          <img 
+            src={event.imageUrl} 
+            alt={event.title}
+            className="w-full h-full object-cover"
+          />
         </div>
-        <div>
-          <h3 className="font-semibold text-lg">{event.title}</h3>
-          <time className="text-sm text-muted-foreground">
-            {new Date(event.date + 'T00:00:00').toLocaleDateString('en-US', {
-              year: 'numeric',
-              month: 'long'
-            })}
-          </time>
+      )}
+      <div className="flex items-center justify-between w-full">
+        <div className="flex items-center gap-3">
+          <div className="flex items-center justify-center w-10 h-10 rounded-full bg-primary/10 text-primary">
+            {getIcon(event.icon)}
+          </div>
+          <div>
+            <h3 className="font-semibold text-lg">{event.title}</h3>
+            <time className="text-sm text-muted-foreground">
+              {new Date(event.date + 'T00:00:00').toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'long'
+              })}
+            </time>
+          </div>
         </div>
+        <ChevronRight className="h-4 w-4 text-muted-foreground transition-transform group-hover:translate-x-1" />
       </div>
-      <ChevronRight className="h-4 w-4 text-muted-foreground transition-transform group-hover:translate-x-1" />
     </Button>
   );
 };
