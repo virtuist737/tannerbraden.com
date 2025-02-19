@@ -75,10 +75,22 @@ export default function EditProject() {
 
   const updateMutation = useMutation({
     mutationFn: async (data: InsertProject) => {
+      const formattedData = {
+        ...data,
+        technologies: Array.isArray(data.technologies) ? data.technologies : [],
+        sortOrder: Number(data.sortOrder) || 0,
+        featured: Boolean(data.featured),
+        buttons: Array.isArray(data.buttons) ? data.buttons : []
+      };
+      
       const response = await apiRequest(`/api/projects/${id}`, {
         method: "PATCH",
-        body: JSON.stringify(data),
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(formattedData),
       });
+      
       if (!response.ok) {
         const error = await response.json();
         throw new Error(error.message || "Failed to update project");
