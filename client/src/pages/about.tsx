@@ -92,7 +92,7 @@ const About = () => {
             <div className="text-center max-w-3xl mx-auto px-4">
               <h1 className="text-4xl font-bold tracking-tighter mb-4">About Me</h1>
               <p className="text-xl text-muted-foreground">
-                I'm a partnerships and growth specialist with a deep drive to increase the quality of human consciousness. By combining my experience in partner marketing with my passion for building scalable solutions, I work to create meaningful impact through technology and collaboration.
+                I'm a neurodivergent dude with a deep drive to reduce human suffering and increase the quality of human consciousness. Here's a bit of my story, some of my interests, and some of my favorite things.
               </p>
             </div>
           </motion.div>
