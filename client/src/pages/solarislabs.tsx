@@ -41,11 +41,11 @@ const SolarisLabs = () => {
 
         <Masonry
           breakpointCols={{
-            default: 5,
-            1536: 4,
-            1280: 3,
-            768: 2,
-            640: 2,
+            default: 3,
+            1536: 2,
+            1280: 2,
+            768: 1,
+            640: 1,
           }}
           className="flex -ml-6 w-auto"
           columnClassName="pl-6 bg-clip-padding"
@@ -75,9 +75,9 @@ const SolarisLabs = () => {
                       />
                     </div>
                   </CardHeader>
-                  <CardContent className="flex-1 p-4 md:p-6 space-y-4">
-                    <h2 className="text-2xl font-semibold">{project.title}</h2>
-                    <p className="text-muted-foreground">{project.description}</p>
+                  <CardContent className="flex-1 p-6 md:p-8 space-y-6">
+                    <h2 className="text-3xl font-semibold">{project.title}</h2>
+                    <p className="text-muted-foreground text-lg">{project.description}</p>
                     <div className="flex flex-wrap gap-2">
                       {project.technologies.map((tech) => (
                         <Badge key={tech} variant="secondary">
