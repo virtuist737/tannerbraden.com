@@ -409,23 +409,28 @@ const TimelineForm = ({ initialData, onSubmit, isSubmitting }: TimelineFormProps
 
                             <Tooltip>
                               <TooltipTrigger asChild>
-                                <div className="inline-block">
-                                  <ImageUpload
-                                    imageUrl={null}
-                                    entityId={initialData?.id || "temp"}
-                                    entityType="timeline-content"
-                                    onSuccess={addImage}
-                                    trigger={
-                                      <Button
-                                        type="button"
-                                        variant="ghost"
-                                        size="icon"
-                                      >
-                                        <ImagePlus className="h-4 w-4" />
-                                      </Button>
-                                    }
-                                  />
-                                </div>
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <div>
+                                      <ImageUpload
+                                        imageUrl={null}
+                                        entityId={initialData?.id || "temp"}
+                                        entityType="timeline-content"
+                                        onSuccess={addImage}
+                                        trigger={
+                                          <Button
+                                            type="button"
+                                            variant="ghost"
+                                            size="icon"
+                                          >
+                                            <ImagePlus className="h-4 w-4" />
+                                          </Button>
+                                        }
+                                      />
+                                    </div>
+                                  </TooltipTrigger>
+                                  <TooltipContent>Add Image</TooltipContent>
+                                </Tooltip>
                               </TooltipTrigger>
                               <TooltipContent>Add Image</TooltipContent>
                             </Tooltip>
