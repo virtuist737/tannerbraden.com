@@ -42,13 +42,13 @@ export default function EditProject() {
   const form = useForm<InsertProject>({
     resolver: zodResolver(insertProjectSchema),
     defaultValues: {
-      title: project?.title || "",
-      description: project?.description || "",
-      imageUrl: project?.imageUrl || "",
-      technologies: project?.technologies || [],
-      buttons: project?.buttons || [],
-      sortOrder: project?.sortOrder || 0,
-      featured: project?.featured || false,
+      title: "",
+      description: "",
+      imageUrl: "",
+      technologies: [],
+      buttons: [],
+      sortOrder: 0,
+      featured: false,
     },
   });
 
@@ -57,8 +57,10 @@ export default function EditProject() {
     name: "buttons",
   });
 
+  // Update form values when project data is loaded
   React.useEffect(() => {
     if (project) {
+      console.log("Setting form values with project data:", project);
       form.reset({
         title: project.title,
         description: project.description,
