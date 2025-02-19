@@ -285,17 +285,15 @@ const TimelineForm = ({ initialData, onSubmit, isSubmitting }: TimelineFormProps
                   <TabsContent value="write" className="space-y-4">
                     {editor && (
                       <>
-                        <div className="border rounded-md p-2 flex gap-2 mb-4">
-                          <TooltipProvider>
+                        <div className="border rounded-md p-2 flex gap-2 mb-4 bg-background sticky top-0 z-10">
+                          <TooltipProvider delayDuration={0}>
                             <Tooltip>
                               <TooltipTrigger asChild>
                                 <Button
                                   type="button"
                                   variant="ghost"
                                   size="icon"
-                                  onClick={() =>
-                                    editor.chain().focus().toggleBold().run()
-                                  }
+                                  onClick={() => editor.chain().focus().toggleBold().run()}
                                   className={editor.isActive("bold") ? "bg-accent" : ""}
                                 >
                                   <Bold className="h-4 w-4" />
@@ -303,16 +301,13 @@ const TimelineForm = ({ initialData, onSubmit, isSubmitting }: TimelineFormProps
                               </TooltipTrigger>
                               <TooltipContent>Bold</TooltipContent>
                             </Tooltip>
-
                             <Tooltip>
                               <TooltipTrigger asChild>
                                 <Button
                                   type="button"
                                   variant="ghost"
                                   size="icon"
-                                  onClick={() =>
-                                    editor.chain().focus().toggleItalic().run()
-                                  }
+                                  onClick={() => editor.chain().focus().toggleItalic().run()}
                                   className={editor.isActive("italic") ? "bg-accent" : ""}
                                 >
                                   <Italic className="h-4 w-4" />
@@ -320,7 +315,6 @@ const TimelineForm = ({ initialData, onSubmit, isSubmitting }: TimelineFormProps
                               </TooltipTrigger>
                               <TooltipContent>Italic</TooltipContent>
                             </Tooltip>
-
                             <Tooltip>
                               <TooltipTrigger asChild>
                                 <Button
@@ -341,16 +335,13 @@ const TimelineForm = ({ initialData, onSubmit, isSubmitting }: TimelineFormProps
                               </TooltipTrigger>
                               <TooltipContent>Heading</TooltipContent>
                             </Tooltip>
-
                             <Tooltip>
                               <TooltipTrigger asChild>
                                 <Button
                                   type="button"
                                   variant="ghost"
                                   size="icon"
-                                  onClick={() =>
-                                    editor.chain().focus().toggleBulletList().run()
-                                  }
+                                  onClick={() => editor.chain().focus().toggleBulletList().run()}
                                   className={editor.isActive("bulletList") ? "bg-accent" : ""}
                                 >
                                   <List className="h-4 w-4" />
@@ -358,16 +349,13 @@ const TimelineForm = ({ initialData, onSubmit, isSubmitting }: TimelineFormProps
                               </TooltipTrigger>
                               <TooltipContent>Bullet List</TooltipContent>
                             </Tooltip>
-
                             <Tooltip>
                               <TooltipTrigger asChild>
                                 <Button
                                   type="button"
                                   variant="ghost"
                                   size="icon"
-                                  onClick={() =>
-                                    editor.chain().focus().toggleOrderedList().run()
-                                  }
+                                  onClick={() => editor.chain().focus().toggleOrderedList().run()}
                                   className={editor.isActive("orderedList") ? "bg-accent" : ""}
                                 >
                                   <ListOrdered className="h-4 w-4" />
@@ -375,16 +363,13 @@ const TimelineForm = ({ initialData, onSubmit, isSubmitting }: TimelineFormProps
                               </TooltipTrigger>
                               <TooltipContent>Numbered List</TooltipContent>
                             </Tooltip>
-
                             <Tooltip>
                               <TooltipTrigger asChild>
                                 <Button
                                   type="button"
                                   variant="ghost"
                                   size="icon"
-                                  onClick={() =>
-                                    editor.chain().focus().toggleBlockquote().run()
-                                  }
+                                  onClick={() => editor.chain().focus().toggleBlockquote().run()}
                                   className={editor.isActive("blockquote") ? "bg-accent" : ""}
                                 >
                                   <Quote className="h-4 w-4" />
@@ -392,7 +377,6 @@ const TimelineForm = ({ initialData, onSubmit, isSubmitting }: TimelineFormProps
                               </TooltipTrigger>
                               <TooltipContent>Quote</TooltipContent>
                             </Tooltip>
-
                             <Tooltip>
                               <TooltipTrigger asChild>
                                 <Button
@@ -407,10 +391,14 @@ const TimelineForm = ({ initialData, onSubmit, isSubmitting }: TimelineFormProps
                               </TooltipTrigger>
                               <TooltipContent>Add Link</TooltipContent>
                             </Tooltip>
-
                             <Tooltip>
                               <TooltipTrigger asChild>
-                                <div>
+                                <Button
+                                  type="button"
+                                  variant="secondary"
+                                  size="sm"
+                                  className="flex items-center gap-2"
+                                >
                                   <ImageUpload
                                     imageUrl={null}
                                     entityId={initialData?.id || "temp"}
@@ -418,18 +406,15 @@ const TimelineForm = ({ initialData, onSubmit, isSubmitting }: TimelineFormProps
                                     onSuccess={addImage}
                                     multiple={true}
                                     trigger={
-                                      <Button
-                                        type="button"
-                                        variant="ghost"
-                                        size="icon"
-                                      >
+                                      <div className="flex items-center gap-2">
                                         <ImagePlus className="h-4 w-4" />
-                                      </Button>
+                                        <span>Add Images</span>
+                                      </div>
                                     }
                                   />
-                                </div>
+                                </Button>
                               </TooltipTrigger>
-                              <TooltipContent>Add Images</TooltipContent>
+                              <TooltipContent>Upload and insert images</TooltipContent>
                             </Tooltip>
                           </TooltipProvider>
                         </div>

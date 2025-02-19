@@ -156,15 +156,13 @@ export const ImageUpload = ({ imageUrl, entityId, entityType, onSuccess, trigger
             disabled={isUploading}
           />
           {isUploading ? (
-            <Button
-              type="button"
-              variant="ghost"
-              size="icon"
-              disabled
-            >
+            <div className="flex items-center gap-2 text-muted-foreground">
               <Loader2 className="h-4 w-4 animate-spin" />
-            </Button>
-          ) : trigger}
+              <span>Uploading...</span>
+            </div>
+          ) : (
+            <div className="flex items-center">{trigger}</div>
+          )}
         </label>
         {multiple && uploadedImages.length > 0 && (
           <Button
