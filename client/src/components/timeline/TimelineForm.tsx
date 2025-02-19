@@ -28,6 +28,8 @@ import type { Timeline } from "@shared/schema";
 import { ImageUpload } from "@/components/shared/ImageUpload";
 import { ImagePlus, Link2, Bold, Italic, Heading2, List, ListOrdered, Quote } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { useCallback } from "react";
+import { useToast } from "@/hooks/use-toast";
 
 const timelineFormSchema = insertTimelineSchema.extend({
   title: z.string().min(1, "Title is required"),
@@ -56,6 +58,7 @@ const ICONS = [
 ];
 
 const TimelineForm = ({ initialData, onSubmit, isSubmitting }: TimelineFormProps) => {
+  const { toast } = useToast();
   const form = useForm<z.infer<typeof timelineFormSchema>>({
     resolver: zodResolver(timelineFormSchema),
     defaultValues: {
@@ -100,11 +103,11 @@ const TimelineForm = ({ initialData, onSubmit, isSubmitting }: TimelineFormProps
       editor
         .chain()
         .focus()
-        .setImage({ 
+        .setImage({
           src: url,
-          alt: 'Timeline content image'
+          alt: "Timeline content image",
         })
-        .insertContent('<p></p>') 
+        .insertContent("<p></p>")
         .run();
     }
   };
@@ -117,6 +120,73 @@ const TimelineForm = ({ initialData, onSubmit, isSubmitting }: TimelineFormProps
       }
     }
   };
+
+  const handleDrop = useCallback(async (event: React.DragEvent<HTMLDivElement>) => {
+    event.preventDefault();
+    event.stopPropagation();
+
+    const file = event.dataTransfer?.files[0];
+    if (!file || !file.type.startsWith("image/")) {
+      toast({
+        title: "Error",
+        description: "Please drop an image file",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("image", file);
+
+    try {
+      const response = await fetch(
+        `/api/upload/timeline-content/${initialData?.id || "temp"}`,
+        {
+          method: "POST",
+          body: formData,
+        }
+      );
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || "Upload failed");
+      }
+
+      const data = await response.json();
+      if (!data.imageUrl) {
+        throw new Error("No image URL returned from server");
+      }
+
+      if (editor) {
+        editor
+          .chain()
+          .focus()
+          .setImage({
+            src: data.imageUrl,
+            alt: "Timeline content image",
+          })
+          .insertContent("<p></p>")
+          .run();
+      }
+
+      toast({
+        title: "Success",
+        description: "Image uploaded successfully",
+      });
+    } catch (error) {
+      console.error("Upload error:", error);
+      toast({
+        title: "Error",
+        description: error instanceof Error ? error.message : "Failed to upload image",
+        variant: "destructive",
+      });
+    }
+  }, [editor, initialData?.id, toast]);
+
+  const handleDragOver = useCallback((event: React.DragEvent<HTMLDivElement>) => {
+    event.preventDefault();
+    event.stopPropagation();
+  }, []);
 
   return (
     <Form {...form}>
@@ -222,7 +292,9 @@ const TimelineForm = ({ initialData, onSubmit, isSubmitting }: TimelineFormProps
                                   type="button"
                                   variant="ghost"
                                   size="icon"
-                                  onClick={() => editor.chain().focus().toggleBold().run()}
+                                  onClick={() =>
+                                    editor.chain().focus().toggleBold().run()
+                                  }
                                   className={editor.isActive("bold") ? "bg-accent" : ""}
                                 >
                                   <Bold className="h-4 w-4" />
@@ -237,7 +309,9 @@ const TimelineForm = ({ initialData, onSubmit, isSubmitting }: TimelineFormProps
                                   type="button"
                                   variant="ghost"
                                   size="icon"
-                                  onClick={() => editor.chain().focus().toggleItalic().run()}
+                                  onClick={() =>
+                                    editor.chain().focus().toggleItalic().run()
+                                  }
                                   className={editor.isActive("italic") ? "bg-accent" : ""}
                                 >
                                   <Italic className="h-4 w-4" />
@@ -252,7 +326,13 @@ const TimelineForm = ({ initialData, onSubmit, isSubmitting }: TimelineFormProps
                                   type="button"
                                   variant="ghost"
                                   size="icon"
-                                  onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
+                                  onClick={() =>
+                                    editor
+                                      .chain()
+                                      .focus()
+                                      .toggleHeading({ level: 2 })
+                                      .run()
+                                  }
                                   className={editor.isActive("heading", { level: 2 }) ? "bg-accent" : ""}
                                 >
                                   <Heading2 className="h-4 w-4" />
@@ -267,7 +347,9 @@ const TimelineForm = ({ initialData, onSubmit, isSubmitting }: TimelineFormProps
                                   type="button"
                                   variant="ghost"
                                   size="icon"
-                                  onClick={() => editor.chain().focus().toggleBulletList().run()}
+                                  onClick={() =>
+                                    editor.chain().focus().toggleBulletList().run()
+                                  }
                                   className={editor.isActive("bulletList") ? "bg-accent" : ""}
                                 >
                                   <List className="h-4 w-4" />
@@ -282,7 +364,9 @@ const TimelineForm = ({ initialData, onSubmit, isSubmitting }: TimelineFormProps
                                   type="button"
                                   variant="ghost"
                                   size="icon"
-                                  onClick={() => editor.chain().focus().toggleOrderedList().run()}
+                                  onClick={() =>
+                                    editor.chain().focus().toggleOrderedList().run()
+                                  }
                                   className={editor.isActive("orderedList") ? "bg-accent" : ""}
                                 >
                                   <ListOrdered className="h-4 w-4" />
@@ -297,7 +381,9 @@ const TimelineForm = ({ initialData, onSubmit, isSubmitting }: TimelineFormProps
                                   type="button"
                                   variant="ghost"
                                   size="icon"
-                                  onClick={() => editor.chain().focus().toggleBlockquote().run()}
+                                  onClick={() =>
+                                    editor.chain().focus().toggleBlockquote().run()
+                                  }
                                   className={editor.isActive("blockquote") ? "bg-accent" : ""}
                                 >
                                   <Quote className="h-4 w-4" />
@@ -345,7 +431,11 @@ const TimelineForm = ({ initialData, onSubmit, isSubmitting }: TimelineFormProps
                             </Tooltip>
                           </TooltipProvider>
                         </div>
-                        <div className="prose prose-stone dark:prose-invert max-w-none min-h-[400px] border rounded-md p-4">
+                        <div
+                          className="prose prose-stone dark:prose-invert max-w-none min-h-[400px] border rounded-md p-4"
+                          onDrop={handleDrop}
+                          onDragOver={handleDragOver}
+                        >
                           <EditorContent editor={editor} />
                         </div>
                       </>
