@@ -37,13 +37,6 @@ export default function EditProject() {
 
   const { data: project, isLoading } = useQuery<Project>({
     queryKey: ["/api/projects", parseInt(id)],
-    queryFn: async () => {
-      const response = await fetch(`/api/projects/${id}`);
-      if (!response.ok) {
-        throw new Error('Failed to fetch project');
-      }
-      return response.json();
-    }
   });
 
   const form = useForm<InsertProject>({
