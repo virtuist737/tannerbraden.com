@@ -2,7 +2,7 @@ import { useMutation } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import { motion } from "framer-motion";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
+import { useForm, useFieldArray } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -16,10 +16,18 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { insertProjectSchema, type InsertProject } from "@shared/schema";
 import { apiRequest } from "@/lib/queryClient";
+import { Plus, Trash2 } from "lucide-react";
 
 export default function NewProject() {
   const [, setLocation] = useLocation();
@@ -30,13 +38,17 @@ export default function NewProject() {
     defaultValues: {
       title: "",
       description: "",
-      imageUrl: "", // Updated field name
+      imageUrl: "",
       technologies: [],
-      githubUrl: "",
-      liveUrl: "",
+      buttons: [],
       sortOrder: 0,
       featured: false,
     },
+  });
+
+  const { fields: buttonFields, append: appendButton, remove: removeButton } = useFieldArray({
+    control: form.control,
+    name: "buttons",
   });
 
   const createMutation = useMutation({
@@ -150,7 +162,7 @@ export default function NewProject() {
 
                 <FormField
                   control={form.control}
-                  name="imageUrl" // Updated field name
+                  name="imageUrl"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Image URL</FormLabel>
@@ -257,6 +269,115 @@ export default function NewProject() {
                     </FormItem>
                   )}
                 />
+
+                {/* Add Custom Buttons Section */}
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-lg font-medium">Custom Buttons</h3>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => appendButton({ title: "", url: "", icon: "", variant: "default" })}
+                    >
+                      <Plus className="h-4 w-4 mr-2" />
+                      Add Button
+                    </Button>
+                  </div>
+
+                  {buttonFields.map((field, index) => (
+                    <Card key={field.id}>
+                      <CardContent className="pt-6">
+                        <div className="grid gap-6">
+                          <div className="flex items-center justify-end">
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => removeButton(index)}
+                            >
+                              <Trash2 className="h-4 w-4 text-destructive" />
+                            </Button>
+                          </div>
+
+                          <FormField
+                            control={form.control}
+                            name={`buttons.${index}.title`}
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Button Title</FormLabel>
+                                <FormControl>
+                                  <Input {...field} />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+
+                          <FormField
+                            control={form.control}
+                            name={`buttons.${index}.url`}
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Button URL</FormLabel>
+                                <FormControl>
+                                  <Input {...field} />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+
+                          <FormField
+                            control={form.control}
+                            name={`buttons.${index}.icon`}
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Icon (optional)</FormLabel>
+                                <FormControl>
+                                  <Input {...field} placeholder="e.g., Github, ExternalLink" />
+                                </FormControl>
+                                <FormDescription>
+                                  Enter a Lucide icon name
+                                </FormDescription>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+
+                          <FormField
+                            control={form.control}
+                            name={`buttons.${index}.variant`}
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Button Style</FormLabel>
+                                <Select
+                                  onValueChange={field.onChange}
+                                  defaultValue={field.value}
+                                >
+                                  <FormControl>
+                                    <SelectTrigger>
+                                      <SelectValue placeholder="Select button style" />
+                                    </SelectTrigger>
+                                  </FormControl>
+                                  <SelectContent>
+                                    <SelectItem value="default">Default</SelectItem>
+                                    <SelectItem value="destructive">Destructive</SelectItem>
+                                    <SelectItem value="outline">Outline</SelectItem>
+                                    <SelectItem value="secondary">Secondary</SelectItem>
+                                    <SelectItem value="ghost">Ghost</SelectItem>
+                                    <SelectItem value="link">Link</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
 
                 <div className="flex justify-end gap-4">
                   <Button

@@ -3,6 +3,14 @@ import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 import { relations } from "drizzle-orm";
 
+// Add the button schema before the projects table
+export const buttonSchema = z.object({
+  title: z.string().min(1, "Button title is required"),
+  url: z.string().url("Valid URL is required"),
+  icon: z.string().optional(),
+  variant: z.enum(["default", "destructive", "outline", "secondary", "ghost", "link"]).default("default"),
+});
+
 // Users table (existing)
 export const users = pgTable("users", {
   id: serial("id").primaryKey(),
@@ -91,14 +99,14 @@ export const favorites = pgTable("favorites", {
 });
 
 // Add projects table after the existing tables
+// Update projects table to include buttons
 export const projects = pgTable("projects", {
   id: serial("id").primaryKey(),
   title: text("title").notNull(),
   description: text("description").notNull(),
   imageUrl: text("image_url").notNull(),
   technologies: text("technologies").array().notNull(),
-  githubUrl: text("github_url"),
-  liveUrl: text("live_url"),
+  buttons: jsonb("buttons").notNull().default('[]'),
   sortOrder: integer("sort_order").notNull().default(0),
   featured: boolean("featured").notNull().default(false),
   createdAt: timestamp("created_at").notNull().defaultNow(),
@@ -156,13 +164,13 @@ export const insertTimelineSchema = createInsertSchema(timeline).omit({
 });
 
 // Add after existing schemas
+// Update insertProjectSchema to include buttons
 export const insertProjectSchema = createInsertSchema(projects).omit({
   id: true,
   createdAt: true,
 }).extend({
   technologies: z.array(z.string()),
-  githubUrl: z.string().url().optional(),
-  liveUrl: z.string().url().optional(),
+  buttons: z.array(buttonSchema),
 });
 
 // Types for TypeScript
@@ -188,5 +196,7 @@ export type Timeline = typeof timeline.$inferSelect;
 export type InsertTimeline = z.infer<typeof insertTimelineSchema>;
 
 // Add after existing types
+// Add Button type for TypeScript
+export type Button = z.infer<typeof buttonSchema>;
 export type Project = typeof projects.$inferSelect;
 export type InsertProject = z.infer<typeof insertProjectSchema>;

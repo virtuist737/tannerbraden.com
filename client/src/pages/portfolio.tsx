@@ -1,17 +1,34 @@
 import { motion } from "framer-motion";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Github, ExternalLink, Loader2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
+import * as Icons from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useQuery } from "@tanstack/react-query";
 import { useInView } from "react-intersection-observer";
-import type { Project } from "@shared/schema";
+import type { Project, Button as ProjectButton } from "@shared/schema";
 
 const LoadingSpinner = () => (
   <div className="flex justify-center items-center w-full py-12">
     <Loader2 className="w-8 h-8 animate-spin text-primary" />
   </div>
 );
+
+const DynamicIcon = ({ name }: { name: string }) => {
+  const Icon = (Icons as any)[name];
+  return Icon ? <Icon className="h-4 w-4" /> : null;
+};
+
+const ProjectButton = ({ button }: { button: ProjectButton }) => {
+  return (
+    <Button variant={button.variant} size="sm" asChild className="gap-2">
+      <a href={button.url} target="_blank" rel="noopener noreferrer">
+        {button.icon && <DynamicIcon name={button.icon} />}
+        {button.title}
+      </a>
+    </Button>
+  );
+};
 
 const Portfolio = () => {
   const { data: projects, isLoading } = useQuery<Project[]>({
@@ -77,35 +94,9 @@ const Portfolio = () => {
                         ))}
                       </div>
                       <div className="flex gap-4">
-                        {project.githubUrl && (
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            asChild
-                            className="gap-2"
-                          >
-                            <a
-                              href={project.githubUrl}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                            >
-                              <Github className="h-4 w-4" />
-                              Code
-                            </a>
-                          </Button>
-                        )}
-                        {project.liveUrl && (
-                          <Button size="sm" asChild className="gap-2">
-                            <a
-                              href={project.liveUrl}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                            >
-                              <ExternalLink className="h-4 w-4" />
-                              Live Demo
-                            </a>
-                          </Button>
-                        )}
+                        {project.buttons?.map((button, buttonIndex) => (
+                          <ProjectButton key={buttonIndex} button={button} />
+                        ))}
                       </div>
                     </CardContent>
                   </Card>
