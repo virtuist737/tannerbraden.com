@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Github, ExternalLink } from "lucide-react";
+import * as Icons from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useQuery } from "@tanstack/react-query";
 import type { Project } from "@shared/schema";
@@ -80,33 +80,28 @@ const Projects = () => {
                       </Badge>
                     ))}
                   </div>
-                  <div className="flex gap-3 pt-4">
-                    {project.githubUrl && (
-                      <a
-                        href={project.githubUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex-1 sm:flex-none"
-                      >
-                        <Button variant="outline" size="sm" className="w-full sm:w-auto gap-2">
-                          <Github className="h-4 w-4" />
-                          Code
-                        </Button>
-                      </a>
-                    )}
-                    {project.liveUrl && (
-                      <a
-                        href={project.liveUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex-1 sm:flex-none"
-                      >
-                        <Button size="sm" className="w-full sm:w-auto gap-2">
-                          <ExternalLink className="h-4 w-4" />
-                          Demo
-                        </Button>
-                      </a>
-                    )}
+                  <div className="flex flex-wrap gap-3 pt-4">
+                    {project.buttons?.map((button, index) => {
+                      const Icon = button.icon ? (Icons as any)[button.icon] : null;
+                      return (
+                        <a
+                          key={index}
+                          href={button.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex-1 sm:flex-none"
+                        >
+                          <Button
+                            variant={button.variant as any}
+                            size="sm"
+                            className="w-full sm:w-auto gap-2"
+                          >
+                            {Icon && <Icon className="h-4 w-4" />}
+                            {button.title}
+                          </Button>
+                        </a>
+                      );
+                    })}
                   </div>
                 </CardContent>
               </Card>

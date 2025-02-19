@@ -3,7 +3,8 @@ import { useQuery } from "@tanstack/react-query";
 import Masonry from 'react-masonry-css';
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Github, ExternalLink, Loader2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
+import * as Icons from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { Project } from "@shared/schema";
 
@@ -84,36 +85,28 @@ const SolarisLabs = () => {
                         </Badge>
                       ))}
                     </div>
-                    <div className="flex gap-4">
-                      {project.githubUrl && (
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          asChild
-                          className="gap-2"
-                        >
-                          <a
-                            href={project.githubUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
+                    <div className="flex flex-wrap gap-4">
+                      {project.buttons?.map((button, index) => {
+                        const Icon = button.icon ? (Icons as any)[button.icon] : null;
+                        return (
+                          <Button
+                            key={index}
+                            variant={button.variant as any}
+                            size="sm"
+                            asChild
+                            className="gap-2"
                           >
-                            <Github className="h-4 w-4" />
-                            Code
-                          </a>
-                        </Button>
-                      )}
-                      {project.liveUrl && (
-                        <Button size="sm" asChild className="gap-2">
-                          <a
-                            href={project.liveUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                          >
-                            <ExternalLink className="h-4 w-4" />
-                            Live Demo
-                          </a>
-                        </Button>
-                      )}
+                            <a
+                              href={button.url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                            >
+                              {Icon && <Icon className="h-4 w-4" />}
+                              {button.title}
+                            </a>
+                          </Button>
+                        );
+                      })}
                     </div>
                   </CardContent>
                 </Card>
