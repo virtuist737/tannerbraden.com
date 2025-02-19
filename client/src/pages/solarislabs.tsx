@@ -59,6 +59,7 @@ const SolarisLabs = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
+                className="mb-6"
               >
                 <Card className="h-full flex flex-col overflow-hidden hover:shadow-lg transition-shadow duration-300">
                   <CardHeader className="p-0">
