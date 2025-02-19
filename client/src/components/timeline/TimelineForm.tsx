@@ -110,6 +110,8 @@ const TimelineForm = ({ initialData, onSubmit, isSubmitting }: TimelineFormProps
         })
         .insertContent("<p></p>")
         .run();
+
+      setUploadedImages(prev => [...prev, url]);
     }
   };
 
@@ -169,6 +171,8 @@ const TimelineForm = ({ initialData, onSubmit, isSubmitting }: TimelineFormProps
           .insertContent("<p></p>")
           .run();
       }
+
+      setUploadedImages(prev => [...prev, data.imageUrl]);
 
       toast({
         title: "Success",

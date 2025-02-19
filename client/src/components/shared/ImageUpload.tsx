@@ -8,7 +8,6 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
@@ -107,6 +106,15 @@ export const ImageUpload = ({ imageUrl, entityId, entityType, onSuccess, trigger
     }
   };
 
+  const handleSelectImage = (url: string) => {
+    onSuccess?.(url);
+    setShowGallery(false);
+  };
+
+  const handleRemoveImage = (urlToRemove: string) => {
+    setUploadedImages(prev => prev.filter(url => url !== urlToRemove));
+  };
+
   const ImageGallery = () => (
     <Dialog open={showGallery} onOpenChange={setShowGallery}>
       <DialogContent className="sm:max-w-[80vw]">
@@ -121,15 +129,12 @@ export const ImageUpload = ({ imageUrl, entityId, entityType, onSuccess, trigger
                   src={url}
                   alt={`Uploaded content ${index + 1}`}
                   className="w-full h-40 object-cover rounded-lg cursor-pointer hover:opacity-75 transition-opacity"
-                  onClick={() => {
-                    onSuccess?.(url);
-                    setShowGallery(false);
-                  }}
+                  onClick={() => handleSelectImage(url)}
                 />
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
-                    setUploadedImages(prev => prev.filter(img => img !== url));
+                    handleRemoveImage(url);
                   }}
                   className="absolute top-2 right-2 p-1 bg-destructive text-destructive-foreground rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
                 >
@@ -168,7 +173,11 @@ export const ImageUpload = ({ imageUrl, entityId, entityType, onSuccess, trigger
           <Button
             variant="ghost"
             size="icon"
-            onClick={() => setShowGallery(true)}
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              setShowGallery(true);
+            }}
             className="ml-2"
           >
             <ImageIcon className="h-4 w-4" />
