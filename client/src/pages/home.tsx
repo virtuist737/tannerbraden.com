@@ -22,25 +22,25 @@ const Home = () => {
       <Helmet>
         <title>Tanner Braden</title>
         <meta 
-          name="description" 
-          content="Partnerships and growth specialist focused on improving human consciousness through scalable solutions. Experienced in partner marketing, program development, and driving meaningful impact." 
+          name="description"
+          content="Creating apps and content to reducing human suffering and increase the quality of human consciousness."
         />
         <meta 
           name="keywords" 
-          content="partner marketing, growth specialist, partnerships lead, human consciousness, digital marketing, program development, partner programs" 
+          content="consciousness, suffering, virtues, virtuist, neurodivergence, partnerships, growth, digital marketing, program development, partner programs" 
         />
         <meta property="og:title" content="Tanner Braden" />
         <meta 
           property="og:description" 
-          content="Partnerships and growth specialist focused on improving human consciousness through scalable solutions. Experienced in partner marketing, program development, and driving meaningful impact." 
-        />
+          content="Creating apps and content to reducing human suffering and increase the quality of human consciousness."
+          />
         <meta property="og:type" content="website" />
         <meta property="og:url" content={window.location.href} />
         <meta name="twitter:title" content="Tanner Braden" />
         <meta 
-          name="twitter:description" 
-          content="Partnerships and growth specialist focused on improving human consciousness through scalable solutions. Experienced in partner marketing, program development, and driving meaningful impact." 
-        />
+          name="twitter:description"
+          content="Creating apps and content to reducing human suffering and increase the quality of human consciousness."
+          />
       </Helmet>
 
       {/* Hero Section */}
@@ -66,17 +66,20 @@ const Home = () => {
             Hi, I'm <span className="text-primary">Tanner</span>
           </h1>
           <p className="mt-6 text-xl text-muted-foreground">
-            I help companies grow through partnerships while working to increase empathy, kindness, and human flourishing at scale.
+            I create apps and content to reduce human suffering and increase the quality of human consciousness.
           </p>
           <div className="flex items-center justify-center gap-4 mt-8">
             <Link href="/solarislabs">
               <Button className="gap-2">
-                My Mission
+                Solaris Labs
                 <ArrowRight className="h-4 w-4" />
               </Button>
             </Link>
             <Link href="/contact">
-              <Button variant="outline">Let's Connect</Button>
+              <Button variant="outline">
+                Let's Connect
+                <AtSign className="h-4 w-4" />
+              </Button>
             </Link>
           </div>
         </motion.div>
