@@ -193,11 +193,10 @@ const TimelineComponent = () => {
                     />
                   </div>
                 )}
-                <div className="prose prose-primary dark:prose-invert max-w-none">
-                  <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                    {selectedEvent.content}
-                  </ReactMarkdown>
-                </div>
+                <div 
+                  className="prose prose-primary dark:prose-invert max-w-none"
+                  dangerouslySetInnerHTML={{ __html: selectedEvent.content }}
+                />
               </ScrollArea>
             </>
           )}
