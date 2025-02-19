@@ -7,8 +7,6 @@ import { Button } from "@/components/ui/button";
 import { useQuery } from "@tanstack/react-query";
 import { useInView } from "react-intersection-observer";
 import type { Project, Button as ProjectButton } from "@shared/schema";
-import Masonry from 'react-masonry-css'
-
 
 const LoadingSpinner = () => (
   <div className="flex justify-center items-center w-full py-12">
@@ -21,6 +19,16 @@ const DynamicIcon = ({ name }: { name: string }) => {
   return Icon ? <Icon className="h-4 w-4" /> : null;
 };
 
+const ProjectButton = ({ button }: { button: ProjectButton }) => {
+  return (
+    <Button variant={button.variant} size="sm" asChild className="gap-2">
+      <a href={button.url} target="_blank" rel="noopener noreferrer">
+        {button.icon && <DynamicIcon name={button.icon} />}
+        {button.title}
+      </a>
+    </Button>
+  );
+};
 
 const Portfolio = () => {
   const { data: projects, isLoading } = useQuery<Project[]>({
@@ -42,17 +50,7 @@ const Portfolio = () => {
           </p>
         </div>
 
-        <Masonry
-          breakpointCols={{
-            default: 3,
-            1536: 2,
-            1280: 2,
-            768: 1,
-            640: 1,
-          }}
-          className="my-masonry-grid"
-          columnClassName="my-masonry-grid_column"
-        >
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {isLoading ? (
             <LoadingSpinner />
           ) : (
@@ -70,7 +68,7 @@ const Portfolio = () => {
                   animate={inView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
                   transition={{ duration: 0.5, delay: index * 0.1 }}
                 >
-                  <Card className="mb-6">
+                  <Card>
                     <CardHeader className="p-0">
                       <div className="relative aspect-video w-full overflow-hidden">
                         <img
@@ -97,22 +95,7 @@ const Portfolio = () => {
                       </div>
                       <div className="flex gap-4">
                         {project.buttons?.map((button, buttonIndex) => (
-                          <Button
-                            key={buttonIndex}
-                            variant={button.variant as any}
-                            size="sm"
-                            asChild
-                            className="gap-2"
-                          >
-                            <a
-                              href={button.url}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                            >
-                              {button.icon && <DynamicIcon name={button.icon} />}
-                              {button.title}
-                            </a>
-                          </Button>
+                          <ProjectButton key={buttonIndex} button={button} />
                         ))}
                       </div>
                     </CardContent>
@@ -121,19 +104,7 @@ const Portfolio = () => {
               );
             })
           )}
-        </Masonry>
-
-        <style jsx global>{`
-          .my-masonry-grid {
-            display: flex;
-            width: auto;
-            margin-left: -24px; /* gutter size offset */
-          }
-          .my-masonry-grid_column {
-            padding-left: 24px; /* gutter size */
-            background-clip: padding-box;
-          }
-        `}</style>
+        </div>
       </motion.div>
     </div>
   );

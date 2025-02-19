@@ -47,8 +47,8 @@ const SolarisLabs = () => {
             768: 1,
             640: 1,
           }}
-          className="my-masonry-grid"
-          columnClassName="my-masonry-grid_column"
+          className="flex -ml-6 w-auto"
+          columnClassName="pl-6 bg-clip-padding"
         >
           {isLoading ? (
             <LoadingSpinner />
@@ -59,8 +59,9 @@ const SolarisLabs = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
+                className="mb-6"
               >
-                <Card className="mb-6 h-full flex flex-col overflow-hidden hover:shadow-lg transition-shadow duration-300">
+                <Card className="h-full flex flex-col overflow-hidden hover:shadow-lg transition-shadow duration-300">
                   <CardHeader className="p-0">
                     <div className="relative w-full overflow-hidden">
                       <img
@@ -114,18 +115,6 @@ const SolarisLabs = () => {
             ))
           )}
         </Masonry>
-
-        <style jsx global>{`
-          .my-masonry-grid {
-            display: flex;
-            width: auto;
-            margin-left: -24px; /* gutter size offset */
-          }
-          .my-masonry-grid_column {
-            padding-left: 24px; /* gutter size */
-            background-clip: padding-box;
-          }
-        `}</style>
       </motion.div>
     </div>
   );
