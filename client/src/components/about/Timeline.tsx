@@ -184,15 +184,6 @@ const TimelineComponent = () => {
                 </div>
               </DialogHeader>
               <ScrollArea className="h-full pr-4">
-                {selectedEvent.imageUrl && (
-                  <div className="relative w-full h-64 mb-6 rounded-lg overflow-hidden">
-                    <img
-                      src={selectedEvent.imageUrl}
-                      alt={selectedEvent.title}
-                      className="object-cover w-full h-full"
-                    />
-                  </div>
-                )}
                 <div className="prose prose-primary dark:prose-invert max-w-none">
                   {renderContent(selectedEvent.content)}
                 </div>
