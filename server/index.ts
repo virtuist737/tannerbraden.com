@@ -107,7 +107,7 @@ app.use((req, res, next) => {
   }
 
   const PORT = process.env.PORT || 5000;
-  server.listen(PORT, () => {
-    log(`🚀 Server started on port ${PORT}`);
+  server.listen(PORT, "0.0.0.0", () => {
+    log(`🚀 Server started on 0.0.0.0:${PORT}`);
   });
 })();
