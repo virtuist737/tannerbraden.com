@@ -1,4 +1,3 @@
-
 import { Pool, neonConfig } from '@neondatabase/serverless';
 import { drizzle } from 'drizzle-orm/neon-serverless';
 import ws from "ws";
@@ -23,29 +22,35 @@ const createPool = async (retryCount = 0): Promise<Pool> => {
       idleTimeoutMillis: 10000,
       max: 20
     });
-    
+
     // Test the connection
     await pool.connect();
+    console.log("Successfully connected to the database.");
     return pool;
   } catch (error) {
     if (retryCount < MAX_RETRIES) {
-      console.log(`Database connection attempt ${retryCount + 1} failed, retrying...`);
+      console.error(`Database connection attempt ${retryCount + 1} failed: ${error.message}, retrying in ${RETRY_DELAY}ms...`);
       await new Promise(resolve => setTimeout(resolve, RETRY_DELAY));
       return createPool(retryCount + 1);
     }
-    throw error;
+    console.error(`Database connection failed after ${MAX_RETRIES} retries: ${error.message}`);
+    throw new Error(`Failed to connect to the database after multiple retries: ${error.message}`);
   }
 };
 
 export const pool = await createPool();
 export const db = drizzle({ client: pool, schema });
 
-// Handle pool errors
+// Handle pool errors with more informative logging
 pool.on('error', (err) => {
   console.error('Unexpected database error:', err);
-  // Attempt to reconnect
+  // Attempt to reconnect with improved error handling
   createPool().then(newPool => {
     pool.end();
     Object.assign(pool, newPool);
-  }).catch(console.error);
+    console.log("Successfully reconnected to the database.");
+  }).catch(error => {
+    console.error('Failed to reconnect to the database:', error);
+    //Consider adding more robust error handling here, such as alerting or failing the application.
+  });
 });
