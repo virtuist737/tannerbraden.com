@@ -200,7 +200,7 @@ const TimelineCard: React.FC<CardProps> = ({ event, onClick }) => {
   return (
     <Button
       variant="outline"
-      className="p-4 md:p-6 h-auto bg-card border rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 w-full md:max-w-xl text-left flex flex-col gap-4 group"
+      className="p-4 md:p-6 h-auto bg-card border rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 w-[275px] md:max-w-[275px] text-left flex flex-col gap-4 group"
       onClick={onClick}
     >
       {event.imageUrl && (
