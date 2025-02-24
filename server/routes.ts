@@ -7,7 +7,10 @@ import {
   insertTimelineSchema,
   insertFavoriteSchema,
   insertInterestSchema,
-  insertProjectSchema
+  insertProjectSchema,
+  insertAchievementSchema,
+  insertUserProgressSchema,
+  insertLeaderboardSchema,
 } from "@shared/schema";
 import { isAuthenticated } from "./auth";
 import * as UAParser from "ua-parser-js";
@@ -608,6 +611,124 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error fetching project:", error);
       res.status(500).json({ error: "Failed to fetch project" });
+    }
+  });
+
+  // Achievement Routes
+  app.get("/api/achievements", async (req, res) => {
+    try {
+      const achievements = await storage.listAchievements();
+      res.json(achievements);
+    } catch (error) {
+      console.error("Error fetching achievements:", error);
+      res.status(500).json({ error: "Failed to fetch achievements" });
+    }
+  });
+
+  app.post("/api/achievements", isAuthenticated, async (req, res) => {
+    try {
+      const parsedBody = insertAchievementSchema.safeParse(req.body);
+      if (!parsedBody.success) {
+        return res.status(400).json({ error: "Invalid achievement data" });
+      }
+
+      const achievement = await storage.createAchievement(parsedBody.data);
+      res.status(201).json(achievement);
+    } catch (error) {
+      console.error("Error creating achievement:", error);
+      res.status(500).json({ error: "Failed to create achievement" });
+    }
+  });
+
+  // User Progress Routes
+  app.get("/api/progress/:userId", async (req, res) => {
+    try {
+      const progress = await storage.getUserProgress(req.params.userId);
+      if (!progress) {
+        return res.status(404).json({ error: "User progress not found" });
+      }
+      res.json(progress);
+    } catch (error) {
+      console.error("Error fetching user progress:", error);
+      res.status(500).json({ error: "Failed to fetch user progress" });
+    }
+  });
+
+  app.post("/api/progress/:userId", async (req, res) => {
+    try {
+      const parsedBody = insertUserProgressSchema.safeParse(req.body);
+      if (!parsedBody.success) {
+        return res.status(400).json({ error: "Invalid progress data" });
+      }
+
+      const progress = await storage.updateUserProgress(req.params.userId, parsedBody.data);
+      res.json(progress);
+    } catch (error) {
+      console.error("Error updating user progress:", error);
+      res.status(500).json({ error: "Failed to update user progress" });
+    }
+  });
+
+  // Leaderboard Routes
+  app.get("/api/leaderboard", async (req, res) => {
+    try {
+      const limit = req.query.limit ? parseInt(req.query.limit as string) : undefined;
+      const leaderboard = await storage.getLeaderboard(limit);
+      res.json(leaderboard);
+    } catch (error) {
+      console.error("Error fetching leaderboard:", error);
+      res.status(500).json({ error: "Failed to fetch leaderboard" });
+    }
+  });
+
+  app.get("/api/leaderboard/rank/:userId", async (req, res) => {
+    try {
+      const rank = await storage.getUserRank(req.params.userId);
+      res.json({ rank });
+    } catch (error) {
+      console.error("Error fetching user rank:", error);
+      res.status(500).json({ error: "Failed to fetch user rank" });
+    }
+  });
+
+  app.post("/api/leaderboard", async (req, res) => {
+    try {
+      const parsedBody = insertLeaderboardSchema.safeParse(req.body);
+      if (!parsedBody.success) {
+        return res.status(400).json({ error: "Invalid leaderboard data" });
+      }
+
+      const entry = await storage.updateLeaderboard(parsedBody.data);
+      res.json(entry);
+    } catch (error) {
+      console.error("Error updating leaderboard:", error);
+      res.status(500).json({ error: "Failed to update leaderboard" });
+    }
+  });
+
+    // Achievement Unlocking Route
+  app.post("/api/achievements/:achievementId/unlock", async (req, res) => {
+    try {
+      const { userId } = req.body;
+      if (!userId) {
+        return res.status(400).json({ error: "User ID is required" });
+      }
+
+      await storage.unlockAchievement(userId, parseInt(req.params.achievementId));
+      res.json({ message: "Achievement unlocked successfully" });
+    } catch (error) {
+      console.error("Error unlocking achievement:", error);
+      res.status(500).json({ error: "Failed to unlock achievement" });
+    }
+  });
+
+  app.get("/api/achievements/:userId", async (req, res) => {
+    try {
+      const achievements = await storage.getUserAchievements(req.params.userId);
+      res.json(achievements);
+    } catch (error) {
+      console.error("Error fetching user achievements:", error);
+      res.status(500).json({ error: "Failed to fetch user achievements" });
     }
   });
 

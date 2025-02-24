@@ -13,6 +13,10 @@ import {
   interests,
   favorites,
   projects,
+  achievements,
+  userAchievements,
+  userProgress,
+  leaderboard,
   type User,
   type InsertUser,
   type BlogPost,
@@ -29,6 +33,12 @@ import {
   type InsertFavorite,
   type Project,
   type InsertProject,
+  type Achievement,
+  type InsertAchievement,
+  type UserProgress,
+  type InsertUserProgress,
+  type Leaderboard,
+  type InsertLeaderboard,
 } from "@shared/schema";
 
 const PostgresSessionStore = connectPg(session);
@@ -98,6 +108,23 @@ export interface IStorage {
   updateProject(id: number, updates: Partial<InsertProject>): Promise<Project | undefined>;
   deleteProject(id: number): Promise<boolean>;
   updateProjectImage(id: number, imageUrl: string): Promise<Project>;
+
+  // Achievement operations
+  createAchievement(achievement: InsertAchievement): Promise<Achievement>;
+  getAchievement(id: number): Promise<Achievement | undefined>;
+  listAchievements(): Promise<Achievement[]>;
+  unlockAchievement(userId: string, achievementId: number): Promise<void>;
+  getUserAchievements(userId: string): Promise<Achievement[]>;
+
+  // User Progress operations
+  createUserProgress(userId: string): Promise<UserProgress>;
+  getUserProgress(userId: string): Promise<UserProgress | undefined>;
+  updateUserProgress(userId: string, updates: Partial<InsertUserProgress>): Promise<UserProgress>;
+
+  // Leaderboard operations
+  updateLeaderboard(entry: InsertLeaderboard): Promise<Leaderboard>;
+  getLeaderboard(limit?: number): Promise<Leaderboard[]>;
+  getUserRank(userId: string): Promise<number>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -406,6 +433,95 @@ export class DatabaseStorage implements IStorage {
       .returning();
     return updated;
   }
+
+  // Achievement operations
+  async createAchievement(achievement: InsertAchievement): Promise<Achievement> {
+    const [newAchievement] = await db.insert(achievements).values(achievement).returning();
+    return newAchievement;
+  }
+
+  async getAchievement(id: number): Promise<Achievement | undefined> {
+    const [achievement] = await db.select().from(achievements).where(eq(achievements.id, id));
+    return achievement;
+  }
+
+  async listAchievements(): Promise<Achievement[]> {
+    return db.select().from(achievements);
+  }
+
+  async unlockAchievement(userId: string, achievementId: number): Promise<void> {
+    await db.insert(userAchievements).values({
+      userId,
+      achievementId,
+    });
+  }
+
+  async getUserAchievements(userId: string): Promise<Achievement[]> {
+    const userAchievementsList = await db
+      .select()
+      .from(userAchievements)
+      .where(eq(userAchievements.userId, userId))
+      .leftJoin(achievements, eq(userAchievements.achievementId, achievements.id));
+
+    return userAchievementsList.map(ua => ua.achievements);
+  }
+
+  // User Progress operations
+  async createUserProgress(userId: string): Promise<UserProgress> {
+    const [progress] = await db.insert(userProgress)
+      .values({ userId })
+      .returning();
+    return progress;
+  }
+
+  async getUserProgress(userId: string): Promise<UserProgress | undefined> {
+    const [progress] = await db.select()
+      .from(userProgress)
+      .where(eq(userProgress.userId, userId));
+    return progress;
+  }
+
+  async updateUserProgress(userId: string, updates: Partial<InsertUserProgress>): Promise<UserProgress> {
+    const [updated] = await db.update(userProgress)
+      .set(updates)
+      .where(eq(userProgress.userId, userId))
+      .returning();
+    return updated;
+  }
+
+  // Leaderboard operations
+  async updateLeaderboard(entry: InsertLeaderboard): Promise<Leaderboard> {
+    const [updated] = await db.insert(leaderboard)
+      .values(entry)
+      .onConflictDoUpdate({
+        target: [leaderboard.userId],
+        set: {
+          score: entry.score,
+          username: entry.username,
+          lastUpdated: new Date(),
+        },
+      })
+      .returning();
+    return updated;
+  }
+
+  async getLeaderboard(limit: number = 10): Promise<Leaderboard[]> {
+    return db.select()
+      .from(leaderboard)
+      .orderBy(sql`${leaderboard.score} DESC`)
+      .limit(limit);
+  }
+
+  async getUserRank(userId: string): Promise<number> {
+    const [rank] = await db.select({
+      rank: sql<number>`rank() over (order by ${leaderboard.score} desc)`,
+    })
+      .from(leaderboard)
+      .where(eq(leaderboard.userId, userId));
+
+    return rank?.rank || 0;
+  }
+
 }
 
 export const storage = new DatabaseStorage();

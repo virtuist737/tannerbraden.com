@@ -11,6 +11,15 @@ export const buttonSchema = z.object({
   variant: z.enum(["default", "destructive", "outline", "secondary", "ghost", "link"]).default("default"),
 });
 
+// Add after the buttonSchema and before the users table
+export const achievementSchema = z.object({
+  title: z.string().min(1, "Achievement title is required"),
+  description: z.string().min(1, "Achievement description is required"),
+  icon: z.string().min(1, "Achievement icon is required"),
+  points: z.number().int().min(0),
+  requirements: z.string().min(1, "Achievement requirements are required"),
+});
+
 // Users table (existing)
 export const users = pgTable("users", {
   id: serial("id").primaryKey(),
@@ -98,6 +107,42 @@ export const favorites = pgTable("favorites", {
   sortOrder: integer("sort_order").notNull(),
 });
 
+// Add after the existing tables
+export const achievements = pgTable("achievements", {
+  id: serial("id").primaryKey(),
+  title: text("title").notNull(),
+  description: text("description").notNull(),
+  icon: text("icon").notNull(),
+  points: integer("points").notNull().default(0),
+  requirements: text("requirements").notNull(),
+});
+
+export const userAchievements = pgTable("user_achievements", {
+  id: serial("id").primaryKey(),
+  userId: text("user_id").notNull(),
+  achievementId: integer("achievement_id").references(() => achievements.id),
+  unlockedAt: timestamp("unlocked_at").notNull().defaultNow(),
+});
+
+export const userProgress = pgTable("user_progress", {
+  id: serial("id").primaryKey(),
+  userId: text("user_id").notNull(),
+  totalPoints: integer("total_points").notNull().default(0),
+  lastVisit: timestamp("last_visit").notNull().defaultNow(),
+  visitStreak: integer("visit_streak").notNull().default(0),
+  sectionsVisited: text("sections_visited").array().notNull().default([]),
+  collectiblesFound: integer("collectibles_found").notNull().default(0),
+});
+
+export const leaderboard = pgTable("leaderboard", {
+  id: serial("id").primaryKey(),
+  userId: text("user_id").notNull(),
+  username: text("username").notNull(),
+  score: integer("score").notNull().default(0),
+  rank: integer("rank").notNull().default(0),
+  lastUpdated: timestamp("last_updated").notNull().defaultNow(),
+});
+
 // Add projects table after the existing tables
 // Update projects table to properly handle buttons
 export const projects = pgTable("projects", {
@@ -117,6 +162,14 @@ export const blogPostsRelations = relations(blogPosts, ({ one }) => ({
   author: one(users, {
     fields: [blogPosts.authorId],
     references: [users.id],
+  }),
+}));
+
+// Add after existing relations
+export const userAchievementsRelations = relations(userAchievements, ({ one }) => ({
+  achievement: one(achievements, {
+    fields: [userAchievements.achievementId],
+    references: [achievements.id],
   }),
 }));
 
@@ -164,6 +217,21 @@ export const insertTimelineSchema = createInsertSchema(timeline).omit({
 });
 
 // Add after existing schemas
+export const insertAchievementSchema = createInsertSchema(achievements).omit({
+  id: true,
+});
+
+export const insertUserProgressSchema = createInsertSchema(userProgress).omit({
+  id: true,
+  lastVisit: true,
+});
+
+export const insertLeaderboardSchema = createInsertSchema(leaderboard).omit({
+  id: true,
+  lastUpdated: true,
+  rank: true,
+});
+
 // Update insertProjectSchema to properly validate buttons
 export const insertProjectSchema = createInsertSchema(projects).omit({
   id: true,
@@ -196,7 +264,16 @@ export type Timeline = typeof timeline.$inferSelect;
 export type InsertTimeline = z.infer<typeof insertTimelineSchema>;
 
 // Add after existing types
-// Add Button type for TypeScript
 export type Button = z.infer<typeof buttonSchema>;
 export type Project = typeof projects.$inferSelect;
 export type InsertProject = z.infer<typeof insertProjectSchema>;
+
+// Add after existing types
+export type Achievement = typeof achievements.$inferSelect;
+export type InsertAchievement = z.infer<typeof insertAchievementSchema>;
+
+export type UserProgress = typeof userProgress.$inferSelect;
+export type InsertUserProgress = z.infer<typeof insertUserProgressSchema>;
+
+export type Leaderboard = typeof leaderboard.$inferSelect;
+export type InsertLeaderboard = z.infer<typeof insertLeaderboardSchema>;
