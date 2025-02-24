@@ -123,11 +123,15 @@ export default function Loop() {
 
         // Create new loop
         loopRef.current = new Tone.Loop((time) => {
-          setCurrentStep((prev) => (prev + 1) % GRID_SIZE);
-          grid.forEach((row, i) => {
-            if (row[currentStep] && instrumentRef.current) {
-              instrumentRef.current.triggerAttackRelease(notes[i], '8n', time);
-            }
+          setCurrentStep((prev) => {
+            const nextStep = (prev + 1) % GRID_SIZE;
+            // Play all active notes for this step
+            grid.forEach((row, noteIndex) => {
+              if (row[prev] && instrumentRef.current) {
+                instrumentRef.current.triggerAttackRelease(notes[noteIndex], '8n', time);
+              }
+            });
+            return nextStep;
           });
         }, '8n').start(0);
 
@@ -153,7 +157,7 @@ export default function Loop() {
         variant: "destructive",
       });
     }
-  }, [isPlaying, grid, currentStep, bpm, toast]);
+  }, [isPlaying, grid, bpm, toast]);
 
   // Update BPM
   useEffect(() => {
