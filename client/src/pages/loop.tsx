@@ -5,6 +5,7 @@ import { Slider } from "@/components/ui/slider";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card } from "@/components/ui/card";
 import { Volume2 } from 'lucide-react';
+import { useToast } from "@/hooks/use-toast";
 
 const GRID_SIZE = 8;
 const DEFAULT_BPM = 120;
@@ -13,60 +14,82 @@ export default function Loop() {
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
   const [bpm, setBpm] = useState(DEFAULT_BPM);
-  const [volume, setVolume] = useState(0);
+  const [volume, setVolume] = useState(-10); // Start at a moderate volume
   const [grid, setGrid] = useState(() => 
     Array(GRID_SIZE).fill(null).map(() => Array(GRID_SIZE).fill(false))
   );
   const [selectedSound, setSelectedSound] = useState('synth');
+  const { toast } = useToast();
 
-  // Create refs for instruments to prevent recreation
+  // Create refs for instruments and loop
   const instrumentRef = useRef<any>();
+  const loopRef = useRef<any>();
   const notes = ['C4', 'D4', 'E4', 'F4', 'G4', 'A4', 'B4', 'C5'];
 
   // Initialize and update instruments based on selection
   useEffect(() => {
-    const vol = new Tone.Volume(volume).toDestination();
+    try {
+      const vol = new Tone.Volume(volume).toDestination();
 
-    switch (selectedSound) {
-      case 'piano':
-        instrumentRef.current = new Tone.Sampler({
-          urls: {
-            C4: "piano-c4.mp3",
-          },
-          baseUrl: "https://tonejs.github.io/audio/salamander/",
-        }).connect(vol);
-        break;
-      case 'drums':
-        instrumentRef.current = new Tone.MembraneSynth({
-          pitchDecay: 0.05,
-          octaves: 4,
-          oscillator: { type: 'sine' },
-          envelope: {
-            attack: 0.001,
-            decay: 0.4,
-            sustain: 0.01,
-            release: 1.4,
-          }
-        }).connect(vol);
-        break;
-      default: // synth
-        instrumentRef.current = new Tone.Synth({
-          oscillator: { type: 'triangle' },
-          envelope: {
-            attack: 0.02,
-            decay: 0.1,
-            sustain: 0.2,
-            release: 0.5,
-          }
-        }).connect(vol);
-    }
-
-    return () => {
-      if (instrumentRef.current) {
-        instrumentRef.current.dispose();
+      switch (selectedSound) {
+        case 'piano':
+          instrumentRef.current = new Tone.Sampler({
+            urls: {
+              C4: "piano-c4.mp3",
+            },
+            baseUrl: "https://tonejs.github.io/audio/salamander/",
+            onload: () => {
+              toast({
+                title: "Piano samples loaded",
+                description: "Ready to play",
+              });
+            },
+          }).connect(vol);
+          break;
+        case 'drums':
+          instrumentRef.current = new Tone.MembraneSynth({
+            pitchDecay: 0.05,
+            octaves: 4,
+            oscillator: { type: 'sine' },
+            envelope: {
+              attack: 0.001,
+              decay: 0.4,
+              sustain: 0.01,
+              release: 1.4,
+            }
+          }).connect(vol);
+          break;
+        default: // synth
+          instrumentRef.current = new Tone.Synth({
+            oscillator: { type: 'triangle8' },
+            envelope: {
+              attack: 0.02,
+              decay: 0.1,
+              sustain: 0.2,
+              release: 0.5,
+            }
+          }).connect(vol);
       }
-    };
-  }, [selectedSound, volume]);
+
+      // Test sound on instrument change
+      if (isPlaying) {
+        instrumentRef.current?.triggerAttackRelease("C4", "8n");
+      }
+
+      return () => {
+        if (instrumentRef.current) {
+          instrumentRef.current.dispose();
+        }
+      };
+    } catch (error) {
+      console.error('Error initializing instrument:', error);
+      toast({
+        title: "Error",
+        description: "Failed to initialize audio instrument",
+        variant: "destructive",
+      });
+    }
+  }, [selectedSound, volume, toast]);
 
   // Handle grid cell toggle
   const toggleCell = (row: number, col: number) => {
@@ -76,28 +99,61 @@ export default function Loop() {
       ) : r
     );
     setGrid(newGrid);
+
+    // Preview sound when toggling cell
+    if (newGrid[row][col] && instrumentRef.current) {
+      instrumentRef.current.triggerAttackRelease(notes[row], "8n");
+    }
   };
 
   // Start/Stop sequence
-  const togglePlay = useCallback(() => {
-    if (!isPlaying) {
-      Tone.start();
-      Tone.Transport.bpm.value = bpm;
-      Tone.Transport.scheduleRepeat((time) => {
-        setCurrentStep((prev) => (prev + 1) % GRID_SIZE);
-        grid.forEach((row, i) => {
-          if (row[currentStep] && instrumentRef.current) {
-            instrumentRef.current.triggerAttackRelease(notes[i], '8n', time);
-          }
+  const togglePlay = useCallback(async () => {
+    try {
+      if (!isPlaying) {
+        // Ensure audio context is running
+        await Tone.start();
+        console.log('Tone.js started');
+
+        Tone.Transport.bpm.value = bpm;
+
+        // Clear any existing loop
+        if (loopRef.current) {
+          loopRef.current.dispose();
+        }
+
+        // Create new loop
+        loopRef.current = new Tone.Loop((time) => {
+          setCurrentStep((prev) => (prev + 1) % GRID_SIZE);
+          grid.forEach((row, i) => {
+            if (row[currentStep] && instrumentRef.current) {
+              instrumentRef.current.triggerAttackRelease(notes[i], '8n', time);
+            }
+          });
+        }, '8n').start(0);
+
+        Tone.Transport.start();
+
+        toast({
+          title: "Playback started",
+          description: "Audio loop is now playing",
         });
-      }, '8n');
-      Tone.Transport.start();
-    } else {
-      Tone.Transport.stop();
-      setCurrentStep(0);
+      } else {
+        Tone.Transport.stop();
+        if (loopRef.current) {
+          loopRef.current.dispose();
+        }
+        setCurrentStep(0);
+      }
+      setIsPlaying(!isPlaying);
+    } catch (error) {
+      console.error('Error toggling playback:', error);
+      toast({
+        title: "Error",
+        description: "Failed to toggle playback",
+        variant: "destructive",
+      });
     }
-    setIsPlaying(!isPlaying);
-  }, [isPlaying, grid, currentStep, bpm]);
+  }, [isPlaying, grid, currentStep, bpm, toast]);
 
   // Update BPM
   useEffect(() => {
@@ -109,6 +165,9 @@ export default function Loop() {
     return () => {
       Tone.Transport.stop();
       Tone.Transport.cancel();
+      if (loopRef.current) {
+        loopRef.current.dispose();
+      }
       if (instrumentRef.current) {
         instrumentRef.current.dispose();
       }
@@ -147,7 +206,7 @@ export default function Loop() {
             <Slider
               value={[volume]}
               onValueChange={(value) => setVolume(value[0])}
-              min={-20}
+              min={-40}
               max={0}
               step={1}
             />
