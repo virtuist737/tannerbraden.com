@@ -10,30 +10,36 @@ import { useToast } from "@/hooks/use-toast";
 const GRID_SIZE = 8;
 const DEFAULT_BPM = 120;
 
+const DRUM_TYPES = ['Kick', 'Snare', 'HiHat', 'Crash', 'Tom1', 'Tom2', 'Rim', 'Clap'];
+
 export default function Loop() {
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
   const [bpm, setBpm] = useState(DEFAULT_BPM);
-  const [volume, setVolume] = useState(-10); // Start at a moderate volume
-  const [grid, setGrid] = useState(() => 
+  const [volume, setVolume] = useState(-10);
+  const [melodyGrid, setMelodyGrid] = useState(() => 
+    Array(GRID_SIZE).fill(null).map(() => Array(GRID_SIZE).fill(false))
+  );
+  const [rhythmGrid, setRhythmGrid] = useState(() => 
     Array(GRID_SIZE).fill(null).map(() => Array(GRID_SIZE).fill(false))
   );
   const [selectedSound, setSelectedSound] = useState('synth');
   const { toast } = useToast();
 
-  // Create refs for instruments and loop
-  const instrumentRef = useRef<any>();
+  // Instrument refs
+  const melodyInstrumentRef = useRef<any>();
+  const drumInstrumentRef = useRef<any>();
   const loopRef = useRef<any>();
-  const notes = ['C5', 'B4', 'A4', 'G4', 'F4', 'E4', 'D4', 'C4']; // Reversed notes array
+  const notes = ['C5', 'B4', 'A4', 'G4', 'F4', 'E4', 'D4', 'C4'];
 
-  // Initialize and update instruments based on selection
+  // Initialize and update melody instrument
   useEffect(() => {
     try {
       const vol = new Tone.Volume(volume).toDestination();
 
       switch (selectedSound) {
         case 'piano':
-          instrumentRef.current = new Tone.Sampler({
+          melodyInstrumentRef.current = new Tone.Sampler({
             urls: {
               C4: "piano-c4.mp3",
             },
@@ -46,21 +52,8 @@ export default function Loop() {
             },
           }).connect(vol);
           break;
-        case 'drums':
-          instrumentRef.current = new Tone.MembraneSynth({
-            pitchDecay: 0.05,
-            octaves: 4,
-            oscillator: { type: 'sine' },
-            envelope: {
-              attack: 0.001,
-              decay: 0.4,
-              sustain: 0.01,
-              release: 1.4,
-            }
-          }).connect(vol);
-          break;
-        default: // synth
-          instrumentRef.current = new Tone.PolySynth(Tone.Synth, {
+        default:
+          melodyInstrumentRef.current = new Tone.PolySynth(Tone.Synth, {
             oscillator: { type: 'triangle8' },
             envelope: {
               attack: 0.02,
@@ -71,41 +64,69 @@ export default function Loop() {
           }).connect(vol);
       }
 
-      // Test sound on instrument change
+      // Initialize drum instrument
+      drumInstrumentRef.current = new Tone.MembraneSynth({
+        pitchDecay: 0.05,
+        octaves: 4,
+        oscillator: { type: 'sine' },
+        envelope: {
+          attack: 0.001,
+          decay: 0.4,
+          sustain: 0.01,
+          release: 1.4,
+        }
+      }).connect(vol);
+
       if (isPlaying) {
-        instrumentRef.current?.triggerAttackRelease("C4", "8n");
+        melodyInstrumentRef.current?.triggerAttackRelease("C4", "8n");
       }
 
       return () => {
-        if (instrumentRef.current) {
-          instrumentRef.current.dispose();
+        if (melodyInstrumentRef.current) {
+          melodyInstrumentRef.current.dispose();
+        }
+        if (drumInstrumentRef.current) {
+          drumInstrumentRef.current.dispose();
         }
       };
     } catch (error) {
-      console.error('Error initializing instrument:', error);
+      console.error('Error initializing instruments:', error);
       toast({
         title: "Error",
-        description: "Failed to initialize audio instrument",
+        description: "Failed to initialize audio instruments",
         variant: "destructive",
       });
     }
   }, [selectedSound, volume, toast]);
 
   // Handle grid cell toggle
-  const toggleCell = (row: number, col: number) => {
-    const newGrid = grid.map((r, i) =>
-      i === row ? r.map((cell: boolean, j: number) =>
-        j === col ? !cell : cell
-      ) : r
-    );
-    setGrid(newGrid);
+  const toggleCell = (row: number, col: number, isRhythm: boolean = false) => {
+    if (isRhythm) {
+      const newGrid = rhythmGrid.map((r, i) =>
+        i === row ? r.map((cell: boolean, j: number) =>
+          j === col ? !cell : cell
+        ) : r
+      );
+      setRhythmGrid(newGrid);
 
-    // Preview sound when toggling cell
-    if (newGrid[row][col] && instrumentRef.current) {
-      // Get all active notes in this column for chord preview
-      const activeNotes = newGrid.map((r, idx) => r[col] ? notes[idx] : null).filter(Boolean);
-      if (activeNotes.length) {
-        instrumentRef.current.triggerAttackRelease(activeNotes, "8n");
+      if (newGrid[row][col] && drumInstrumentRef.current) {
+        // Preview drum sound with different pitches for different drum types
+        const pitch = `C${Math.floor(row / 2) + 2}`;
+        drumInstrumentRef.current.triggerAttackRelease(pitch, "8n");
+      }
+    } else {
+      const newGrid = melodyGrid.map((r, i) =>
+        i === row ? r.map((cell: boolean, j: number) =>
+          j === col ? !cell : cell
+        ) : r
+      );
+      setMelodyGrid(newGrid);
+
+      if (newGrid[row][col] && melodyInstrumentRef.current) {
+        const activeNotes = newGrid.map((r, idx) => r[col] ? notes[idx] : null).filter(Boolean);
+        if (activeNotes.length) {
+          melodyInstrumentRef.current.triggerAttackRelease(activeNotes, "8n");
+        }
       }
     }
   };
@@ -114,30 +135,34 @@ export default function Loop() {
   const togglePlay = useCallback(async () => {
     try {
       if (!isPlaying) {
-        // Ensure audio context is running
         await Tone.start();
-        console.log('Tone.js started');
-
         Tone.Transport.bpm.value = bpm;
 
-        // Clear any existing loop
         if (loopRef.current) {
           loopRef.current.dispose();
         }
 
-        // Create new loop
         loopRef.current = new Tone.Loop((time) => {
           setCurrentStep((prev) => {
             const nextStep = (prev + 1) % GRID_SIZE;
-            // Get all active notes for this step
-            const activeNotes = grid.map((row, noteIndex) => 
+
+            // Play melody notes
+            const activeMelodyNotes = melodyGrid.map((row, noteIndex) => 
               row[prev] ? notes[noteIndex] : null
             ).filter(Boolean);
 
-            // Play all active notes simultaneously
-            if (activeNotes.length && instrumentRef.current) {
-              instrumentRef.current.triggerAttackRelease(activeNotes, '8n', time);
+            if (activeMelodyNotes.length && melodyInstrumentRef.current) {
+              melodyInstrumentRef.current.triggerAttackRelease(activeMelodyNotes, '8n', time);
             }
+
+            // Play rhythm notes
+            rhythmGrid.forEach((row, drumIndex) => {
+              if (row[prev] && drumInstrumentRef.current) {
+                const pitch = `C${Math.floor(drumIndex / 2) + 2}`;
+                drumInstrumentRef.current.triggerAttackRelease(pitch, '16n', time);
+              }
+            });
+
             return nextStep;
           });
         }, '8n').start(0);
@@ -164,7 +189,7 @@ export default function Loop() {
         variant: "destructive",
       });
     }
-  }, [isPlaying, grid, bpm, toast]);
+  }, [isPlaying, melodyGrid, rhythmGrid, bpm, toast]);
 
   // Update BPM
   useEffect(() => {
@@ -179,8 +204,11 @@ export default function Loop() {
       if (loopRef.current) {
         loopRef.current.dispose();
       }
-      if (instrumentRef.current) {
-        instrumentRef.current.dispose();
+      if (melodyInstrumentRef.current) {
+        melodyInstrumentRef.current.dispose();
+      }
+      if (drumInstrumentRef.current) {
+        drumInstrumentRef.current.dispose();
       }
     };
   }, []);
@@ -231,38 +259,72 @@ export default function Loop() {
           <SelectContent>
             <SelectItem value="synth">Synth</SelectItem>
             <SelectItem value="piano">Piano</SelectItem>
-            <SelectItem value="drums">Drums</SelectItem>
           </SelectContent>
         </Select>
 
         <Button 
           variant="outline"
-          onClick={() => setGrid(Array(GRID_SIZE).fill(null).map(() => Array(GRID_SIZE).fill(false)))}
+          onClick={() => {
+            setMelodyGrid(Array(GRID_SIZE).fill(null).map(() => Array(GRID_SIZE).fill(false)));
+            setRhythmGrid(Array(GRID_SIZE).fill(null).map(() => Array(GRID_SIZE).fill(false)));
+          }}
         >
-          Clear
+          Clear All
         </Button>
       </div>
 
-      <Card className="p-6">
-        <div className="grid gap-1">
-          {grid.map((row, i) => (
-            <div key={i} className="flex gap-1">
-              {row.map((cell, j) => (
-                <button
-                  key={`${i}-${j}`}
-                  onClick={() => toggleCell(i, j)}
-                  className={`
-                    w-12 h-12 rounded transition-all
-                    ${cell ? 'bg-primary' : 'bg-secondary'}
-                    ${currentStep === j ? 'ring-2 ring-primary' : ''}
-                    hover:opacity-80
-                  `}
-                />
+      <div className="space-y-8">
+        {/* Melody Grid */}
+        <div>
+          <h2 className="text-xl font-semibold mb-4">Melody</h2>
+          <Card className="p-6">
+            <div className="grid gap-1">
+              {melodyGrid.map((row, i) => (
+                <div key={i} className="flex gap-1">
+                  {row.map((cell, j) => (
+                    <button
+                      key={`${i}-${j}`}
+                      onClick={() => toggleCell(i, j, false)}
+                      className={`
+                        w-12 h-12 rounded transition-all
+                        ${cell ? 'bg-primary' : 'bg-secondary'}
+                        ${currentStep === j ? 'ring-2 ring-primary' : ''}
+                        hover:opacity-80
+                      `}
+                    />
+                  ))}
+                </div>
               ))}
             </div>
-          ))}
+          </Card>
         </div>
-      </Card>
+
+        {/* Rhythm Grid */}
+        <div>
+          <h2 className="text-xl font-semibold mb-4">Rhythm</h2>
+          <Card className="p-6">
+            <div className="grid gap-1">
+              {rhythmGrid.map((row, i) => (
+                <div key={i} className="flex gap-1">
+                  <span className="w-20 text-sm flex items-center">{DRUM_TYPES[i]}</span>
+                  {row.map((cell, j) => (
+                    <button
+                      key={`${i}-${j}`}
+                      onClick={() => toggleCell(i, j, true)}
+                      className={`
+                        w-12 h-12 rounded transition-all
+                        ${cell ? 'bg-orange-500' : 'bg-orange-200/20'}
+                        ${currentStep === j ? 'ring-2 ring-orange-500' : ''}
+                        hover:opacity-80 dark:hover:opacity-70
+                      `}
+                    />
+                  ))}
+                </div>
+              ))}
+            </div>
+          </Card>
+        </div>
+      </div>
     </div>
   );
 }
