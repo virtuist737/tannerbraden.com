@@ -60,7 +60,7 @@ export default function Loop() {
           }).connect(vol);
           break;
         default: // synth
-          instrumentRef.current = new Tone.Synth({
+          instrumentRef.current = new Tone.PolySynth(Tone.Synth, {
             oscillator: { type: 'triangle8' },
             envelope: {
               attack: 0.02,
@@ -102,7 +102,11 @@ export default function Loop() {
 
     // Preview sound when toggling cell
     if (newGrid[row][col] && instrumentRef.current) {
-      instrumentRef.current.triggerAttackRelease(notes[row], "8n");
+      // Get all active notes in this column for chord preview
+      const activeNotes = newGrid.map((r, idx) => r[col] ? notes[idx] : null).filter(Boolean);
+      if (activeNotes.length) {
+        instrumentRef.current.triggerAttackRelease(activeNotes, "8n");
+      }
     }
   };
 
@@ -125,12 +129,15 @@ export default function Loop() {
         loopRef.current = new Tone.Loop((time) => {
           setCurrentStep((prev) => {
             const nextStep = (prev + 1) % GRID_SIZE;
-            // Play all active notes for this step
-            grid.forEach((row, noteIndex) => {
-              if (row[prev] && instrumentRef.current) {
-                instrumentRef.current.triggerAttackRelease(notes[noteIndex], '8n', time);
-              }
-            });
+            // Get all active notes for this step
+            const activeNotes = grid.map((row, noteIndex) => 
+              row[prev] ? notes[noteIndex] : null
+            ).filter(Boolean);
+
+            // Play all active notes simultaneously
+            if (activeNotes.length && instrumentRef.current) {
+              instrumentRef.current.triggerAttackRelease(activeNotes, '8n', time);
+            }
             return nextStep;
           });
         }, '8n').start(0);
