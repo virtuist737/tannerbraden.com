@@ -8,6 +8,7 @@ import Projects from "@/components/home/Projects";
 import BlogCard from "@/components/blog/BlogCard";
 import { useQuery } from "@tanstack/react-query";
 import type { BlogPost } from "@shared/schema";
+import Loop from "@/components/Loop"; // Added import for Loop component
 
 const Home = () => {
   const { data: latestPosts, isLoading: isLoadingPosts } = useQuery<BlogPost[]>({
@@ -83,6 +84,14 @@ const Home = () => {
             </Link>
           </div>
         </motion.div>
+      </section>
+
+      {/* Loop Machine */}
+      <section className="py-16">
+        <div className="container">
+          <h2 className="text-3xl font-bold tracking-tight mb-8">Loop Machine</h2>
+          <Loop />
+        </div>
       </section>
 
       {/* Featured Projects Section */}
