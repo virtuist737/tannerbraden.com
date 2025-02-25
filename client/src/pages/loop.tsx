@@ -24,7 +24,7 @@ export default function Loop() {
   // Create refs for instruments and loop
   const instrumentRef = useRef<any>();
   const loopRef = useRef<any>();
-  const notes = ['C4', 'D4', 'E4', 'F4', 'G4', 'A4', 'B4', 'C5'];
+  const notes = ['C5', 'B4', 'A4', 'G4', 'F4', 'E4', 'D4', 'C4']; // Reversed notes array
 
   // Initialize and update instruments based on selection
   useEffect(() => {
