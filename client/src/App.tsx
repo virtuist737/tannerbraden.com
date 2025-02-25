@@ -17,7 +17,6 @@ import SolarisLabs from "@/pages/solarislabs";
 import Auth from "@/pages/auth";
 import NotFound from "@/pages/not-found";
 import Dashboard from "@/pages/dashboard";
-import Loop from "@/pages/loop";
 
 // Admin Pages
 import AdminInterests from "@/pages/admin/interests";
@@ -52,7 +51,6 @@ export default function App() {
                 <Route path="/blog/:slug" component={BlogPost} />
                 <Route path="/contact" component={Contact} />
                 <Route path="/solarislabs" component={SolarisLabs} />
-                <Route path="/loop" component={Loop} />
                 <Route path="/auth" component={Auth} />
                 <ProtectedRoute path="/dashboard" component={Dashboard} />
                 <ProtectedRoute path="/admin/interests" component={AdminInterests} />
