@@ -1,0 +1,141 @@
+Step-by-Step Fix
+
+1. Add a Loading State
+
+In your LoopMachine component, add a state variable isDrumLoaded to track whether the drum samples are ready:
+
+javascript
+Wrap
+Copy
+const [isDrumLoaded, setIsDrumLoaded] = useState(false);
+2. Update the useEffect Hook
+
+Modify the useEffect hook where the Tone.Sampler is initialized for the drum kit. Set isDrumLoaded to false when a new drum kit is selected (to handle kit changes), and set it to true in the onload callback once the samples are loaded. Here’s the updated useEffect:
+
+javascript
+Wrap
+Copy
+useEffect(() => {
+  try {
+    masterVolumeRef.current = new Tone.Volume(volume).toDestination();
+
+    // Melody instrument setup (unchanged)
+    switch (selectedSound) {
+      case 'piano':
+        melodyInstrumentRef.current = new Tone.Sampler({
+          urls: { C4: "piano-c4.mp3" },
+          baseUrl: "https://tonejs.github.io/audio/salamander/",
+          onload: () => {
+            toast({ title: "Piano samples loaded", description: "Ready to play" });
+          },
+        }).connect(masterVolumeRef.current);
+        break;
+      default:
+        melodyInstrumentRef.current = new Tone.PolySynth(Tone.Synth, {
+          oscillator: { type: 'triangle8' },
+          envelope: { attack: 0.02, decay: 0.1, sustain: 0.2, release: 0.5 },
+        }).connect(masterVolumeRef.current);
+    }
+
+    // Drum sampler setup
+    const kit = drumKits[selectedDrumKit];
+    setIsDrumLoaded(false); // Reset loading state when kit changes
+    rhythmInstrumentRef.current = new Tone.Sampler({
+      urls: kit.samples,
+      baseUrl: kit.baseUrl,
+      onload: () => {
+        setIsDrumLoaded(true); // Set to true when samples are loaded
+        toast({ title: "Drum samples loaded", description: "Ready to play" });
+      },
+    }).connect(masterVolumeRef.current);
+
+    // Cleanup (unchanged)
+    return () => {
+      if (melodyInstrumentRef.current) melodyInstrumentRef.current.dispose();
+      if (rhythmInstrumentRef.current) rhythmInstrumentRef.current.dispose();
+      if (masterVolumeRef.current) masterVolumeRef.current.dispose();
+    };
+  } catch (error) {
+    console.error('Error initializing instruments:', error);
+    toast({
+      title: "Error",
+      description: "Failed to initialize audio instruments",
+      variant: "destructive",
+    });
+  }
+}, [selectedSound, selectedDrumKit, volume, toast]);
+3. Modify toggleRhythmCell
+
+Update the toggleRhythmCell function to check isDrumLoaded before triggering the sample. If the samples aren’t loaded, show a toast notification to inform the user:
+
+javascript
+Wrap
+Copy
+const toggleRhythmCell = (row: number, col: number) => {
+  const newGrid = rhythmGrid.map((r, i) =>
+    i === row ? r.map((cell: boolean, j: number) => (j === col ? !cell : cell)) : r
+  );
+  setRhythmGrid(newGrid);
+
+  if (newGrid[row][col] && rhythmInstrumentRef.current) {
+    if (isDrumLoaded) {
+      rhythmInstrumentRef.current.triggerAttackRelease(drumNotes[row], "8n");
+    } else {
+      toast({
+        title: "Samples Loading",
+        description: "Drum samples are still loading. Please wait.",
+        variant: "default",
+      });
+    }
+  }
+};
+4. Update Playback (Optional)
+
+To ensure consistency during playback, also check isDrumLoaded in the togglePlay function’s Tone.Sequence. This prevents the same error when the sequence runs:
+
+javascript
+Wrap
+Copy
+const togglePlay = useCallback(async () => {
+  try {
+    if (!isPlaying) {
+      await Tone.start();
+      Tone.Transport.bpm.value = bpm;
+
+      if (sequenceRef.current) sequenceRef.current.dispose();
+
+      sequenceRef.current = new Tone.Sequence((time, step) => {
+        setCurrentStep(step);
+
+        const activeMelodyNotes = melodyGrid
+          .map((row, rowIndex) => (row[step] ? notes[rowIndex] : null))
+          .filter(Boolean);
+
+        if (activeMelodyNotes.length && melodyInstrumentRef.current) {
+          melodyInstrumentRef.current.triggerAttackRelease(activeMelodyNotes, '8n', time);
+        }
+
+        rhythmGrid.forEach((row, rowIndex) => {
+          if (row[step] && rhythmInstrumentRef.current && isDrumLoaded) {
+            rhythmInstrumentRef.current.triggerAttackRelease(drumNotes[rowIndex], '8n', time);
+          }
+        });
+      }, Array.from({ length: BEATS_PER_BAR * numBars }, (_, i) => i), '8n').start(0);
+
+      Tone.Transport.start();
+      toast({ title: "Playback started", description: "Audio loop is now playing" });
+    } else {
+      Tone.Transport.stop();
+      if (sequenceRef.current) sequenceRef.current.dispose();
+      setCurrentStep(0);
+    }
+    setIsPlaying(!isPlaying);
+  } catch (error) {
+    console.error('Error toggling playback:', error);
+    toast({
+      title: "Error",
+      description: "Failed to toggle playback",
+      variant: "destructive",
+    });
+  }
+}, [isPlaying, melodyGrid, rhythmGrid, bpm, notes, numBars, isDrumLoaded, toast]);
