@@ -7,16 +7,17 @@ import { Card } from "@/components/ui/card";
 import { Volume2 } from 'lucide-react';
 import { useToast } from "@/hooks/use-toast";
 
-const GRID_SIZE = 8;
+const BEATS_PER_BAR = 8;
 const DEFAULT_BPM = 120;
 
 export default function LoopMachine() {
+  const [numBars, setNumBars] = useState(1);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
   const [bpm, setBpm] = useState(DEFAULT_BPM);
   const [volume, setVolume] = useState(-10);
   const [grid, setGrid] = useState(() => 
-    Array(GRID_SIZE).fill(null).map(() => Array(GRID_SIZE).fill(false))
+    Array(BEATS_PER_BAR).fill(null).map(() => Array(BEATS_PER_BAR).fill(false))
   );
   const [selectedSound, setSelectedSound] = useState('synth');
   const { toast } = useToast();
@@ -142,7 +143,7 @@ export default function LoopMachine() {
               instrumentRef.current?.triggerAttackRelease(notes[rowIndex], '8n', time);
             }
           });
-        }, Array.from({ length: GRID_SIZE }, (_, i) => i), '8n').start(0);
+        }, Array.from({ length: BEATS_PER_BAR * numBars }, (_, i) => i), '8n').start(0);
 
         Tone.Transport.start();
         toast({
@@ -242,6 +243,29 @@ export default function LoopMachine() {
                 {scale}
               </SelectItem>
             ))}
+          </SelectContent>
+        </Select>
+
+        <Select 
+          value={numBars.toString()} 
+          onValueChange={(value) => {
+            const newBars = parseInt(value);
+            setNumBars(newBars);
+            setGrid(Array(BEATS_PER_BAR).fill(null).map(() => Array(BEATS_PER_BAR * newBars).fill(false)));
+            setCurrentStep(0);
+            if (isPlaying) {
+              togglePlay();
+            }
+          }}
+        >
+          <SelectTrigger className="w-32">
+            <SelectValue placeholder="Bars" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="1">1 Bar</SelectItem>
+            <SelectItem value="2">2 Bars</SelectItem>
+            <SelectItem value="3">3 Bars</SelectItem>
+            <SelectItem value="4">4 Bars</SelectItem>
           </SelectContent>
         </Select>
 
