@@ -115,19 +115,16 @@ export default function LoopMachine() {
           loopRef.current.dispose();
         }
 
-        loopRef.current = new Tone.Loop((time) => {
-          setCurrentStep((prev) => {
-            const nextStep = (prev + 1) % GRID_SIZE;
-            const activeNotes = grid.map((row, noteIndex) => 
-              row[prev] ? notes[noteIndex] : null
-            ).filter(Boolean);
+        loopRef.current = new Tone.Sequence((time, step) => {
+          setCurrentStep(step);
+          const activeNotes = grid.map((row, noteIndex) => 
+            row[step] ? notes[noteIndex] : null
+          ).filter(Boolean);
 
-            if (activeNotes.length && instrumentRef.current) {
-              instrumentRef.current.triggerAttackRelease(activeNotes, '8n', time);
-            }
-            return nextStep;
-          });
-        }, '8n').start(0);
+          if (activeNotes.length && instrumentRef.current) {
+            instrumentRef.current.triggerAttackRelease(activeNotes, '8n', time);
+          }
+        }, Array.from({ length: GRID_SIZE }, (_, i) => i), '8n').start(0);
 
         Tone.Transport.start();
 
