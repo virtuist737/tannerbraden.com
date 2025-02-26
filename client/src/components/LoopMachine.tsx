@@ -11,24 +11,7 @@ const BEATS_PER_BAR = 8;
 const DEFAULT_BPM = 120;
 
 // Drum configuration
-const drumNotes = ['C1', 'D1', 'E1'];
 const drumLabels = ['Kick', 'Snare', 'Hi-Hat'];
-
-// Define drum kits here.  Each kit maps notes to sample URLs.
-const drumKits = {
-  'Kit 1': {
-    'C1': 'kick.mp3',
-    'D1': 'snare.mp3',
-    'E1': 'hihat.mp3'
-  },
-  'Kit 2': {
-    'C1': 'kick2.mp3',
-    'D1': 'snare2.mp3',
-    'E1': 'hihat2.mp3'
-  }
-};
-
-const drumSamples = drumKits['Kit 1']; // Default to Kit 1
 
 
 type ScaleType = keyof typeof scaleNotes;
@@ -115,25 +98,28 @@ export default function LoopMachine() {
           }).connect(masterVolumeRef.current);
       }
 
-      rhythmInstrumentRef.current = new Tone.Sampler({
-        urls: drumKits[selectedDrumKit], // Use selected drum kit
-        baseUrl: "https://tonejs.github.io/audio/drum-samples/",  
-        onload: () => {
-          setIsDrumLoaded(true); // Set loading state to true after load
-          toast({
-            title: "Drum samples loaded",
-            description: "Ready to play",
-          });
-        },
-        onerror: (error) => {
-          console.error("Error loading drum samples:", error);
-          toast({
-            title: "Error loading drum samples",
-            description: "Please check your internet connection",
-            variant: "destructive",
-          });
-        }
-      }).connect(masterVolumeRef.current);
+      // Create individual synths for each drum sound
+      rhythmInstrumentRef.current = {
+        kick: new Tone.MembraneSynth({
+          pitchDecay: 0.05,
+          octaves: 10,
+          oscillator: { type: 'sine' },
+          envelope: { attack: 0.001, decay: 0.4, sustain: 0.01, release: 1.4 }
+        }).connect(masterVolumeRef.current),
+        snare: new Tone.NoiseSynth({
+          noise: { type: 'white' },
+          envelope: { attack: 0.001, decay: 0.2, sustain: 0 }
+        }).connect(masterVolumeRef.current),
+        hihat: new Tone.MetalSynth({
+          frequency: 200,
+          envelope: { attack: 0.001, decay: 0.1, sustain: 0 },
+          harmonicity: 5.1,
+          modulationIndex: 32,
+          resonance: 4000,
+          octaves: 1.5
+        }).connect(masterVolumeRef.current)
+      };
+      setIsDrumLoaded(true);
 
       return () => {
         if (melodyInstrumentRef.current) {
@@ -178,7 +164,17 @@ export default function LoopMachine() {
     setRhythmGrid(newGrid);
 
     if (newGrid[row][col] && rhythmInstrumentRef.current) {
-      rhythmInstrumentRef.current.triggerAttackRelease(drumNotes[row], "8n");
+      switch (row) {
+        case 0:
+          rhythmInstrumentRef.current.kick.triggerAttackRelease('C1', '8n');
+          break;
+        case 1:
+          rhythmInstrumentRef.current.snare.triggerAttackRelease('8n');
+          break;
+        case 2:
+          rhythmInstrumentRef.current.hihat.triggerAttackRelease('8n');
+          break;
+      }
     }
   };
 
@@ -205,7 +201,17 @@ export default function LoopMachine() {
 
           rhythmGrid.forEach((row, rowIndex) => {
             if (row[step] && rhythmInstrumentRef.current && isDrumLoaded) {
-              rhythmInstrumentRef.current.triggerAttackRelease(drumNotes[rowIndex], '8n', time);
+              switch (rowIndex) {
+                case 0:
+                  rhythmInstrumentRef.current.kick.triggerAttackRelease('C1', '8n', time);
+                  break;
+                case 1:
+                  rhythmInstrumentRef.current.snare.triggerAttackRelease('8n', time);
+                  break;
+                case 2:
+                  rhythmInstrumentRef.current.hihat.triggerAttackRelease('8n', time);
+                  break;
+              }
             }
           });
         }, Array.from({ length: BEATS_PER_BAR * numBars }, (_, i) => i), '8n').start(0);
