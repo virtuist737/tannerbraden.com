@@ -14,9 +14,9 @@ const DEFAULT_BPM = 120;
 const drumNotes = ['C1', 'D1', 'E1'];
 const drumLabels = ['Kick', 'Snare', 'Hi-Hat'];
 const drumSamples = {
-  'C1': 'kick.wav',
-  'D1': 'snare.wav',
-  'E1': 'hihat.wav'
+  'C1': 'kick.mp3',
+  'D1': 'snare.mp3',
+  'E1': 'hihat.mp3'
 } as const;
 
 type ScaleType = keyof typeof scaleNotes;
@@ -103,7 +103,7 @@ export default function LoopMachine() {
 
       rhythmInstrumentRef.current = new Tone.Sampler({
         urls: drumSamples,
-        baseUrl: "/sounds/drums/",  
+        baseUrl: "https://tonejs.github.io/audio/drum-samples/",  
         onload: () => {
           toast({
             title: "Drum samples loaded",
