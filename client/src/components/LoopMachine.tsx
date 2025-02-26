@@ -13,11 +13,23 @@ const DEFAULT_BPM = 120;
 // Drum configuration
 const drumNotes = ['C1', 'D1', 'E1'];
 const drumLabels = ['Kick', 'Snare', 'Hi-Hat'];
-const drumSamples = {
-  'C1': 'kick.mp3',
-  'D1': 'snare.mp3',
-  'E1': 'hihat.mp3'
-} as const;
+
+// Define drum kits here.  Each kit maps notes to sample URLs.
+const drumKits = {
+  'Kit 1': {
+    'C1': 'kick.mp3',
+    'D1': 'snare.mp3',
+    'E1': 'hihat.mp3'
+  },
+  'Kit 2': {
+    'C1': 'kick2.mp3',
+    'D1': 'snare2.mp3',
+    'E1': 'hihat2.mp3'
+  }
+};
+
+const drumSamples = drumKits['Kit 1']; // Default to Kit 1
+
 
 type ScaleType = keyof typeof scaleNotes;
 
@@ -34,6 +46,7 @@ export default function LoopMachine() {
     Array(3).fill(null).map(() => Array(BEATS_PER_BAR).fill(false))
   );
   const [selectedSound, setSelectedSound] = useState('synth');
+  const [selectedDrumKit, setSelectedDrumKit] = useState('Kit 1'); // Add state for drum kit selection
   const { toast } = useToast();
 
   const melodyInstrumentRef = useRef<any>();
@@ -102,7 +115,7 @@ export default function LoopMachine() {
       }
 
       rhythmInstrumentRef.current = new Tone.Sampler({
-        urls: drumSamples,
+        urls: drumKits[selectedDrumKit], // Use selected drum kit
         baseUrl: "https://tonejs.github.io/audio/drum-samples/",  
         onload: () => {
           toast({
@@ -131,7 +144,7 @@ export default function LoopMachine() {
         variant: "destructive",
       });
     }
-  }, [selectedSound, volume, toast]);
+  }, [selectedSound, volume, toast, selectedDrumKit]); // Add selectedDrumKit to dependencies
 
   const toggleMelodyCell = (row: number, col: number) => {
     const newGrid = melodyGrid.map((r, i) =>
@@ -308,6 +321,19 @@ export default function LoopMachine() {
             <SelectItem value="2">2 Bars</SelectItem>
             <SelectItem value="3">3 Bars</SelectItem>
             <SelectItem value="4">4 Bars</SelectItem>
+          </SelectContent>
+        </Select>
+
+        <Select value={selectedDrumKit} onValueChange={setSelectedDrumKit}> {/* Added Drum Kit Selector */}
+          <SelectTrigger className="w-32">
+            <SelectValue placeholder="Drum Kit" />
+          </SelectTrigger>
+          <SelectContent>
+            {Object.keys(drumKits).map((kit) => (
+              <SelectItem key={kit} value={kit}>
+                {kit}
+              </SelectItem>
+            ))}
           </SelectContent>
         </Select>
 
