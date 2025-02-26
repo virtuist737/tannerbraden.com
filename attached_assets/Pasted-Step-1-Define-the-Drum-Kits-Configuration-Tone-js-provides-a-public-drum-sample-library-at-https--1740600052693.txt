@@ -1,0 +1,151 @@
+Step 1: Define the Drum Kits Configuration
+
+Tone.js provides a public drum sample library at https://tonejs.github.io/audio/drum-samples/, with subdirectories like acoustic-kit, electronic-kit, and vinyl-kit, each containing .wav files such as kick.wav, snare.wav, and variations of hi-hat samples (e.g., hihat-closed.wav, hat.wav, hh.wav). Since the sample names differ across kits, we’ll define a drumKits object that maps each kit to its base URL and specific sample files.
+
+Replace the existing drumSamples constant with a more flexible structure:
+
+javascript
+Wrap
+Copy
+const drumKits = {
+  'Acoustic': {
+    baseUrl: 'https://tonejs.github.io/audio/drum-samples/acoustic-kit/',
+    samples: {
+      'C1': 'kick.wav',
+      'D1': 'snare.wav',
+      'E1': 'hihat-closed.wav'
+    }
+  },
+  'Electronic': {
+    baseUrl: 'https://tonejs.github.io/audio/drum-samples/electronic-kit/',
+    samples: {
+      'C1': 'kick.wav',
+      'D1': 'snare.wav',
+      'E1': 'hat.wav'
+    }
+  },
+  'Vinyl': {
+    baseUrl: 'https://tonejs.github.io/audio/drum-samples/vinyl-kit/',
+    samples: {
+      'C1': 'kick.wav',
+      'D1': 'snare.wav',
+      'E1': 'hh.wav'
+    }
+  }
+};
+Notes:
+The keys 'C1', 'D1', and 'E1' correspond to kick, snare, and hi-hat, matching the drumNotes array.
+Sample names are specific to each kit, based on Tone.js’s repository (e.g., hat.wav in electronic-kit, hh.wav in vinyl-kit).
+You can add more kits (e.g., techno-kit) by extending this object with their respective URLs and samples.
+Remove the original drumSamples constant, as it’s no longer needed.
+
+Step 2: Add State for Drum Kit Selection
+
+Add a new state variable to track the selected drum kit, similar to how selectedSound works for melody voices:
+
+javascript
+Wrap
+Copy
+const [selectedDrumKit, setSelectedDrumKit] = useState('Acoustic');
+Default Value: Set to 'Acoustic' as the initial drum kit.
+Step 3: Update the useEffect Hook for Instrument Initialization
+
+Modify the useEffect hook that initializes the instruments to use the selected drum kit’s samples and base URL. The rhythmInstrumentRef should dynamically load samples based on selectedDrumKit. Update the dependency array to include selectedDrumKit so the sampler is recreated when the kit changes.
+
+Here’s the updated useEffect:
+
+javascript
+Wrap
+Copy
+useEffect(() => {
+  try {
+    masterVolumeRef.current = new Tone.Volume(volume).toDestination();
+
+    switch (selectedSound) {
+      case 'piano':
+        melodyInstrumentRef.current = new Tone.Sampler({
+          urls: {
+            C4: "piano-c4.mp3",
+          },
+          baseUrl: "https://tonejs.github.io/audio/salamander/",
+          onload: () => {
+            toast({
+              title: "Piano samples loaded",
+              description: "Ready to play",
+            });
+          },
+        }).connect(masterVolumeRef.current);
+        break;
+      default:
+        melodyInstrumentRef.current = new Tone.PolySynth(Tone.Synth, {
+          oscillator: { type: 'triangle8' },
+          envelope: {
+            attack: 0.02,
+            decay: 0.1,
+            sustain: 0.2,
+            release: 0.5,
+          }
+        }).connect(masterVolumeRef.current);
+    }
+
+    const kit = drumKits[selectedDrumKit];
+    rhythmInstrumentRef.current = new Tone.Sampler({
+      urls: kit.samples,
+      baseUrl: kit.baseUrl,
+      onload: () => {
+        toast({
+          title: "Drum samples loaded",
+          description: "Ready to play",
+        });
+      },
+    }).connect(masterVolumeRef.current);
+
+    return () => {
+      if (melodyInstrumentRef.current) {
+        melodyInstrumentRef.current.dispose();
+      }
+      if (rhythmInstrumentRef.current) {
+        rhythmInstrumentRef.current.dispose();
+      }
+      if (masterVolumeRef.current) {
+        masterVolumeRef.current.dispose();
+      }
+    };
+  } catch (error) {
+    console.error('Error initializing instruments:', error);
+    toast({
+      title: "Error",
+      description: "Failed to initialize audio instruments",
+      variant: "destructive",
+    });
+  }
+}, [selectedSound, selectedDrumKit, volume, toast]);
+Changes:
+Access the selected kit’s configuration with drumKits[selectedDrumKit].
+Use kit.samples for the sample mappings and kit.baseUrl for the base URL.
+Add selectedDrumKit to the dependency array: [selectedSound, selectedDrumKit, volume, toast].
+The cleanup function remains unchanged, ensuring proper disposal of the sampler when the kit changes.
+Step 4: Add UI for Drum Kit Selection
+
+Add a <Select> component to the JSX to allow users to choose a drum kit, mirroring the melody sound selection UI. Place it alongside the existing controls:
+
+javascript
+Wrap
+Copy
+<Select value={selectedDrumKit} onValueChange={setSelectedDrumKit}>
+  <SelectTrigger className="w-32">
+    <SelectValue placeholder="Drum Kit" />
+  </SelectTrigger>
+  <SelectContent>
+    {Object.keys(drumKits).map((kit) => (
+      <SelectItem key={kit} value={kit}>
+        {kit}
+      </SelectItem>
+    ))}
+  </SelectContent>
+</Select>
+Placement: Add this within the <div className="flex flex-wrap gap-4 items-center"> section, after the melody sound <Select> and before the scale selection <Select>.
+Options: Dynamically generate options from drumKits keys ('Acoustic', 'Electronic', 'Vinyl').
+Step 5: Verify Existing Functionality
+
+The rest of the code (e.g., toggleRhythmCell, sequence logic) relies on rhythmInstrumentRef.current triggering notes 'C1', 'D1', and 'E1'. Since these match the keys in drumKits.samples, no further changes are needed for the rhythm grid or playback logic. The labels ['Kick', 'Snare', 'Hi-Hat'] remain appropriate as they describe the drum types consistently across kits.
