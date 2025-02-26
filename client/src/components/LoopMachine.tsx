@@ -101,28 +101,16 @@ export default function LoopMachine() {
           }).connect(masterVolumeRef.current);
       }
 
-      // Initialize rhythm instruments with synthesizers
-      const kick = new Tone.MembraneSynth({
-        pitchDecay: 0.05,
-        octaves: 5,
-        oscillator: { type: 'sine' }
+      rhythmInstrumentRef.current = new Tone.Sampler({
+        urls: drumSamples,
+        baseUrl: "https://tonejs.github.io/audio/drum-samples/",  
+        onload: () => {
+          toast({
+            title: "Drum samples loaded",
+            description: "Ready to play",
+          });
+        },
       }).connect(masterVolumeRef.current);
-
-      const snare = new Tone.NoiseSynth({
-        noise: { type: 'white' },
-        envelope: { attack: 0.005, decay: 0.1, sustain: 0 }
-      }).connect(masterVolumeRef.current);
-
-      const hihat = new Tone.MetalSynth({
-        frequency: 200,
-        envelope: { attack: 0.001, decay: 0.1, sustain: 0 },
-        harmonicity: 5.1,
-        modulationIndex: 32,
-        resonance: 4000,
-        octaves: 1.5
-      }).connect(masterVolumeRef.current);
-
-      rhythmInstrumentRef.current = { kick, snare, hihat };
 
       return () => {
         if (melodyInstrumentRef.current) {
@@ -167,8 +155,7 @@ export default function LoopMachine() {
     setRhythmGrid(newGrid);
 
     if (newGrid[row][col] && rhythmInstrumentRef.current) {
-      const instruments = ['kick', 'snare', 'hihat'];
-      rhythmInstrumentRef.current[instruments[row]].triggerAttackRelease("8n");
+      rhythmInstrumentRef.current.triggerAttackRelease(drumNotes[row], "8n");
     }
   };
 
