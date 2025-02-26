@@ -75,6 +75,33 @@ export default function LoopMachine() {
         case 'drums':
           instrumentRef.current = new Tone.MembraneSynth({
             pitchDecay: 0.05,
+
+  // Create and update sequence when relevant parameters change
+  useEffect(() => {
+    if (isPlaying) {
+      if (loopRef.current) {
+        loopRef.current.dispose();
+      }
+
+      loopRef.current = new Tone.Sequence((time, step) => {
+        setCurrentStep(step);
+        const activeNotes = grid.map((row, noteIndex) => 
+          row[step] ? notes[noteIndex] : null
+        ).filter(Boolean);
+
+        if (activeNotes.length && instrumentRef.current) {
+          instrumentRef.current.triggerAttackRelease(activeNotes, '8n', time);
+        }
+      }, Array.from({ length: GRID_SIZE }, (_, i) => i), '8n').start(0);
+
+      return () => {
+        if (loopRef.current) {
+          loopRef.current.dispose();
+        }
+      };
+    }
+  }, [isPlaying, grid, notes, selectedScale]);
+
             octaves: 4,
             oscillator: { type: 'sine' },
             envelope: {
@@ -141,17 +168,6 @@ export default function LoopMachine() {
         if (loopRef.current) {
           loopRef.current.dispose();
         }
-
-        loopRef.current = new Tone.Sequence((time, step) => {
-          setCurrentStep(step);
-          const activeNotes = grid.map((row, noteIndex) => 
-            row[step] ? notes[noteIndex] : null
-          ).filter(Boolean);
-
-          if (activeNotes.length && instrumentRef.current) {
-            instrumentRef.current.triggerAttackRelease(activeNotes, '8n', time);
-          }
-        }, Array.from({ length: GRID_SIZE }, (_, i) => i), '8n').start(0);
 
         Tone.Transport.start();
 
