@@ -14,6 +14,7 @@ import type { BlogPost } from "@shared/schema";
 import { useEffect, useState, useCallback, useRef } from 'react';
 import * as Tone from 'tone';
 import { useToast } from "@/hooks/use-toast";
+import LoopMachine from '@/components/LoopMachine';
 
 const GRID_SIZE = 8;
 const DEFAULT_BPM = 120;
