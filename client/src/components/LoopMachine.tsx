@@ -23,7 +23,8 @@ export default function LoopMachine() {
   const { toast } = useToast();
 
   const instrumentRef = useRef<any>();
-  const loopRef = useRef<any>();
+  const sequenceRef = useRef<any>();
+
   const scales = [
     'Pentatonic Major',
     'Pentatonic Minor',
@@ -38,20 +39,20 @@ export default function LoopMachine() {
   ];
 
   const scaleNotes = {
-      'Pentatonic Major': ['E5', 'D5', 'C5', 'A4', 'G4', 'E4', 'D4', 'C4'],
-      'Pentatonic Minor': ['F5', 'Eb5', 'C5', 'Bb4', 'G4', 'F4', 'Eb4', 'C4'],
-      'Blues Scale': ['Eb5', 'C5', 'Bb4', 'G4', 'F#4', 'F4', 'Eb4', 'C4'],
-      'Dorian Mode': ['C5', 'Bb4', 'A4', 'G4', 'F4', 'Eb4', 'D4', 'C4'],
-      'Mixolydian Mode': ['C5', 'Bb4', 'A4', 'G4', 'F4', 'E4', 'D4', 'C4'],
-      'Harmonic Minor': ['C5', 'B4', 'Ab4', 'G4', 'F4', 'Eb4', 'D4', 'C4'],
-      'Melodic Minor': ['C5', 'B4', 'A4', 'G4', 'F4', 'Eb4', 'D4', 'C4'],
-      'Phrygian Mode': ['C5', 'Bb4', 'Ab4', 'G4', 'F4', 'Eb4', 'Db4', 'C4'],
-      'Whole Tone Scale': ['D5', 'C5', 'A#4', 'G#4', 'F#4', 'E4', 'D4', 'C4'],
-      'Japanese Hirajoshi': ['Eb5', 'D5', 'C5', 'Ab4', 'G4', 'Eb4', 'D4', 'C4'],
+    'Pentatonic Major': ['E5', 'D5', 'C5', 'A4', 'G4', 'E4', 'D4', 'C4'],
+    'Pentatonic Minor': ['F5', 'Eb5', 'C5', 'Bb4', 'G4', 'F4', 'Eb4', 'C4'],
+    'Blues Scale': ['Eb5', 'C5', 'Bb4', 'G4', 'F#4', 'F4', 'Eb4', 'C4'],
+    'Dorian Mode': ['C5', 'Bb4', 'A4', 'G4', 'F4', 'Eb4', 'D4', 'C4'],
+    'Mixolydian Mode': ['C5', 'Bb4', 'A4', 'G4', 'F4', 'E4', 'D4', 'C4'],
+    'Harmonic Minor': ['C5', 'B4', 'Ab4', 'G4', 'F4', 'Eb4', 'D4', 'C4'],
+    'Melodic Minor': ['C5', 'B4', 'A4', 'G4', 'F4', 'Eb4', 'D4', 'C4'],
+    'Phrygian Mode': ['C5', 'Bb4', 'Ab4', 'G4', 'F4', 'Eb4', 'Db4', 'C4'],
+    'Whole Tone Scale': ['D5', 'C5', 'A#4', 'G#4', 'F#4', 'E4', 'D4', 'C4'],
+    'Japanese Hirajoshi': ['Eb5', 'D5', 'C5', 'Ab4', 'G4', 'Eb4', 'D4', 'C4'],
   };
+
   const [selectedScale, setSelectedScale] = useState('Pentatonic Major');
   const notes = useMemo(() => scaleNotes[selectedScale], [selectedScale]);
-
 
   useEffect(() => {
     try {
@@ -75,33 +76,6 @@ export default function LoopMachine() {
         case 'drums':
           instrumentRef.current = new Tone.MembraneSynth({
             pitchDecay: 0.05,
-
-  // Create and update sequence when relevant parameters change
-  useEffect(() => {
-    if (isPlaying) {
-      if (loopRef.current) {
-        loopRef.current.dispose();
-      }
-
-      loopRef.current = new Tone.Sequence((time, step) => {
-        setCurrentStep(step);
-        const activeNotes = grid.map((row, noteIndex) => 
-          row[step] ? notes[noteIndex] : null
-        ).filter(Boolean);
-
-        if (activeNotes.length && instrumentRef.current) {
-          instrumentRef.current.triggerAttackRelease(activeNotes, '8n', time);
-        }
-      }, Array.from({ length: GRID_SIZE }, (_, i) => i), '8n').start(0);
-
-      return () => {
-        if (loopRef.current) {
-          loopRef.current.dispose();
-        }
-      };
-    }
-  }, [isPlaying, grid, notes, selectedScale]);
-
             octaves: 4,
             oscillator: { type: 'sine' },
             envelope: {
@@ -122,10 +96,6 @@ export default function LoopMachine() {
               release: 0.5,
             }
           }).connect(vol);
-      }
-
-      if (isPlaying) {
-        instrumentRef.current?.triggerAttackRelease("C4", "8n");
       }
 
       return () => {
@@ -152,10 +122,7 @@ export default function LoopMachine() {
     setGrid(newGrid);
 
     if (newGrid[row][col] && instrumentRef.current) {
-      const activeNotes = newGrid.map((r, idx) => r[col] ? notes[idx] : null).filter(Boolean);
-      if (activeNotes.length) {
-        instrumentRef.current.triggerAttackRelease(activeNotes, "8n");
-      }
+      instrumentRef.current.triggerAttackRelease(notes[row], "8n");
     }
   };
 
@@ -165,20 +132,28 @@ export default function LoopMachine() {
         await Tone.start();
         Tone.Transport.bpm.value = bpm;
 
-        if (loopRef.current) {
-          loopRef.current.dispose();
+        if (sequenceRef.current) {
+          sequenceRef.current.dispose();
         }
 
-        Tone.Transport.start();
+        sequenceRef.current = new Tone.Sequence((time, step) => {
+          setCurrentStep(step);
+          grid.forEach((row, rowIndex) => {
+            if (row[step]) {
+              instrumentRef.current?.triggerAttackRelease(notes[rowIndex], '8n', time);
+            }
+          });
+        }, Array.from({ length: GRID_SIZE }, (_, i) => i), '8n').start(0);
 
+        Tone.Transport.start();
         toast({
           title: "Playback started",
           description: "Audio loop is now playing",
         });
       } else {
         Tone.Transport.stop();
-        if (loopRef.current) {
-          loopRef.current.dispose();
+        if (sequenceRef.current) {
+          sequenceRef.current.dispose();
         }
         setCurrentStep(0);
       }
@@ -191,7 +166,7 @@ export default function LoopMachine() {
         variant: "destructive",
       });
     }
-  }, [isPlaying, grid, bpm, toast]);
+  }, [isPlaying, grid, bpm, notes, toast]);
 
   useEffect(() => {
     Tone.Transport.bpm.value = bpm;
@@ -201,8 +176,8 @@ export default function LoopMachine() {
     return () => {
       Tone.Transport.stop();
       Tone.Transport.cancel();
-      if (loopRef.current) {
-        loopRef.current.dispose();
+      if (sequenceRef.current) {
+        sequenceRef.current.dispose();
       }
       if (instrumentRef.current) {
         instrumentRef.current.dispose();
