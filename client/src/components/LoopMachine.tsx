@@ -10,20 +10,34 @@ import { useToast } from "@/hooks/use-toast";
 const BEATS_PER_BAR = 8;
 const DEFAULT_BPM = 120;
 
+// Drum configuration
+const drumNotes = ['C1', 'D1', 'E1'];
+const drumLabels = ['Kick', 'Snare', 'Hi-Hat'];
+const drumSamples = {
+  'C1': 'kick.wav',
+  'D1': 'snare.wav',
+  'E1': 'hihat.wav'
+};
+
 export default function LoopMachine() {
   const [numBars, setNumBars] = useState(1);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
   const [bpm, setBpm] = useState(DEFAULT_BPM);
   const [volume, setVolume] = useState(-10);
-  const [grid, setGrid] = useState(() => 
+  const [melodyGrid, setMelodyGrid] = useState(() => 
     Array(BEATS_PER_BAR).fill(null).map(() => Array(BEATS_PER_BAR).fill(false))
+  );
+  const [rhythmGrid, setRhythmGrid] = useState(() => 
+    Array(3).fill(null).map(() => Array(BEATS_PER_BAR).fill(false))
   );
   const [selectedSound, setSelectedSound] = useState('synth');
   const { toast } = useToast();
 
-  const instrumentRef = useRef<any>();
+  const melodyInstrumentRef = useRef<any>();
+  const rhythmInstrumentRef = useRef<any>();
   const sequenceRef = useRef<any>();
+  const masterVolumeRef = useRef<any>();
 
   const scales = [
     'Pentatonic Major',
@@ -49,18 +63,19 @@ export default function LoopMachine() {
     'Phrygian Mode': ['C5', 'Bb4', 'Ab4', 'G4', 'F4', 'Eb4', 'Db4', 'C4'],
     'Whole Tone Scale': ['D5', 'C5', 'A#4', 'G#4', 'F#4', 'E4', 'D4', 'C4'],
     'Japanese Hirajoshi': ['Eb5', 'D5', 'C5', 'Ab4', 'G4', 'Eb4', 'D4', 'C4'],
-  };
+  } as const;
 
-  const [selectedScale, setSelectedScale] = useState('Pentatonic Major');
-  const notes = useMemo(() => scaleNotes[selectedScale], [selectedScale]);
+  const [selectedScale, setSelectedScale] = useState<keyof typeof scaleNotes>('Pentatonic Major');
+  const notes = scaleNotes[selectedScale];
 
   useEffect(() => {
     try {
-      const vol = new Tone.Volume(volume).toDestination();
+      masterVolumeRef.current = new Tone.Volume(volume).toDestination();
 
+      // Initialize melody instrument
       switch (selectedSound) {
         case 'piano':
-          instrumentRef.current = new Tone.Sampler({
+          melodyInstrumentRef.current = new Tone.Sampler({
             urls: {
               C4: "piano-c4.mp3",
             },
@@ -71,23 +86,10 @@ export default function LoopMachine() {
                 description: "Ready to play",
               });
             },
-          }).connect(vol);
-          break;
-        case 'drums':
-          instrumentRef.current = new Tone.MembraneSynth({
-            pitchDecay: 0.05,
-            octaves: 4,
-            oscillator: { type: 'sine' },
-            envelope: {
-              attack: 0.001,
-              decay: 0.4,
-              sustain: 0.01,
-              release: 1.4,
-            }
-          }).connect(vol);
+          }).connect(masterVolumeRef.current);
           break;
         default:
-          instrumentRef.current = new Tone.PolySynth(Tone.Synth, {
+          melodyInstrumentRef.current = new Tone.PolySynth(Tone.Synth, {
             oscillator: { type: 'triangle8' },
             envelope: {
               attack: 0.02,
@@ -95,34 +97,65 @@ export default function LoopMachine() {
               sustain: 0.2,
               release: 0.5,
             }
-          }).connect(vol);
+          }).connect(masterVolumeRef.current);
       }
 
+      // Initialize rhythm instrument (drum sampler)
+      rhythmInstrumentRef.current = new Tone.Sampler({
+        urls: drumSamples,
+        baseUrl: "/sounds/drums/",  // Update this path to your actual drum samples location
+        onload: () => {
+          toast({
+            title: "Drum samples loaded",
+            description: "Ready to play",
+          });
+        },
+      }).connect(masterVolumeRef.current);
+
       return () => {
-        if (instrumentRef.current) {
-          instrumentRef.current.dispose();
+        if (melodyInstrumentRef.current) {
+          melodyInstrumentRef.current.dispose();
+        }
+        if (rhythmInstrumentRef.current) {
+          rhythmInstrumentRef.current.dispose();
+        }
+        if (masterVolumeRef.current) {
+          masterVolumeRef.current.dispose();
         }
       };
     } catch (error) {
-      console.error('Error initializing instrument:', error);
+      console.error('Error initializing instruments:', error);
       toast({
         title: "Error",
-        description: "Failed to initialize audio instrument",
+        description: "Failed to initialize audio instruments",
         variant: "destructive",
       });
     }
   }, [selectedSound, volume, toast]);
 
-  const toggleCell = (row: number, col: number) => {
-    const newGrid = grid.map((r, i) =>
+  const toggleMelodyCell = (row: number, col: number) => {
+    const newGrid = melodyGrid.map((r, i) =>
       i === row ? r.map((cell: boolean, j: number) =>
         j === col ? !cell : cell
       ) : r
     );
-    setGrid(newGrid);
+    setMelodyGrid(newGrid);
 
-    if (newGrid[row][col] && instrumentRef.current) {
-      instrumentRef.current.triggerAttackRelease(notes[row], "8n");
+    if (newGrid[row][col] && melodyInstrumentRef.current) {
+      melodyInstrumentRef.current.triggerAttackRelease(notes[row], "8n");
+    }
+  };
+
+  const toggleRhythmCell = (row: number, col: number) => {
+    const newGrid = rhythmGrid.map((r, i) =>
+      i === row ? r.map((cell: boolean, j: number) =>
+        j === col ? !cell : cell
+      ) : r
+    );
+    setRhythmGrid(newGrid);
+
+    if (newGrid[row][col] && rhythmInstrumentRef.current) {
+      rhythmInstrumentRef.current.triggerAttackRelease(drumNotes[row], "8n");
     }
   };
 
@@ -138,9 +171,20 @@ export default function LoopMachine() {
 
         sequenceRef.current = new Tone.Sequence((time, step) => {
           setCurrentStep(step);
-          grid.forEach((row, rowIndex) => {
-            if (row[step]) {
-              instrumentRef.current?.triggerAttackRelease(notes[rowIndex], '8n', time);
+
+          // Play melody notes
+          const activeMelodyNotes = melodyGrid.map((row, rowIndex) => 
+            row[step] ? notes[rowIndex] : null
+          ).filter(Boolean);
+
+          if (activeMelodyNotes.length && melodyInstrumentRef.current) {
+            melodyInstrumentRef.current.triggerAttackRelease(activeMelodyNotes, '8n', time);
+          }
+
+          // Play rhythm notes
+          rhythmGrid.forEach((row, rowIndex) => {
+            if (row[step] && rhythmInstrumentRef.current) {
+              rhythmInstrumentRef.current.triggerAttackRelease(drumNotes[rowIndex], '8n', time);
             }
           });
         }, Array.from({ length: BEATS_PER_BAR * numBars }, (_, i) => i), '8n').start(0);
@@ -166,7 +210,7 @@ export default function LoopMachine() {
         variant: "destructive",
       });
     }
-  }, [isPlaying, grid, bpm, notes, toast]);
+  }, [isPlaying, melodyGrid, rhythmGrid, bpm, notes, numBars, toast]);
 
   useEffect(() => {
     Tone.Transport.bpm.value = bpm;
@@ -179,15 +223,12 @@ export default function LoopMachine() {
       if (sequenceRef.current) {
         sequenceRef.current.dispose();
       }
-      if (instrumentRef.current) {
-        instrumentRef.current.dispose();
-      }
     };
   }, []);
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-wrap gap-4">
+      <div className="flex flex-wrap gap-4 items-center">
         <Button 
           onClick={togglePlay}
           variant={isPlaying ? "destructive" : "default"}
@@ -229,7 +270,6 @@ export default function LoopMachine() {
           <SelectContent>
             <SelectItem value="synth">Synth</SelectItem>
             <SelectItem value="piano">Piano</SelectItem>
-            <SelectItem value="drums">Drums</SelectItem>
           </SelectContent>
         </Select>
 
@@ -251,7 +291,8 @@ export default function LoopMachine() {
           onValueChange={(value) => {
             const newBars = parseInt(value);
             setNumBars(newBars);
-            setGrid(Array(BEATS_PER_BAR).fill(null).map(() => Array(BEATS_PER_BAR * newBars).fill(false)));
+            setMelodyGrid(Array(BEATS_PER_BAR).fill(null).map(() => Array(BEATS_PER_BAR * newBars).fill(false)));
+            setRhythmGrid(Array(3).fill(null).map(() => Array(BEATS_PER_BAR * newBars).fill(false)));
             setCurrentStep(0);
             if (isPlaying) {
               togglePlay();
@@ -271,32 +312,68 @@ export default function LoopMachine() {
 
         <Button 
           variant="outline"
-          onClick={() => setGrid(Array(GRID_SIZE).fill(null).map(() => Array(GRID_SIZE).fill(false)))}
+          onClick={() => {
+            setMelodyGrid(Array(BEATS_PER_BAR).fill(null).map(() => Array(BEATS_PER_BAR * numBars).fill(false)));
+            setRhythmGrid(Array(3).fill(null).map(() => Array(BEATS_PER_BAR * numBars).fill(false)));
+          }}
         >
           Clear
         </Button>
       </div>
 
-      <Card className="p-6">
-        <div className="grid gap-1">
-          {grid.map((row, i) => (
-            <div key={i} className="flex gap-1 justify-center">
-              {row.map((cell, j) => (
-                <button
-                  key={`${i}-${j}`}
-                  onClick={() => toggleCell(i, j)}
-                  className={`
-                    w-12 h-12 rounded transition-all
-                    ${cell ? 'bg-primary' : 'bg-secondary'}
-                    ${currentStep === j ? 'ring-2 ring-primary' : ''}
-                    hover:opacity-80
-                  `}
-                />
-              ))}
-            </div>
-          ))}
-        </div>
-      </Card>
+      <div className="grid gap-6">
+        {/* Melody Grid */}
+        <Card className="p-6">
+          <h3 className="text-lg font-semibold mb-4">Melody</h3>
+          <div className="grid gap-1">
+            {melodyGrid.map((row, i) => (
+              <div key={i} className="flex gap-1 items-center">
+                <span className="w-12 text-sm text-right mr-2">{notes[i]}</span>
+                <div className="flex gap-1">
+                  {row.map((cell, j) => (
+                    <button
+                      key={`${i}-${j}`}
+                      onClick={() => toggleMelodyCell(i, j)}
+                      className={`
+                        w-12 h-12 rounded transition-all
+                        ${cell ? 'bg-primary' : 'bg-secondary'}
+                        ${currentStep === j ? 'ring-2 ring-primary' : ''}
+                        hover:opacity-80
+                      `}
+                    />
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        </Card>
+
+        {/* Rhythm Grid */}
+        <Card className="p-6">
+          <h3 className="text-lg font-semibold mb-4">Rhythm</h3>
+          <div className="grid gap-1">
+            {rhythmGrid.map((row, i) => (
+              <div key={i} className="flex gap-1 items-center">
+                <span className="w-12 text-sm text-right mr-2">{drumLabels[i]}</span>
+                <div className="flex gap-1">
+                  {row.map((cell, j) => (
+                    <button
+                      key={`${i}-${j}`}
+                      onClick={() => toggleRhythmCell(i, j)}
+                      className={`
+                        w-12 h-12 rounded transition-all
+                        ${cell ? 'bg-primary' : 'bg-secondary'}
+                        ${currentStep === j ? 'ring-2 ring-primary' : ''}
+                        hover:opacity-80
+                      `}
+                    />
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        </Card>
+      </div>
     </div>
   );
 }
