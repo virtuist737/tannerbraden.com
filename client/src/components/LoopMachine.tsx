@@ -17,7 +17,9 @@ const drumSamples = {
   'C1': 'kick.wav',
   'D1': 'snare.wav',
   'E1': 'hihat.wav'
-};
+} as const;
+
+type ScaleType = keyof typeof scaleNotes;
 
 export default function LoopMachine() {
   const [numBars, setNumBars] = useState(1);
@@ -65,14 +67,13 @@ export default function LoopMachine() {
     'Japanese Hirajoshi': ['Eb5', 'D5', 'C5', 'Ab4', 'G4', 'Eb4', 'D4', 'C4'],
   } as const;
 
-  const [selectedScale, setSelectedScale] = useState<keyof typeof scaleNotes>('Pentatonic Major');
+  const [selectedScale, setSelectedScale] = useState<ScaleType>('Pentatonic Major');
   const notes = scaleNotes[selectedScale];
 
   useEffect(() => {
     try {
       masterVolumeRef.current = new Tone.Volume(volume).toDestination();
 
-      // Initialize melody instrument
       switch (selectedSound) {
         case 'piano':
           melodyInstrumentRef.current = new Tone.Sampler({
@@ -100,10 +101,9 @@ export default function LoopMachine() {
           }).connect(masterVolumeRef.current);
       }
 
-      // Initialize rhythm instrument (drum sampler)
       rhythmInstrumentRef.current = new Tone.Sampler({
         urls: drumSamples,
-        baseUrl: "/sounds/drums/",  // Update this path to your actual drum samples location
+        baseUrl: "/sounds/drums/",  
         onload: () => {
           toast({
             title: "Drum samples loaded",
@@ -172,7 +172,6 @@ export default function LoopMachine() {
         sequenceRef.current = new Tone.Sequence((time, step) => {
           setCurrentStep(step);
 
-          // Play melody notes
           const activeMelodyNotes = melodyGrid.map((row, rowIndex) => 
             row[step] ? notes[rowIndex] : null
           ).filter(Boolean);
@@ -181,7 +180,6 @@ export default function LoopMachine() {
             melodyInstrumentRef.current.triggerAttackRelease(activeMelodyNotes, '8n', time);
           }
 
-          // Play rhythm notes
           rhythmGrid.forEach((row, rowIndex) => {
             if (row[step] && rhythmInstrumentRef.current) {
               rhythmInstrumentRef.current.triggerAttackRelease(drumNotes[rowIndex], '8n', time);
@@ -273,12 +271,15 @@ export default function LoopMachine() {
           </SelectContent>
         </Select>
 
-        <Select value={selectedScale} onValueChange={setSelectedScale}>
+        <Select 
+          value={selectedScale} 
+          onValueChange={(value: ScaleType) => setSelectedScale(value)}
+        >
           <SelectTrigger className="w-40">
             <SelectValue placeholder="Select Scale" />
           </SelectTrigger>
           <SelectContent>
-            {scales.map((scale) => (
+            {(Object.keys(scaleNotes) as ScaleType[]).map((scale) => (
               <SelectItem key={scale} value={scale}>
                 {scale}
               </SelectItem>
@@ -322,7 +323,6 @@ export default function LoopMachine() {
       </div>
 
       <div className="grid gap-6">
-        {/* Melody Grid */}
         <Card className="p-6">
           <h3 className="text-lg font-semibold mb-4">Melody</h3>
           <div className="grid gap-1">
@@ -348,7 +348,6 @@ export default function LoopMachine() {
           </div>
         </Card>
 
-        {/* Rhythm Grid */}
         <Card className="p-6">
           <h3 className="text-lg font-semibold mb-4">Rhythm</h3>
           <div className="grid gap-1">
