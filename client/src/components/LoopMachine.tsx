@@ -1,5 +1,5 @@
 
-import { useEffect, useState, useCallback, useRef } from 'react';
+import { useEffect, useState, useCallback, useRef, useMemo } from 'react';
 import * as Tone from 'tone';
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
@@ -24,7 +24,34 @@ export default function LoopMachine() {
 
   const instrumentRef = useRef<any>();
   const loopRef = useRef<any>();
-  const notes = ['C5', 'B4', 'A4', 'G4', 'F4', 'E4', 'D4', 'C4'];
+  const scales = [
+    'Pentatonic Major',
+    'Pentatonic Minor',
+    'Blues Scale',
+    'Dorian Mode',
+    'Mixolydian Mode',
+    'Harmonic Minor',
+    'Melodic Minor',
+    'Phrygian Mode',
+    'Whole Tone Scale',
+    'Japanese Hirajoshi',
+  ];
+
+  const scaleNotes = {
+      'Pentatonic Major': ['E5', 'D5', 'C5', 'A4', 'G4', 'E4', 'D4', 'C4'],
+      'Pentatonic Minor': ['F5', 'Eb5', 'C5', 'Bb4', 'G4', 'F4', 'Eb4', 'C4'],
+      'Blues Scale': ['Eb5', 'C5', 'Bb4', 'G4', 'F#4', 'F4', 'Eb4', 'C4'],
+      'Dorian Mode': ['C5', 'Bb4', 'A4', 'G4', 'F4', 'Eb4', 'D4', 'C4'],
+      'Mixolydian Mode': ['C5', 'Bb4', 'A4', 'G4', 'F4', 'E4', 'D4', 'C4'],
+      'Harmonic Minor': ['C5', 'B4', 'Ab4', 'G4', 'F4', 'Eb4', 'D4', 'C4'],
+      'Melodic Minor': ['C5', 'B4', 'A4', 'G4', 'F4', 'Eb4', 'D4', 'C4'],
+      'Phrygian Mode': ['C5', 'Bb4', 'Ab4', 'G4', 'F4', 'Eb4', 'Db4', 'C4'],
+      'Whole Tone Scale': ['D5', 'C5', 'A#4', 'G#4', 'F#4', 'E4', 'D4', 'C4'],
+      'Japanese Hirajoshi': ['Eb5', 'D5', 'C5', 'Ab4', 'G4', 'Eb4', 'D4', 'C4'],
+  };
+  const [selectedScale, setSelectedScale] = useState('Pentatonic Major');
+  const notes = useMemo(() => scaleNotes[selectedScale], [selectedScale]);
+
 
   useEffect(() => {
     try {
@@ -212,6 +239,19 @@ export default function LoopMachine() {
             <SelectItem value="synth">Synth</SelectItem>
             <SelectItem value="piano">Piano</SelectItem>
             <SelectItem value="drums">Drums</SelectItem>
+          </SelectContent>
+        </Select>
+
+        <Select value={selectedScale} onValueChange={setSelectedScale}>
+          <SelectTrigger className="w-40">
+            <SelectValue placeholder="Select Scale" />
+          </SelectTrigger>
+          <SelectContent>
+            {scales.map((scale) => (
+              <SelectItem key={scale} value={scale}>
+                {scale}
+              </SelectItem>
+            ))}
           </SelectContent>
         </Select>
 
