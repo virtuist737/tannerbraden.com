@@ -34,7 +34,6 @@ export default function LoopMachine() {
     Array(3).fill(null).map(() => Array(BEATS_PER_BAR).fill(false))
   );
   const [selectedSound, setSelectedSound] = useState('synth');
-  const [isSamplesLoaded, setIsSamplesLoaded] = useState(true);
   const { toast } = useToast();
 
   const melodyInstrumentRef = useRef<any>();
@@ -77,14 +76,12 @@ export default function LoopMachine() {
 
       switch (selectedSound) {
         case 'piano':
-          setIsSamplesLoaded(false);
           melodyInstrumentRef.current = new Tone.Sampler({
             urls: {
               C4: "piano-c4.mp3",
             },
             baseUrl: "https://tonejs.github.io/audio/salamander/",
             onload: () => {
-              setIsSamplesLoaded(true);
               toast({
                 title: "Piano samples loaded",
                 description: "Ready to play",
@@ -144,7 +141,7 @@ export default function LoopMachine() {
     );
     setMelodyGrid(newGrid);
 
-    if (newGrid[row][col] && melodyInstrumentRef.current && isSamplesLoaded) {
+    if (newGrid[row][col] && melodyInstrumentRef.current) {
       melodyInstrumentRef.current.triggerAttackRelease(notes[row], "8n");
     }
   };
