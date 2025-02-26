@@ -101,22 +101,22 @@ export default function LoopMachine() {
       // Create individual synths for each drum sound
       rhythmInstrumentRef.current = {
         kick: new Tone.MembraneSynth({
-          pitchDecay: 0.05,
-          octaves: 10,
+          pitchDecay: 0.1,
+          octaves: 8,
           oscillator: { type: 'sine' },
-          envelope: { attack: 0.001, decay: 0.4, sustain: 0.01, release: 1.4 }
+          envelope: { attack: 0.001, decay: 0.5, sustain: 0, release: 0.3 }
         }).connect(masterVolumeRef.current),
+
         snare: new Tone.NoiseSynth({
           noise: { type: 'white' },
-          envelope: { attack: 0.001, decay: 0.2, sustain: 0 }
+          envelope: { attack: 0.001, decay: 0.4, sustain: 0.1 },
+          filter: { type: 'bandpass', Q: 2, frequency: 2000 }
         }).connect(masterVolumeRef.current),
-        hihat: new Tone.MetalSynth({
-          frequency: 200,
-          envelope: { attack: 0.001, decay: 0.1, sustain: 0 },
-          harmonicity: 5.1,
-          modulationIndex: 32,
-          resonance: 4000,
-          octaves: 1.5
+
+        hihat: new Tone.NoiseSynth({
+          noise: { type: 'white' },
+          envelope: { attack: 0.001, decay: 0.05, sustain: 0 },
+          filter: { type: 'highpass', frequency: 4000 }
         }).connect(masterVolumeRef.current)
       };
       setIsDrumLoaded(true);
@@ -126,7 +126,9 @@ export default function LoopMachine() {
           melodyInstrumentRef.current.dispose();
         }
         if (rhythmInstrumentRef.current) {
-          rhythmInstrumentRef.current.dispose();
+          rhythmInstrumentRef.current.kick.dispose();
+          rhythmInstrumentRef.current.snare.dispose();
+          rhythmInstrumentRef.current.hihat.dispose();
         }
         if (masterVolumeRef.current) {
           masterVolumeRef.current.dispose();
