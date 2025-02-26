@@ -48,6 +48,7 @@ export default function LoopMachine() {
   const [selectedSound, setSelectedSound] = useState('synth');
   const [selectedDrumKit, setSelectedDrumKit] = useState('Kit 1'); // Add state for drum kit selection
   const { toast } = useToast();
+  const [isDrumLoaded, setIsDrumLoaded] = useState(false); // Add loading state
 
   const melodyInstrumentRef = useRef<any>();
   const rhythmInstrumentRef = useRef<any>();
@@ -118,11 +119,20 @@ export default function LoopMachine() {
         urls: drumKits[selectedDrumKit], // Use selected drum kit
         baseUrl: "https://tonejs.github.io/audio/drum-samples/",  
         onload: () => {
+          setIsDrumLoaded(true); // Set loading state to true after load
           toast({
             title: "Drum samples loaded",
             description: "Ready to play",
           });
         },
+        onerror: (error) => {
+          console.error("Error loading drum samples:", error);
+          toast({
+            title: "Error loading drum samples",
+            description: "Please check your internet connection",
+            variant: "destructive",
+          });
+        }
       }).connect(masterVolumeRef.current);
 
       return () => {
@@ -194,7 +204,7 @@ export default function LoopMachine() {
           }
 
           rhythmGrid.forEach((row, rowIndex) => {
-            if (row[step] && rhythmInstrumentRef.current) {
+            if (row[step] && rhythmInstrumentRef.current && isDrumLoaded) {
               rhythmInstrumentRef.current.triggerAttackRelease(drumNotes[rowIndex], '8n', time);
             }
           });
@@ -221,7 +231,7 @@ export default function LoopMachine() {
         variant: "destructive",
       });
     }
-  }, [isPlaying, melodyGrid, rhythmGrid, bpm, notes, numBars, toast]);
+  }, [isPlaying, melodyGrid, rhythmGrid, bpm, notes, numBars, toast, isDrumLoaded]);
 
   useEffect(() => {
     Tone.Transport.bpm.value = bpm;
