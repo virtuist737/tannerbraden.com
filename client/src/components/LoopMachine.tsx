@@ -29,7 +29,7 @@ export default function LoopMachine() {
     Array(3).fill(null).map(() => Array(BEATS_PER_BAR).fill(false))
   );
   const [selectedSound, setSelectedSound] = useState('synth');
-  const [selectedDrumKit, setSelectedDrumKit] = useState('Kit 1'); // Add state for drum kit selection
+  
   const { toast } = useToast();
   const [isDrumLoaded, setIsDrumLoaded] = useState(false); // Add loading state
 
@@ -140,7 +140,7 @@ export default function LoopMachine() {
         variant: "destructive",
       });
     }
-  }, [selectedSound, volume, toast, selectedDrumKit]); // Add selectedDrumKit to dependencies
+  }, [selectedSound, volume, toast]);
 
   const toggleMelodyCell = (row: number, col: number) => {
     const newGrid = melodyGrid.map((r, i) =>
@@ -340,18 +340,7 @@ export default function LoopMachine() {
           </SelectContent>
         </Select>
 
-        <Select value={selectedDrumKit} onValueChange={setSelectedDrumKit}> {/* Added Drum Kit Selector */}
-          <SelectTrigger className="w-32">
-            <SelectValue placeholder="Drum Kit" />
-          </SelectTrigger>
-          <SelectContent>
-            {Object.keys(drumKits).map((kit) => (
-              <SelectItem key={kit} value={kit}>
-                {kit}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        
 
         <Button 
           variant="outline"
