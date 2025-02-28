@@ -75,6 +75,63 @@ export default function LoopMachinePresetForm({
     isDefault: false,
   };
 
+  // Process and validate grid data from initialValues
+  const processGridData = (gridData: any, defaultGrid: boolean[][], rowCount: number, initialNumBars: number): boolean[][] => {
+    console.log("Processing grid data:", gridData);
+    
+    // Handle array data
+    if (Array.isArray(gridData)) {
+      console.log("Grid data is an array with", gridData.length, "rows");
+      
+      // Ensure we have the right number of rows
+      let processedGrid = [...gridData];
+      if (processedGrid.length < rowCount) {
+        // Add missing rows
+        const additionalRows = Array(rowCount - processedGrid.length)
+          .fill(0)
+          .map(() => Array(initialNumBars * 16).fill(false));
+        processedGrid = [...processedGrid, ...additionalRows];
+      } else if (processedGrid.length > rowCount) {
+        // Trim extra rows
+        processedGrid = processedGrid.slice(0, rowCount);
+      }
+      
+      // Ensure each row has the right number of columns
+      const colCount = initialNumBars * 16;
+      processedGrid = processedGrid.map(row => {
+        if (!Array.isArray(row)) {
+          return Array(colCount).fill(false);
+        }
+        
+        if (row.length < colCount) {
+          // Add missing columns
+          return [...row, ...Array(colCount - row.length).fill(false)];
+        } else if (row.length > colCount) {
+          // Trim extra columns
+          return row.slice(0, colCount);
+        }
+        return row;
+      });
+      
+      return processedGrid;
+    } 
+    // Handle string data (JSON string)
+    else if (typeof gridData === 'string') {
+      try {
+        const parsed = JSON.parse(gridData);
+        return processGridData(parsed, defaultGrid, rowCount, initialNumBars);
+      } catch (e) {
+        console.error("Error parsing grid data:", e);
+        return defaultGrid;
+      }
+    } 
+    // If not valid, return default
+    else {
+      console.log("Using default grid data");
+      return defaultGrid;
+    }
+  };
+
   // Get values from initialValues if provided (for editing) or use defaults
   const formValues = initialValues ? {
     name: initialValues.name || "",
@@ -84,41 +141,31 @@ export default function LoopMachinePresetForm({
     selectedSound: (initialValues.selectedSound as "synth" | "piano") || "synth",
     selectedScale: (initialValues.selectedScale as any) || "Pentatonic Major",
     numBars: initialValues.numBars || 2,
-    // Handle grid data that could be arrays or stringified JSON
-    melodyGrid: (() => {
-      if (Array.isArray(initialValues.melodyGrid)) {
-        return initialValues.melodyGrid;
-      } else if (typeof initialValues.melodyGrid === 'string') {
-        try {
-          return JSON.parse(initialValues.melodyGrid);
-        } catch (e) {
-          console.error("Error parsing melodyGrid:", e);
-          return defaultValues.melodyGrid;
-        }
-      } else {
-        console.log("Using default melodyGrid");
-        return defaultValues.melodyGrid;
-      }
-    })(),
-    rhythmGrid: (() => {
-      if (Array.isArray(initialValues.rhythmGrid)) {
-        return initialValues.rhythmGrid;
-      } else if (typeof initialValues.rhythmGrid === 'string') {
-        try {
-          return JSON.parse(initialValues.rhythmGrid);
-        } catch (e) {
-          console.error("Error parsing rhythmGrid:", e);
-          return defaultValues.rhythmGrid;
-        }
-      } else {
-        console.log("Using default rhythmGrid");
-        return defaultValues.rhythmGrid;
-      }
-    })(),
+    
+    // Process melody grid (8 rows)
+    melodyGrid: processGridData(
+      initialValues.melodyGrid, 
+      defaultValues.melodyGrid, 
+      8, 
+      initialValues.numBars || 2
+    ),
+    
+    // Process rhythm grid (3 rows)
+    rhythmGrid: processGridData(
+      initialValues.rhythmGrid, 
+      defaultValues.rhythmGrid, 
+      3, 
+      initialValues.numBars || 2
+    ),
+    
     isDefault: initialValues.isDefault || false,
   } : defaultValues;
   
-  console.log("Form values:", formValues);
+  console.log("Processed form values:", formValues);
+  console.log("Melody grid dimensions:", formValues.melodyGrid.length, "rows ×", 
+    formValues.melodyGrid[0]?.length || 0, "columns");
+  console.log("Rhythm grid dimensions:", formValues.rhythmGrid.length, "rows ×", 
+    formValues.rhythmGrid[0]?.length || 0, "columns");
 
   const form = useForm<LoopMachinePresetFormValues>({
     resolver: zodResolver(loopMachinePresetFormSchema),
