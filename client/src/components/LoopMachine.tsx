@@ -17,16 +17,16 @@ const drumLabels = ['Kick', 'Snare', 'Hi-Hat'];
 type ScaleType = keyof typeof scaleNotes;
 
 export default function LoopMachine() {
-  const [numBars, setNumBars] = useState(1);
+  const [numBars, setNumBars] = useState(2);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
   const [bpm, setBpm] = useState(DEFAULT_BPM);
   const [volume, setVolume] = useState(-10);
   const [melodyGrid, setMelodyGrid] = useState(() => 
-    Array(BEATS_PER_BAR).fill(null).map(() => Array(BEATS_PER_BAR).fill(false))
+    Array(BEATS_PER_BAR).fill(null).map(() => Array(BEATS_PER_BAR*2).fill(false))
   );
   const [rhythmGrid, setRhythmGrid] = useState(() => 
-    Array(3).fill(null).map(() => Array(BEATS_PER_BAR).fill(false))
+    Array(3).fill(null).map(() => Array(BEATS_PER_BAR*2).fill(false))
   );
   const [selectedSound, setSelectedSound] = useState('synth');
   
@@ -41,26 +41,26 @@ export default function LoopMachine() {
   const scales = [
     'Pentatonic Major',
     'Pentatonic Minor',
+    'Ionian Mode',
+    'Harmonic Minor',
+    'Melodic Minor',
     'Blues Scale',
     'Dorian Mode',
     'Mixolydian Mode',
-    'Harmonic Minor',
-    'Melodic Minor',
     'Phrygian Mode',
-    'Whole Tone Scale',
     'Japanese Hirajoshi',
   ];
 
   const scaleNotes = {
     'Pentatonic Major': ['E5', 'D5', 'C5', 'A4', 'G4', 'E4', 'D4', 'C4'],
     'Pentatonic Minor': ['F5', 'Eb5', 'C5', 'Bb4', 'G4', 'F4', 'Eb4', 'C4'],
+    'Ionian Mode': ['C5', 'B4', 'A4', 'G4', 'F4', 'E4', 'D4', 'C4'],
+    'Harmonic Minor': ['C5', 'B4', 'Ab4', 'G4', 'F4', 'Eb4', 'D4', 'C4'],
+    'Melodic Minor': ['C5', 'B4', 'A4', 'G4', 'F4', 'Eb4', 'D4', 'C4'],
     'Blues Scale': ['Eb5', 'C5', 'Bb4', 'G4', 'F#4', 'F4', 'Eb4', 'C4'],
     'Dorian Mode': ['C5', 'Bb4', 'A4', 'G4', 'F4', 'Eb4', 'D4', 'C4'],
     'Mixolydian Mode': ['C5', 'Bb4', 'A4', 'G4', 'F4', 'E4', 'D4', 'C4'],
-    'Harmonic Minor': ['C5', 'B4', 'Ab4', 'G4', 'F4', 'Eb4', 'D4', 'C4'],
-    'Melodic Minor': ['C5', 'B4', 'A4', 'G4', 'F4', 'Eb4', 'D4', 'C4'],
     'Phrygian Mode': ['C5', 'Bb4', 'Ab4', 'G4', 'F4', 'Eb4', 'Db4', 'C4'],
-    'Whole Tone Scale': ['D5', 'C5', 'A#4', 'G#4', 'F#4', 'E4', 'D4', 'C4'],
     'Japanese Hirajoshi': ['Eb5', 'D5', 'C5', 'Ab4', 'G4', 'Eb4', 'D4', 'C4'],
   } as const;
 
