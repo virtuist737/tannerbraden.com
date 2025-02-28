@@ -1,4 +1,3 @@
-
 import { Helmet } from 'react-helmet-async';
 import LoopMachine from '@/components/LoopMachine';
 
@@ -6,10 +5,26 @@ export default function LoopMachinePage() {
   return (
     <div className="container py-8">
       <Helmet>
-        <title>Loop Machine | Tanner Braden</title>
+        <title>Loop Machine - Tanner Braden</title>
         <meta 
           name="description"
-          content="Create your own musical loops with this interactive sequencer."
+          content="Interactive music creation tool designed to enhance creativity and consciousness through sound patterns."
+        />
+        <meta 
+          name="keywords" 
+          content="loop machine, music creation, consciousness expansion, sound patterns, digital music, interactive sound, mindfulness"
+        />
+        <meta property="og:title" content="Loop Machine - Tanner Braden" />
+        <meta 
+          property="og:description" 
+          content="Interactive music creation tool designed to enhance creativity and consciousness through sound patterns."
+        />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content={window.location.href} />
+        <meta name="twitter:title" content="Loop Machine - Tanner Braden" />
+        <meta 
+          name="twitter:description"
+          content="Interactive music creation tool designed to enhance creativity and consciousness through sound patterns."
         />
       </Helmet>
 
