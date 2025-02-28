@@ -1,27 +1,31 @@
+
 import { useState } from "react";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
 import { z } from "zod";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { LoopMachinePreset, InsertLoopMachinePreset } from "@shared/schema";
 import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Slider } from "@/components/ui/slider";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Separator } from "@/components/ui/separator";
 import { Switch } from "@/components/ui/switch";
-import { Slider } from "@/components/ui/slider";
-import { Card } from "@/components/ui/card";
-import { InsertLoopMachinePreset, LoopMachinePreset } from "@shared/schema";
 
-// Form schema for loop machine presets
+// This schema should mirror the server-side schema but can add client-side validations
 const loopMachinePresetFormSchema = z.object({
   name: z.string().min(1, "Name is required"),
-  description: z.string().optional().nullable(),
-  bpm: z.number().int().min(60).max(200).default(120),
-  volume: z.number().int().min(-40).max(0).default(-10),
-  selectedSound: z.enum(["synth", "piano"]).default("synth"),
+  description: z.string().optional(),
+  bpm: z.number().int().min(60, "Minimum BPM is 60").max(200, "Maximum BPM is 200"),
+  volume: z.number().int().min(-40, "Minimum volume is -40").max(0, "Maximum volume is 0"),
+  selectedSound: z.enum(["synth", "piano"]),
   selectedScale: z.enum([
     "Pentatonic Major",
-    "Pentatonic Minor",
+    "Pentatonic Minor", 
     "Ionian Mode",
     "Harmonic Minor",
     "Melodic Minor",
@@ -30,8 +34,8 @@ const loopMachinePresetFormSchema = z.object({
     "Mixolydian Mode",
     "Phrygian Mode",
     "Japanese Hirajoshi"
-  ]).default("Pentatonic Major"),
-  numBars: z.number().int().min(1).max(4).default(2),
+  ]),
+  numBars: z.number().int().min(1, "Minimum bars is 1").max(4, "Maximum bars is 4"),
   melodyGrid: z.array(z.array(z.boolean())),
   rhythmGrid: z.array(z.array(z.boolean())),
   isDefault: z.boolean().default(false),
@@ -39,28 +43,26 @@ const loopMachinePresetFormSchema = z.object({
 
 type LoopMachinePresetFormValues = z.infer<typeof loopMachinePresetFormSchema>;
 
+// Helper to create empty grids
+const createEmptyGrid = (rows: number, cols: number): boolean[][] => {
+  return Array(rows).fill(0).map(() => Array(cols).fill(false));
+};
+
 interface LoopMachinePresetFormProps {
-  initialData?: LoopMachinePreset;
-  onSubmit: (data: LoopMachinePresetFormValues) => Promise<void>;
+  initialValues?: LoopMachinePreset;
+  onSubmit: (data: LoopMachinePresetFormValues) => void;
   isSubmitting?: boolean;
 }
 
 export default function LoopMachinePresetForm({ 
-  initialData, 
-  onSubmit, 
-  isSubmitting = false 
+  initialValues, 
+  onSubmit,
+  isSubmitting = false
 }: LoopMachinePresetFormProps) {
-  // Create empty grid based on number of bars
-  const createEmptyMelodyGrid = (bars: number) => 
-    Array(8).fill(null).map(() => Array(8 * bars).fill(false));
-  
-  const createEmptyRhythmGrid = (bars: number) => 
-    Array(3).fill(null).map(() => Array(8 * bars).fill(false));
+  const [activeTab, setActiveTab] = useState("basic");
 
-  // Set default values based on initial data or defaults
-  const defaultValues: Partial<LoopMachinePresetFormValues> = initialData ? {
-    ...initialData,
-  } : {
+  // Generate default values if not editing
+  const defaultValues: LoopMachinePresetFormValues = {
     name: "",
     description: "",
     bpm: 120,
@@ -68,273 +70,343 @@ export default function LoopMachinePresetForm({
     selectedSound: "synth",
     selectedScale: "Pentatonic Major",
     numBars: 2,
-    melodyGrid: createEmptyMelodyGrid(2),
-    rhythmGrid: createEmptyRhythmGrid(2),
+    melodyGrid: createEmptyGrid(8, 32), // 8 notes, 16 steps per bar × 2 bars
+    rhythmGrid: createEmptyGrid(4, 32), // 4 drum parts, 16 steps per bar × 2 bars
     isDefault: false,
   };
 
+  // Get values from initialValues if provided (for editing) or use defaults
+  const formValues = initialValues ? {
+    ...initialValues,
+    // Make sure any JSON fields are properly parsed
+    melodyGrid: Array.isArray(initialValues.melodyGrid) 
+      ? initialValues.melodyGrid 
+      : typeof initialValues.melodyGrid === 'string' 
+        ? JSON.parse(initialValues.melodyGrid as unknown as string)
+        : defaultValues.melodyGrid,
+    rhythmGrid: Array.isArray(initialValues.rhythmGrid) 
+      ? initialValues.rhythmGrid 
+      : typeof initialValues.rhythmGrid === 'string' 
+        ? JSON.parse(initialValues.rhythmGrid as unknown as string) 
+        : defaultValues.rhythmGrid,
+  } : defaultValues;
+
   const form = useForm<LoopMachinePresetFormValues>({
     resolver: zodResolver(loopMachinePresetFormSchema),
-    defaultValues,
+    defaultValues: formValues,
   });
 
-  // Watch numBars to update grid size
-  const numBars = form.watch("numBars");
+  // Shorthand for the form fields
+  const { control, handleSubmit, watch, setValue } = form;
+  
+  // Watch for numBars changes to update grid sizes
+  const numBars = watch("numBars");
 
-  // Handle submission
-  const handleSubmit = async (data: LoopMachinePresetFormValues) => {
-    try {
-      await onSubmit(data);
-      form.reset(data);
-    } catch (error) {
-      console.error("Error submitting form:", error);
-    }
+  // Handle grid cell toggles
+  const toggleMelodyCell = (row: number, col: number) => {
+    const currentGrid = [...form.getValues("melodyGrid")];
+    currentGrid[row][col] = !currentGrid[row][col];
+    setValue("melodyGrid", currentGrid);
+  };
+
+  const toggleRhythmCell = (row: number, col: number) => {
+    const currentGrid = [...form.getValues("rhythmGrid")];
+    currentGrid[row][col] = !currentGrid[row][col];
+    setValue("rhythmGrid", currentGrid);
+  };
+
+  // Calculate grid dimensions based on number of bars
+  const gridCols = numBars * 16; // 16 steps per bar
+
+  // Resize grids when numBars changes
+  const resizeGrids = () => {
+    const newCols = numBars * 16;
+    
+    // Resize melody grid
+    const currentMelodyGrid = form.getValues("melodyGrid");
+    const newMelodyGrid = currentMelodyGrid.map(row => {
+      if (row.length < newCols) {
+        // Add new columns
+        return [...row, ...Array(newCols - row.length).fill(false)];
+      } else {
+        // Remove excess columns
+        return row.slice(0, newCols);
+      }
+    });
+    
+    // Resize rhythm grid
+    const currentRhythmGrid = form.getValues("rhythmGrid");
+    const newRhythmGrid = currentRhythmGrid.map(row => {
+      if (row.length < newCols) {
+        // Add new columns
+        return [...row, ...Array(newCols - row.length).fill(false)];
+      } else {
+        // Remove excess columns
+        return row.slice(0, newCols);
+      }
+    });
+    
+    setValue("melodyGrid", newMelodyGrid);
+    setValue("rhythmGrid", newRhythmGrid);
   };
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-          <FormField
-            control={form.control}
-            name="name"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Name</FormLabel>
-                <FormControl>
-                  <Input placeholder="My awesome preset" {...field} />
-                </FormControl>
-                <FormDescription>
-                  A descriptive name for this preset
-                </FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="description"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Description</FormLabel>
-                <FormControl>
-                  <Textarea 
-                    placeholder="A short description of this preset" 
-                    value={field.value || ""}
-                    onChange={field.onChange}
-                  />
-                </FormControl>
-                <FormDescription>
-                  Optional description for your preset
-                </FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
-
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-          <FormField
-            control={form.control}
-            name="bpm"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>BPM: {field.value}</FormLabel>
-                <FormControl>
-                  <Slider
-                    value={[field.value]}
-                    onValueChange={(value) => field.onChange(value[0])}
-                    min={60}
-                    max={200}
-                    step={1}
-                  />
-                </FormControl>
-                <FormDescription>
-                  Beats per minute (tempo)
-                </FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="volume"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Volume: {field.value} dB</FormLabel>
-                <FormControl>
-                  <Slider
-                    value={[field.value]}
-                    onValueChange={(value) => field.onChange(value[0])}
-                    min={-40}
-                    max={0}
-                    step={1}
-                  />
-                </FormControl>
-                <FormDescription>
-                  Master volume level
-                </FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
-
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
-          <FormField
-            control={form.control}
-            name="selectedSound"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Sound</FormLabel>
-                <Select
-                  value={field.value}
-                  onValueChange={field.onChange}
-                >
+      <form onSubmit={handleSubmit(onSubmit)}>
+        <Tabs 
+          defaultValue="basic" 
+          value={activeTab} 
+          onValueChange={setActiveTab}
+          className="w-full"
+        >
+          <TabsList className="grid grid-cols-3 mb-6">
+            <TabsTrigger value="basic">Basic Settings</TabsTrigger>
+            <TabsTrigger value="melody">Melody Grid</TabsTrigger>
+            <TabsTrigger value="rhythm">Rhythm Grid</TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="basic" className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <FormField
+                control={control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Preset Name</FormLabel>
+                    <FormControl>
+                      <Input placeholder="My Awesome Preset" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              <FormField
+                control={control}
+                name="isDefault"
+                render={({ field }) => (
+                  <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
+                    <div className="space-y-0.5">
+                      <FormLabel>Default Preset</FormLabel>
+                      <FormDescription>
+                        Make this the default preset for the Loop Machine
+                      </FormDescription>
+                    </div>
+                    <FormControl>
+                      <Switch
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+            </div>
+            
+            <FormField
+              control={control}
+              name="description"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Description</FormLabel>
                   <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select a sound" />
-                    </SelectTrigger>
+                    <Textarea 
+                      placeholder="Describe your preset..." 
+                      className="resize-none" 
+                      {...field} 
+                      value={field.value || ""}
+                    />
                   </FormControl>
-                  <SelectContent>
-                    <SelectItem value="synth">Synth</SelectItem>
-                    <SelectItem value="piano">Piano</SelectItem>
-                  </SelectContent>
-                </Select>
-                <FormDescription>
-                  Instrument sound for melody
-                </FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="selectedScale"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Scale</FormLabel>
-                <Select
-                  value={field.value}
-                  onValueChange={field.onChange}
-                >
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            
+            <Separator />
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <FormField
+                control={control}
+                name="bpm"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Tempo (BPM): {field.value}</FormLabel>
+                    <FormControl>
+                      <Slider
+                        min={60}
+                        max={200}
+                        step={1}
+                        value={[field.value]}
+                        onValueChange={(value) => field.onChange(value[0])}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              <FormField
+                control={control}
+                name="volume"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Volume: {field.value} dB</FormLabel>
+                    <FormControl>
+                      <Slider
+                        min={-40}
+                        max={0}
+                        step={1}
+                        value={[field.value]}
+                        onValueChange={(value) => field.onChange(value[0])}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <FormField
+                control={control}
+                name="selectedSound"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Sound</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select a sound" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="synth">Synth</SelectItem>
+                        <SelectItem value="piano">Piano</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              <FormField
+                control={control}
+                name="selectedScale"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Scale</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select a scale" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="Pentatonic Major">Pentatonic Major</SelectItem>
+                        <SelectItem value="Pentatonic Minor">Pentatonic Minor</SelectItem>
+                        <SelectItem value="Ionian Mode">Ionian Mode</SelectItem>
+                        <SelectItem value="Harmonic Minor">Harmonic Minor</SelectItem>
+                        <SelectItem value="Melodic Minor">Melodic Minor</SelectItem>
+                        <SelectItem value="Blues Scale">Blues Scale</SelectItem>
+                        <SelectItem value="Dorian Mode">Dorian Mode</SelectItem>
+                        <SelectItem value="Mixolydian Mode">Mixolydian Mode</SelectItem>
+                        <SelectItem value="Phrygian Mode">Phrygian Mode</SelectItem>
+                        <SelectItem value="Japanese Hirajoshi">Japanese Hirajoshi</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+            
+            <FormField
+              control={control}
+              name="numBars"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Number of Bars: {field.value}</FormLabel>
                   <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select a scale" />
-                    </SelectTrigger>
+                    <Slider
+                      min={1}
+                      max={4}
+                      step={1}
+                      value={[field.value]}
+                      onValueChange={(value) => {
+                        field.onChange(value[0]);
+                        // Resize grids when numBars changes
+                        setTimeout(resizeGrids, 0);
+                      }}
+                    />
                   </FormControl>
-                  <SelectContent>
-                    <SelectItem value="Pentatonic Major">Pentatonic Major</SelectItem>
-                    <SelectItem value="Pentatonic Minor">Pentatonic Minor</SelectItem>
-                    <SelectItem value="Ionian Mode">Ionian Mode</SelectItem>
-                    <SelectItem value="Harmonic Minor">Harmonic Minor</SelectItem>
-                    <SelectItem value="Melodic Minor">Melodic Minor</SelectItem>
-                    <SelectItem value="Blues Scale">Blues Scale</SelectItem>
-                    <SelectItem value="Dorian Mode">Dorian Mode</SelectItem>
-                    <SelectItem value="Mixolydian Mode">Mixolydian Mode</SelectItem>
-                    <SelectItem value="Phrygian Mode">Phrygian Mode</SelectItem>
-                    <SelectItem value="Japanese Hirajoshi">Japanese Hirajoshi</SelectItem>
-                  </SelectContent>
-                </Select>
-                <FormDescription>
-                  Musical scale for melody notes
-                </FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="numBars"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Number of Bars</FormLabel>
-                <Select
-                  value={field.value?.toString() || ""}
-                  onValueChange={(value) => {
-                    const newBars = parseInt(value);
-                    field.onChange(newBars);
-                    
-                    // Update the grid size when number of bars changes
-                    form.setValue("melodyGrid", createEmptyMelodyGrid(newBars));
-                    form.setValue("rhythmGrid", createEmptyRhythmGrid(newBars));
-                  }}
-                >
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select number of bars" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    <SelectItem value="1">1 Bar</SelectItem>
-                    <SelectItem value="2">2 Bars</SelectItem>
-                    <SelectItem value="3">3 Bars</SelectItem>
-                    <SelectItem value="4">4 Bars</SelectItem>
-                  </SelectContent>
-                </Select>
-                <FormDescription>
-                  Number of bars in the loop
-                </FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
-
-        <FormField
-          control={form.control}
-          name="isDefault"
-          render={({ field }) => (
-            <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-              <div className="space-y-0.5">
-                <FormLabel className="text-base">Set as Default</FormLabel>
-                <FormDescription>
-                  Make this the default preset that loads when users open the Loop Machine
-                </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </TabsContent>
+          
+          <TabsContent value="melody">
+            <div className="space-y-4">
+              <Label>Melody Grid</Label>
+              <div className="overflow-x-auto pb-4">
+                <div className="grid-container" style={{ 
+                  display: 'grid', 
+                  gridTemplateColumns: `repeat(${gridCols}, 30px)`,
+                  gap: '2px'
+                }}>
+                  {watch("melodyGrid").map((row, rowIndex) => (
+                    row.slice(0, gridCols).map((cell, colIndex) => (
+                      <Button
+                        key={`m-${rowIndex}-${colIndex}`}
+                        type="button"
+                        variant={cell ? "default" : "outline"}
+                        className="w-[30px] h-[30px] p-0"
+                        onClick={() => toggleMelodyCell(rowIndex, colIndex)}
+                      >
+                        {cell ? "●" : ""}
+                      </Button>
+                    ))
+                  ))}
+                </div>
               </div>
-              <FormControl>
-                <Switch
-                  checked={field.value}
-                  onCheckedChange={field.onChange}
-                />
-              </FormControl>
-            </FormItem>
-          )}
-        />
-
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-          <Card className="p-4">
-            <h3 className="font-medium mb-2">Melody Grid</h3>
-            <p className="text-sm text-muted-foreground mb-4">
-              You can edit the grid pattern in the Loop Machine interface after saving this preset.
-            </p>
-            {/* Hidden field for melodyGrid */}
-            <input 
-              type="hidden" 
-              {...form.register("melodyGrid")} 
-            />
-          </Card>
-
-          <Card className="p-4">
-            <h3 className="font-medium mb-2">Rhythm Grid</h3>
-            <p className="text-sm text-muted-foreground mb-4">
-              You can edit the drum pattern in the Loop Machine interface after saving this preset.
-            </p>
-            {/* Hidden field for rhythmGrid */}
-            <input 
-              type="hidden" 
-              {...form.register("rhythmGrid")} 
-            />
-          </Card>
-        </div>
-
-        <div className="flex justify-end">
-          <Button type="submit" disabled={isSubmitting}>
-            {isSubmitting ? "Saving..." : initialData ? "Update Preset" : "Create Preset"}
+            </div>
+          </TabsContent>
+          
+          <TabsContent value="rhythm">
+            <div className="space-y-4">
+              <Label>Rhythm Grid</Label>
+              <div className="overflow-x-auto pb-4">
+                <div className="grid-container" style={{ 
+                  display: 'grid', 
+                  gridTemplateColumns: `repeat(${gridCols}, 30px)`,
+                  gap: '2px'
+                }}>
+                  {watch("rhythmGrid").map((row, rowIndex) => (
+                    row.slice(0, gridCols).map((cell, colIndex) => (
+                      <Button
+                        key={`r-${rowIndex}-${colIndex}`}
+                        type="button"
+                        variant={cell ? "default" : "outline"}
+                        className="w-[30px] h-[30px] p-0"
+                        onClick={() => toggleRhythmCell(rowIndex, colIndex)}
+                      >
+                        {cell ? "●" : ""}
+                      </Button>
+                    ))
+                  ))}
+                </div>
+              </div>
+            </div>
+          </TabsContent>
+        </Tabs>
+        
+        <div className="mt-6 flex justify-end">
+          <Button 
+            type="submit" 
+            disabled={isSubmitting}
+            className="w-full md:w-auto"
+          >
+            {isSubmitting ? "Saving..." : initialValues ? "Update Preset" : "Create Preset"}
           </Button>
         </div>
       </form>

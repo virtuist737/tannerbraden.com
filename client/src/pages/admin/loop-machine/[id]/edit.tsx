@@ -57,6 +57,87 @@ export default function EditLoopMachinePreset() {
     updatePresetMutation.mutate(data);
   };
 
+  // Update preset mutation
+  const updatePresetMutation = useMutation({
+    mutationFn: async (data: Partial<InsertLoopMachinePreset>) => {
+      return await apiRequest<LoopMachinePreset>(`/api/loop-presets/${presetId}`, {
+        method: 'PATCH',
+        body: JSON.stringify(data),
+      });
+    },
+    onSuccess: () => {
+      toast({
+        title: "Preset updated",
+        description: "Loop machine preset has been updated successfully.",
+      });
+      queryClient.invalidateQueries(["/api/loop-presets"]);
+      navigate("/admin/loop-machine");
+    },
+    onError: (error) => {
+      toast({
+        title: "Error",
+        description: "Failed to update preset. Please try again.",
+        variant: "destructive",
+      });
+      console.error("Error updating preset:", error);
+    }
+  });
+
+  // Set default preset mutation
+  const setDefaultMutation = useMutation({
+    mutationFn: async () => {
+      return await apiRequest<LoopMachinePreset>(`/api/loop-presets/${presetId}/set-default`, {
+        method: 'POST',
+      });
+    },
+    onSuccess: () => {
+      toast({
+        title: "Default preset set",
+        description: "This preset is now the default.",
+      });
+      queryClient.invalidateQueries(["/api/loop-presets"]);
+    },
+    onError: (error) => {
+      toast({
+        title: "Error",
+        description: "Failed to set default preset. Please try again.",
+        variant: "destructive",
+      });
+      console.error("Error setting default preset:", error);
+    }
+  });
+
+  const handleSubmit = (data: Partial<InsertLoopMachinePreset>) => {
+    updatePresetMutation.mutate(data);
+  };
+
+  if (isLoading) {
+    return (
+      <ProtectedRoute>
+        <div className="container mx-auto py-8">
+          <div className="flex justify-center items-center h-64">
+            <p>Loading preset data...</p>
+          </div>
+        </div>
+      </ProtectedRoute>
+    );
+  }
+
+  if (error || !preset) {
+    return (
+      <ProtectedRoute>
+        <div className="container mx-auto py-8">
+          <div className="flex flex-col justify-center items-center h-64">
+            <p className="text-red-500 mb-4">Error loading preset data</p>
+            <Button onClick={() => navigate("/admin/loop-machine")}>
+              Back to Presets
+            </Button>
+          </div>
+        </div>
+      </ProtectedRoute>
+    );
+  }
+
   return (
     <ProtectedRoute>
       <div className="container mx-auto py-8">
@@ -75,6 +156,28 @@ export default function EditLoopMachinePreset() {
         </div>
 
         <Separator className="my-6" />
+        
+        <div className="flex justify-between mb-6">
+          <div></div>
+          <div className="flex gap-2">
+            <Button
+              variant={preset.isDefault ? "secondary" : "outline"}
+              onClick={() => setDefaultMutation.mutate()}
+              disabled={preset.isDefault || setDefaultMutation.isPending}
+            >
+              <Star className="mr-2 h-4 w-4" />
+              {preset.isDefault ? "Default Preset" : "Set as Default"}
+            </Button>
+          </div>
+        </div>
+        
+        <div className="bg-card rounded-lg border p-6">
+          <LoopMachinePresetForm
+            initialValues={preset}
+            onSubmit={handleSubmit}
+            isSubmitting={updatePresetMutation.isPending}
+          />
+        </div>
 
         {isLoading ? (
           <div className="flex justify-center p-8">

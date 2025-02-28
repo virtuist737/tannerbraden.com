@@ -19,7 +19,9 @@ export default function AdminLoopMachinePresets() {
   // Fetch all presets
   const { data: presets, isLoading, error } = useQuery({
     queryKey: ["/api/loop-presets"],
-    select: (data: LoopMachinePreset[]) => data
+    queryFn: async () => {
+      return await apiRequest<LoopMachinePreset[]>("/api/loop-presets");
+    }
   });
 
   // Delete mutation
