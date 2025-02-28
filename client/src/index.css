@@ -12,25 +12,71 @@
   }
   
   :root {
-    --primary: 251 83% 60%;
+    /* Use a nice blue for primary color */
+    --primary: 217 91% 53%;
     --primary-foreground: 0 0% 98%;
     
-    --ring: 251 83% 60%;
+    /* Make light mode white with dark text */
+    --background: 0 0% 100%;
+    --foreground: 222 47% 11%;
     
-    --accent: 251 83% 95%;
-    --accent-foreground: 251 83% 30%;
+    /* Card should be white in light mode */
+    --card: 0 0% 100%;
+    --card-foreground: 222 47% 11%;
+    
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 47% 11%;
+    
+    --secondary: 217 91% 95%;
+    --secondary-foreground: 217 91% 30%;
+    
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+    
+    --accent: 217 91% 95%;
+    --accent-foreground: 217 91% 30%;
+    
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+    
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 217 91% 53%;
     
     --radius: 0.8rem;
   }
   
   .dark {
-    --primary: 251 83% 60%;
+    /* Keep the same blue for primary in dark mode */
+    --primary: 217 91% 53%;
     --primary-foreground: 0 0% 98%;
     
-    --ring: 251 83% 60%;
+    /* Dark mode with appropriate contrast */
+    --background: 224 71% 4%;
+    --foreground: 210 40% 98%;
     
-    --accent: 251 83% 25%;
-    --accent-foreground: 0 0% 98%;
+    /* Card should not be colored in dark mode */
+    --card: 224 71% 4%;
+    --card-foreground: 210 40% 98%;
+    
+    --popover: 224 71% 4%;
+    --popover-foreground: 210 40% 98%;
+    
+    --secondary: 217 91% 25%;
+    --secondary-foreground: 210 40% 98%;
+    
+    --muted: 217 50% 12%;
+    --muted-foreground: 215 20% 65%;
+    
+    --accent: 217 91% 20%;
+    --accent-foreground: 210 40% 98%;
+    
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+    
+    --border: 217 25% 26.7%;
+    --input: 217 25% 26.7%;
+    --ring: 217 91% 53%;
   }
 }
 
