@@ -55,7 +55,7 @@ export default function LoopMachine() {
   const [rhythmGrid, setRhythmGrid] = useState(() => 
     Array(3).fill(null).map(() => Array(BEATS_PER_BAR*2).fill(false))
   );
-  const [selectedSound, setSelectedSound] = useState('synth');
+  const [selectedSound, setSelectedSound] = useState('synth-triangle');
   const [selectedPresetId, setSelectedPresetId] = useState<number | null>(null);
 
   // State for drag operations
@@ -132,18 +132,68 @@ export default function LoopMachine() {
       masterVolumeRef.current = new Tone.Volume(volume).toDestination();
 
       switch (selectedSound) {
-        case 'piano':
-          melodyInstrumentRef.current = new Tone.Sampler({
-            urls: {
-              C4: "piano-c4.mp3",
+        case 'synth-triangle':
+          melodyInstrumentRef.current = new Tone.PolySynth(Tone.Synth, {
+            oscillator: { type: 'triangle8' },
+            envelope: {
+              attack: 0.02,
+              decay: 0.1,
+              sustain: 0.2,
+              release: 0.5,
+            }
+          }).connect(masterVolumeRef.current);
+          break;
+        case 'synth-square':
+          melodyInstrumentRef.current = new Tone.PolySynth(Tone.Synth, {
+            oscillator: { type: 'square' },
+            envelope: {
+              attack: 0.01,
+              decay: 0.2,
+              sustain: 0.3,
+              release: 0.4,
+            }
+          }).connect(masterVolumeRef.current);
+          break;
+        case 'synth-sawtooth':
+          melodyInstrumentRef.current = new Tone.PolySynth(Tone.Synth, {
+            oscillator: { type: 'sawtooth' },
+            envelope: {
+              attack: 0.03,
+              decay: 0.3,
+              sustain: 0.4,
+              release: 0.6,
+            }
+          }).connect(masterVolumeRef.current);
+          break;
+        case 'synth-sine':
+          melodyInstrumentRef.current = new Tone.PolySynth(Tone.Synth, {
+            oscillator: { type: 'sine' },
+            envelope: {
+              attack: 0.05,
+              decay: 0.1,
+              sustain: 0.5,
+              release: 0.7,
+            }
+          }).connect(masterVolumeRef.current);
+          break;
+        case 'synth-fm':
+          melodyInstrumentRef.current = new Tone.PolySynth(Tone.FMSynth, {
+            harmonicity: 2,
+            modulationIndex: 10,
+            oscillator: { type: 'sine' },
+            envelope: {
+              attack: 0.04,
+              decay: 0.2,
+              sustain: 0.3,
+              release: 0.5,
             },
-            baseUrl: "https://tonejs.github.io/audio/salamander/",
-            onload: () => {
-              toast({
-                title: "Piano samples loaded",
-                description: "Ready to play",
-              });
-            },
+            modulation: { type: 'square' },
+            modulationEnvelope: {
+              attack: 0.2,
+              decay: 0.1,
+              sustain: 0.2,
+              release: 0.4,
+            }
           }).connect(masterVolumeRef.current);
           break;
         default:
@@ -583,8 +633,11 @@ export default function LoopMachine() {
                       <SelectValue placeholder="Sound" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="synth">Synth</SelectItem>
-                      <SelectItem value="piano">Piano</SelectItem>
+                      <SelectItem value="synth-triangle">Triangle Synth</SelectItem>
+                      <SelectItem value="synth-square">Square Synth</SelectItem>
+                      <SelectItem value="synth-sawtooth">Sawtooth Synth</SelectItem>
+                      <SelectItem value="synth-sine">Sine Synth</SelectItem>
+                      <SelectItem value="synth-fm">FM Synth</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
