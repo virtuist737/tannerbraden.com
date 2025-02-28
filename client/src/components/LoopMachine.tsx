@@ -630,7 +630,13 @@ export default function LoopMachine() {
                 <div className="flex-grow">
                   <Select value={selectedSound} onValueChange={setSelectedSound}>
                     <SelectTrigger>
-                      <SelectValue placeholder="Sound" />
+                      <SelectValue>
+                        {selectedSound === 'synth-triangle' ? 'Triangle Synth' : 
+                         selectedSound === 'synth-square' ? 'Square Synth' : 
+                         selectedSound === 'synth-sawtooth' ? 'Sawtooth Synth' : 
+                         selectedSound === 'synth-sine' ? 'Sine Synth' : 
+                         selectedSound === 'synth-fm' ? 'FM Synth' : 'Sound'}
+                      </SelectValue>
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="synth-triangle">Triangle Synth</SelectItem>
