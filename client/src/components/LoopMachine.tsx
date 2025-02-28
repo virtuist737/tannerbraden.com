@@ -303,7 +303,8 @@ export default function LoopMachine() {
     );
     setMelodyGrid(newGrid);
 
-    if (newGrid[row][col] && melodyInstrumentRef.current) {
+    // Always play sound when toggling, regardless of new state
+    if (melodyInstrumentRef.current) {
       melodyInstrumentRef.current.triggerAttackRelease(notes[row], "8n");
     }
   };
@@ -316,7 +317,8 @@ export default function LoopMachine() {
     );
     setRhythmGrid(newGrid);
 
-    if (newGrid[row][col] && rhythmInstrumentRef.current) {
+    // Always play sound when toggling, regardless of new state
+    if (rhythmInstrumentRef.current && isDrumLoaded) {
       switch (row) {
         case 0:
           rhythmInstrumentRef.current.kick.triggerAttackRelease('C1', '8n');
@@ -335,28 +337,33 @@ export default function LoopMachine() {
   const handleMelodyDragStart = (row: number, col: number) => {
     setIsDragging(true);
     setDragTarget('melody');
-    setDragValue(!melodyGrid[row][col]); // Set to opposite of current state
+    // Set to opposite of current state
+    const newCellValue = !melodyGrid[row][col]; 
+    setDragValue(newCellValue);
 
     // Apply to the initial cell
     const newGrid = [...melodyGrid];
-    newGrid[row][col] = !melodyGrid[row][col];
+    newGrid[row][col] = newCellValue;
     setMelodyGrid(newGrid);
 
-    // Play sound if activating
-    if (!melodyGrid[row][col] && melodyInstrumentRef.current) {
+    // Always play sound on click/touch, regardless of state change
+    if (melodyInstrumentRef.current) {
       melodyInstrumentRef.current.triggerAttackRelease(notes[row], "8n");
     }
   };
 
   const handleMelodyDragEnter = (row: number, col: number) => {
     if (isDragging && dragTarget === 'melody') {
-      const newGrid = [...melodyGrid];
-      newGrid[row][col] = dragValue;
-      setMelodyGrid(newGrid);
+      // Only update if the cell state would actually change
+      if (melodyGrid[row][col] !== dragValue) {
+        const newGrid = [...melodyGrid];
+        newGrid[row][col] = dragValue;
+        setMelodyGrid(newGrid);
 
-      // Play sound if activating
-      if (dragValue && melodyInstrumentRef.current) {
-        melodyInstrumentRef.current.triggerAttackRelease(notes[row], "8n");
+        // Play sound when dragging into new cells
+        if (melodyInstrumentRef.current) {
+          melodyInstrumentRef.current.triggerAttackRelease(notes[row], "8n");
+        }
       }
     }
   };
@@ -365,15 +372,17 @@ export default function LoopMachine() {
   const handleRhythmDragStart = (row: number, col: number) => {
     setIsDragging(true);
     setDragTarget('rhythm');
-    setDragValue(!rhythmGrid[row][col]); // Set to opposite of current state
+    // Set to opposite of current state
+    const newCellValue = !rhythmGrid[row][col];
+    setDragValue(newCellValue);
 
     // Apply to the initial cell
     const newGrid = [...rhythmGrid];
-    newGrid[row][col] = !rhythmGrid[row][col];
+    newGrid[row][col] = newCellValue;
     setRhythmGrid(newGrid);
 
-    // Play sound if activating
-    if (!rhythmGrid[row][col] && rhythmInstrumentRef.current && isDrumLoaded) {
+    // Always play sound on click/touch, regardless of state change
+    if (rhythmInstrumentRef.current && isDrumLoaded) {
       switch (row) {
         case 0:
           rhythmInstrumentRef.current.kick.triggerAttackRelease('C1', '8n');
@@ -390,22 +399,25 @@ export default function LoopMachine() {
 
   const handleRhythmDragEnter = (row: number, col: number) => {
     if (isDragging && dragTarget === 'rhythm') {
-      const newGrid = [...rhythmGrid];
-      newGrid[row][col] = dragValue;
-      setRhythmGrid(newGrid);
+      // Only update if the cell state would actually change
+      if (rhythmGrid[row][col] !== dragValue) {
+        const newGrid = [...rhythmGrid];
+        newGrid[row][col] = dragValue;
+        setRhythmGrid(newGrid);
 
-      // Play sound if activating
-      if (dragValue && rhythmInstrumentRef.current && isDrumLoaded) {
-        switch (row) {
-          case 0:
-            rhythmInstrumentRef.current.kick.triggerAttackRelease('C1', '8n');
-            break;
-          case 1:
-            rhythmInstrumentRef.current.snare.triggerAttackRelease('8n');
-            break;
-          case 2:
-            rhythmInstrumentRef.current.hihat.triggerAttackRelease('8n');
-            break;
+        // Play sound when dragging into new cells
+        if (rhythmInstrumentRef.current && isDrumLoaded) {
+          switch (row) {
+            case 0:
+              rhythmInstrumentRef.current.kick.triggerAttackRelease('C1', '8n');
+              break;
+            case 1:
+              rhythmInstrumentRef.current.snare.triggerAttackRelease('8n');
+              break;
+            case 2:
+              rhythmInstrumentRef.current.hihat.triggerAttackRelease('8n');
+              break;
+          }
         }
       }
     }
