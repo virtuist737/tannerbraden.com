@@ -65,7 +65,7 @@ export default function LoopMachine() {
     enabled: true,
     retry: false
   });
-
+  
   // Handle successful preset loading
   useEffect(() => {
     if (defaultPreset) {
@@ -73,7 +73,7 @@ export default function LoopMachine() {
       loadPreset(defaultPreset);
     }
   }, [defaultPreset]);
-
+  
   // Fetch all presets for the dropdown
   const { data: presets } = useQuery<LoopMachinePreset[]>({
     queryKey: ['/api/loop-presets'],
@@ -88,7 +88,7 @@ export default function LoopMachine() {
     setSelectedSound(preset.selectedSound);
     setSelectedScale(preset.selectedScale as ScaleType);
     setNumBars(preset.numBars);
-
+    
     try {
       // Only set grids if they are valid arrays
       if (Array.isArray(preset.melodyGrid) && 
@@ -96,7 +96,7 @@ export default function LoopMachine() {
           Array.isArray(preset.melodyGrid[0])) {
         setMelodyGrid(preset.melodyGrid as boolean[][]);
       }
-
+      
       if (Array.isArray(preset.rhythmGrid) && 
           preset.rhythmGrid.length > 0 && 
           Array.isArray(preset.rhythmGrid[0])) {
@@ -105,7 +105,7 @@ export default function LoopMachine() {
     } catch (error) {
       console.error("Error loading grid data from preset:", error);
     }
-
+    
     toast({
       title: "Preset loaded",
       description: `Loaded preset: ${preset.name}`,
@@ -505,30 +505,6 @@ export default function LoopMachine() {
         >
           Clear
         </Button>
-
-        <Select 
-          value={selectedPresetId?.toString() || ''}
-          onValueChange={(value) => {
-            if (value) {
-              const preset = presets?.find(p => p.id.toString() === value);
-              if (preset) {
-                setSelectedPresetId(preset.id);
-                loadPreset(preset);
-              }
-            }
-          }}
-        >
-          <SelectTrigger className="w-32">
-            <SelectValue placeholder="Preset" />
-          </SelectTrigger>
-          <SelectContent>
-            {presets?.map((preset) => (
-              <SelectItem key={preset.id} value={preset.id.toString()}>
-                {preset.name}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
       </div>
 
       <div className="grid gap-6">
