@@ -9,6 +9,7 @@ import { Separator } from "@/components/ui/separator";
 import { ArrowLeft } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import LoopMachinePresetForm from "@/components/loop-machine/LoopMachinePresetForm";
+import { Star } from "lucide-react";
 
 export default function EditLoopMachinePreset() {
   const { id } = useParams();
@@ -28,60 +29,32 @@ export default function EditLoopMachinePreset() {
 
   // Update preset mutation
   const updatePresetMutation = useMutation({
-    mutationFn: async (data: InsertLoopMachinePreset) => {
-      const response = await apiRequest<LoopMachinePreset>(`/api/loop-machine-presets/${presetId}`, {
-        method: "PATCH",
-        body: JSON.stringify(data)
-      });
-      return response;
-    },
-    onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ["/api/loop-machine-presets"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/loop-machine-presets", presetId] });
-      toast({
-        title: "Preset updated",
-        description: "The preset has been successfully updated."
-      });
-      navigate("/admin/loop-machine");
-    },
-    onError: (error: Error) => {
-      toast({
-        title: "Error",
-        description: `Failed to update preset: ${error.message}`,
-        variant: "destructive"
-      });
-    }
-  });
-
-  const handleSubmit = async (data: InsertLoopMachinePreset) => {
-    updatePresetMutation.mutate(data);
-  };
-
-  // Update preset mutation
-  const updatePresetMutation = useMutation({
     mutationFn: async (data: Partial<InsertLoopMachinePreset>) => {
       return await apiRequest<LoopMachinePreset>(`/api/loop-presets/${presetId}`, {
         method: 'PATCH',
-        body: JSON.stringify(data),
+        body: JSON.stringify({ data }),
       });
     },
     onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/loop-machine-presets'] });
       toast({
-        title: "Preset updated",
-        description: "Loop machine preset has been updated successfully.",
+        title: "Success",
+        description: "Loop machine preset updated successfully",
       });
-      queryClient.invalidateQueries(["/api/loop-presets"]);
       navigate("/admin/loop-machine");
     },
-    onError: (error) => {
+    onError: () => {
       toast({
         title: "Error",
-        description: "Failed to update preset. Please try again.",
+        description: "Failed to update loop machine preset",
         variant: "destructive",
       });
-      console.error("Error updating preset:", error);
-    }
+    },
   });
+
+  const handleSubmit = (data: InsertLoopMachinePreset) => {
+    updatePresetMutation.mutate(data);
+  };
 
   // Set default preset mutation
   const setDefaultMutation = useMutation({
@@ -106,10 +79,6 @@ export default function EditLoopMachinePreset() {
       console.error("Error setting default preset:", error);
     }
   });
-
-  const handleSubmit = (data: Partial<InsertLoopMachinePreset>) => {
-    updatePresetMutation.mutate(data);
-  };
 
   if (isLoading) {
     return (
@@ -156,7 +125,7 @@ export default function EditLoopMachinePreset() {
         </div>
 
         <Separator className="my-6" />
-        
+
         <div className="flex justify-between mb-6">
           <div></div>
           <div className="flex gap-2">
@@ -170,7 +139,7 @@ export default function EditLoopMachinePreset() {
             </Button>
           </div>
         </div>
-        
+
         <div className="bg-card rounded-lg border p-6">
           <LoopMachinePresetForm
             initialValues={preset}
@@ -179,6 +148,7 @@ export default function EditLoopMachinePreset() {
           />
         </div>
 
+        {/* Kept the original error/loading handling for completeness */}
         {isLoading ? (
           <div className="flex justify-center p-8">
             <div className="animate-pulse space-y-4 w-full max-w-4xl">
@@ -191,8 +161,8 @@ export default function EditLoopMachinePreset() {
         ) : error ? (
           <div className="bg-destructive/10 text-destructive p-4 rounded-md">
             <p>Error loading preset: {(error as Error).message}</p>
-            <Button 
-              className="mt-4" 
+            <Button
+              className="mt-4"
               variant="outline"
               onClick={() => navigate("/admin/loop-machine")}
             >
@@ -213,8 +183,8 @@ export default function EditLoopMachinePreset() {
             <p className="mt-2 text-muted-foreground">
               The preset you're looking for doesn't exist or has been deleted.
             </p>
-            <Button 
-              className="mt-4" 
+            <Button
+              className="mt-4"
               onClick={() => navigate("/admin/loop-machine")}
             >
               Return to Presets
