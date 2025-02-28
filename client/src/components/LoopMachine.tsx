@@ -747,7 +747,7 @@ export default function LoopMachine() {
                           key={`${i}-${j}`}
                           custom={i * BEATS_PER_BAR + j} // Custom prop for staggered animation
                           variants={cellVariants}
-                          initial={isInitialLoad ? "initialLoad" : "inactive"}
+                          initial="inactive"
                           animate={
                             currentStep === j 
                               ? "pulse" 
@@ -810,7 +810,7 @@ export default function LoopMachine() {
                           key={`${i}-${j}`}
                           custom={(i+BEATS_PER_BAR) * BEATS_PER_BAR + j} // Custom prop for staggered animation
                           variants={cellVariants}
-                          initial={isInitialLoad ? "initialLoad" : "inactive"}
+                          initial="inactive"
                           animate={
                             currentStep === j 
                               ? "pulse" 
