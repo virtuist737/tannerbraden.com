@@ -254,7 +254,7 @@ export default function LoopMachinePresetForm({
               <FormItem>
                 <FormLabel>Number of Bars</FormLabel>
                 <Select
-                  value={field.value.toString()}
+                  value={field.value?.toString() || ""}
                   onValueChange={(value) => {
                     const newBars = parseInt(value);
                     field.onChange(newBars);
