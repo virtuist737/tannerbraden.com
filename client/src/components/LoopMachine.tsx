@@ -29,7 +29,12 @@ export default function LoopMachine() {
     Array(3).fill(null).map(() => Array(BEATS_PER_BAR*2).fill(false))
   );
   const [selectedSound, setSelectedSound] = useState('synth');
-  
+
+  // State for drag operations
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragValue, setDragValue] = useState(false);
+  const [dragTarget, setDragTarget] = useState<'melody' | 'rhythm' | null>(null);
+
   const { toast } = useToast();
   const [isDrumLoaded, setIsDrumLoaded] = useState(false); // Add loading state
 
@@ -144,6 +149,7 @@ export default function LoopMachine() {
     }
   }, [selectedSound, volume, toast]);
 
+  // Handle single cell toggle
   const toggleMelodyCell = (row: number, col: number) => {
     const newGrid = melodyGrid.map((r, i) =>
       i === row ? r.map((cell: boolean, j: number) =>
@@ -179,6 +185,109 @@ export default function LoopMachine() {
       }
     }
   };
+
+  // Drag selection handlers for melody grid
+  const handleMelodyDragStart = (row: number, col: number) => {
+    setIsDragging(true);
+    setDragTarget('melody');
+    setDragValue(!melodyGrid[row][col]); // Set to opposite of current state
+
+    // Apply to the initial cell
+    const newGrid = [...melodyGrid];
+    newGrid[row][col] = !melodyGrid[row][col];
+    setMelodyGrid(newGrid);
+
+    // Play sound if activating
+    if (!melodyGrid[row][col] && melodyInstrumentRef.current) {
+      melodyInstrumentRef.current.triggerAttackRelease(notes[row], "8n");
+    }
+  };
+
+  const handleMelodyDragEnter = (row: number, col: number) => {
+    if (isDragging && dragTarget === 'melody') {
+      const newGrid = [...melodyGrid];
+      newGrid[row][col] = dragValue;
+      setMelodyGrid(newGrid);
+
+      // Play sound if activating
+      if (dragValue && melodyInstrumentRef.current) {
+        melodyInstrumentRef.current.triggerAttackRelease(notes[row], "8n");
+      }
+    }
+  };
+
+  // Drag selection handlers for rhythm grid
+  const handleRhythmDragStart = (row: number, col: number) => {
+    setIsDragging(true);
+    setDragTarget('rhythm');
+    setDragValue(!rhythmGrid[row][col]); // Set to opposite of current state
+
+    // Apply to the initial cell
+    const newGrid = [...rhythmGrid];
+    newGrid[row][col] = !rhythmGrid[row][col];
+    setRhythmGrid(newGrid);
+
+    // Play sound if activating
+    if (!rhythmGrid[row][col] && rhythmInstrumentRef.current && isDrumLoaded) {
+      switch (row) {
+        case 0:
+          rhythmInstrumentRef.current.kick.triggerAttackRelease('C1', '8n');
+          break;
+        case 1:
+          rhythmInstrumentRef.current.snare.triggerAttackRelease('8n');
+          break;
+        case 2:
+          rhythmInstrumentRef.current.hihat.triggerAttackRelease('8n');
+          break;
+      }
+    }
+  };
+
+  const handleRhythmDragEnter = (row: number, col: number) => {
+    if (isDragging && dragTarget === 'rhythm') {
+      const newGrid = [...rhythmGrid];
+      newGrid[row][col] = dragValue;
+      setRhythmGrid(newGrid);
+
+      // Play sound if activating
+      if (dragValue && rhythmInstrumentRef.current && isDrumLoaded) {
+        switch (row) {
+          case 0:
+            rhythmInstrumentRef.current.kick.triggerAttackRelease('C1', '8n');
+            break;
+          case 1:
+            rhythmInstrumentRef.current.snare.triggerAttackRelease('8n');
+            break;
+          case 2:
+            rhythmInstrumentRef.current.hihat.triggerAttackRelease('8n');
+            break;
+        }
+      }
+    }
+  };
+
+  // End drag operation
+  const handleDragEnd = () => {
+    setIsDragging(false);
+    setDragTarget(null);
+  };
+
+  // Global mouse/touch event handlers
+  useEffect(() => {
+    const handleGlobalMouseUp = () => {
+      if (isDragging) {
+        handleDragEnd();
+      }
+    };
+
+    window.addEventListener('mouseup', handleGlobalMouseUp);
+    window.addEventListener('touchend', handleGlobalMouseUp);
+
+    return () => {
+      window.removeEventListener('mouseup', handleGlobalMouseUp);
+      window.removeEventListener('touchend', handleGlobalMouseUp);
+    };
+  }, [isDragging]);
 
   const togglePlay = useCallback(async () => {
     try {
@@ -342,7 +451,7 @@ export default function LoopMachine() {
           </SelectContent>
         </Select>
 
-        
+
 
         <Button 
           variant="outline"
@@ -366,12 +475,29 @@ export default function LoopMachine() {
                   {row.map((cell, j) => (
                     <button
                       key={`${i}-${j}`}
-                      onClick={() => toggleMelodyCell(i, j)}
+                      onMouseDown={() => handleMelodyDragStart(i, j)}
+                      onMouseEnter={() => handleMelodyDragEnter(i, j)}
+                      onTouchStart={() => handleMelodyDragStart(i, j)}
+                      onTouchMove={(e) => {
+                        // Get the touch element at the current position
+                        const touch = e.touches[0];
+                        const element = document.elementFromPoint(touch.clientX, touch.clientY);
+                        // Extract row and column from element's key if it exists
+                        const key = element?.getAttribute('data-key');
+                        if (key) {
+                          const [row, col] = key.split('-').map(Number);
+                          if (row !== undefined && col !== undefined) {
+                            handleMelodyDragEnter(row, col);
+                          }
+                        }
+                      }}
+                      data-key={`${i}-${j}`}
                       className={`
                         w-12 h-12 rounded transition-all
                         ${cell ? 'bg-primary' : 'bg-secondary'}
                         ${currentStep === j ? 'ring-2 ring-primary' : ''}
                         hover:opacity-80
+                        touch-none
                       `}
                     />
                   ))}
@@ -391,12 +517,29 @@ export default function LoopMachine() {
                   {row.map((cell, j) => (
                     <button
                       key={`${i}-${j}`}
-                      onClick={() => toggleRhythmCell(i, j)}
+                      onMouseDown={() => handleRhythmDragStart(i, j)}
+                      onMouseEnter={() => handleRhythmDragEnter(i, j)}
+                      onTouchStart={() => handleRhythmDragStart(i, j)}
+                      onTouchMove={(e) => {
+                        // Get the touch element at the current position
+                        const touch = e.touches[0];
+                        const element = document.elementFromPoint(touch.clientX, touch.clientY);
+                        // Extract row and column from element's key if it exists
+                        const key = element?.getAttribute('data-key');
+                        if (key) {
+                          const [row, col] = key.split('-').map(Number);
+                          if (row !== undefined && col !== undefined) {
+                            handleRhythmDragEnter(row, col);
+                          }
+                        }
+                      }}
+                      data-key={`${i}-${j}`}
                       className={`
                         w-12 h-12 rounded transition-all
                         ${cell ? 'bg-primary' : 'bg-secondary'}
                         ${currentStep === j ? 'ring-2 ring-primary' : ''}
                         hover:opacity-80
+                        touch-none
                       `}
                     />
                   ))}
