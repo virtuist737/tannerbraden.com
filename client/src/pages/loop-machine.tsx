@@ -22,11 +22,13 @@ export default function LoopMachinePage() {
         />
         <meta property="og:type" content="website" />
         <meta property="og:url" content={window.location.href} />
+        <meta property="og:image" content="https://res.cloudinary.com/dvk20sglr/image/upload/v1739851169/tanner2.0_dark-500x500_f0dznv.png" />
         <meta name="twitter:title" content="Loop Machine - Tanner Braden" />
         <meta 
           name="twitter:description"
           content="Interactive music creation tool."
         />
+        <meta name="twitter:image" content="https://res.cloudinary.com/dvk20sglr/image/upload/v1739851169/tanner2.0_dark-500x500_f0dznv.png" />
       </Helmet>
 
         <div className="container">

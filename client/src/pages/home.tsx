@@ -38,11 +38,13 @@ const Home = () => {
         />
         <meta property="og:type" content="website" />
         <meta property="og:url" content={window.location.href} />
+        <meta property="og:image" content="https://res.cloudinary.com/dvk20sglr/image/upload/v1739851169/tanner2.0_dark-500x500_f0dznv.png" />
         <meta name="twitter:title" content="Tanner Braden - Digital Creator & Consciousness Explorer" />
         <meta
           name="twitter:description"
           content="Creating digital applications and content focused on elevating human consciousness."
         />
+        <meta name="twitter:image" content="https://res.cloudinary.com/dvk20sglr/image/upload/v1739851169/tanner2.0_dark-500x500_f0dznv.png" />
       </Helmet>
 
       {/* Hero Section */}
