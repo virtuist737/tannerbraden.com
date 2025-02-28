@@ -20,7 +20,7 @@ const Home = () => {
   });
 
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex flex-col min-h-screen bg-gradient-to-b from-background to-primary/5">
       <Helmet>
         <title>Tanner Braden</title>
         <meta 
@@ -88,7 +88,7 @@ const Home = () => {
       </section>
 
       {/* Loop Machine Section */}
-      <section className="py-16 bg-gradient-to-b from-background to-primary/5">
+      <section className="py-16">
         <div className="container">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
