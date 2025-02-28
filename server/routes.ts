@@ -679,8 +679,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       console.log("PATCH request body for loop preset:", JSON.stringify(req.body, null, 2));
+      console.log("Request Content-Type:", req.headers['content-type']);
+      console.log("Request body type:", typeof req.body);
       
-      const parsedBody = insertLoopMachinePresetSchema.partial().safeParse(req.body);
+      // Determine content type and try to parse it if necessary
+      let inputData = req.body;
+      if (typeof req.body === 'string') {
+        try {
+          inputData = JSON.parse(req.body);
+          console.log("Parsed string body into object");
+        } catch (e) {
+          console.error("Failed to parse string body:", e);
+        }
+      }
+      
+      // Validate the data
+      const parsedBody = insertLoopMachinePresetSchema.partial().safeParse(inputData);
       if (!parsedBody.success) {
         console.error("Loop preset validation error:", parsedBody.error);
         return res.status(400).json({ 
@@ -690,6 +704,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       console.log("Parsed data to update:", JSON.stringify(parsedBody.data, null, 2));
+      
+      // Special handling for grid data
+      if (inputData.melodyGrid && !parsedBody.data.melodyGrid) {
+        console.log("Adding melodyGrid from input data");
+        parsedBody.data.melodyGrid = inputData.melodyGrid;
+      }
+      
+      if (inputData.rhythmGrid && !parsedBody.data.rhythmGrid) {
+        console.log("Adding rhythmGrid from input data");
+        parsedBody.data.rhythmGrid = inputData.rhythmGrid;
+      }
       
       const preset = await storage.updateLoopMachinePreset(id, parsedBody.data);
       if (!preset) {

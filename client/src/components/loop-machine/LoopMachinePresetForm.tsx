@@ -274,10 +274,23 @@ export default function LoopMachinePresetForm({
 
   // Debug form data before submit
   const handleFormSubmit = (data: LoopMachinePresetFormValues) => {
-    console.log("Submitting form data:", data);
-    console.log("melodyGrid dimensions:", data.melodyGrid?.length, "x", data.melodyGrid?.[0]?.length);
-    console.log("rhythmGrid dimensions:", data.rhythmGrid?.length, "x", data.rhythmGrid?.[0]?.length);
-    onSubmit(data);
+    // Get the current form state directly
+    const melodyGridData = form.getValues("melodyGrid");
+    const rhythmGridData = form.getValues("rhythmGrid");
+    
+    // Create a complete data object including grids
+    const completeData = {
+      ...data,
+      melodyGrid: melodyGridData,
+      rhythmGrid: rhythmGridData
+    };
+    
+    console.log("Submitting form data:", completeData);
+    console.log("melodyGrid dimensions:", completeData.melodyGrid?.length, "x", completeData.melodyGrid?.[0]?.length);
+    console.log("rhythmGrid dimensions:", completeData.rhythmGrid?.length, "x", completeData.rhythmGrid?.[0]?.length);
+    
+    // Submit the complete data
+    onSubmit(completeData);
   };
 
   return (
