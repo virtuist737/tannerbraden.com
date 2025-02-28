@@ -17,9 +17,9 @@ export default function EditLoopMachinePreset() {
   const { toast } = useToast();
   const presetId = parseInt(id);
 
-  // Fetch preset data
+  // Fetch preset data with a custom query function to get the specific preset
   const { data: preset, isLoading, error } = useQuery<LoopMachinePreset>({
-    queryKey: ["/api/loop-presets", presetId],
+    queryKey: [`/api/loop-presets/${presetId}`],
     enabled: !!presetId && !isNaN(presetId),
     staleTime: 0, // Always refetch to get the latest data
     refetchOnWindowFocus: false, // Don't refetch on window focus
