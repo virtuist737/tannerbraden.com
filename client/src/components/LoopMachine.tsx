@@ -5,9 +5,21 @@ import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card } from "@/components/ui/card";
-import { Volume2, Save, BookMarked } from 'lucide-react';
+import { 
+  Volume2, 
+  Play, 
+  Square, 
+  Music, 
+  Drum, 
+  BookMarked, 
+  ZoomIn, 
+  ZoomOut, 
+  Music2,
+  Disc3
+} from 'lucide-react';
 import { useToast } from "@/hooks/use-toast";
 import { LoopMachinePreset } from "@shared/schema";
+import { motion, AnimatePresence } from "framer-motion";
 
 const BEATS_PER_BAR = 8;
 const DEFAULT_BPM = 120;
@@ -157,14 +169,12 @@ export default function LoopMachine() {
 
         snare: new Tone.NoiseSynth({
           noise: { type: 'white' },
-          envelope: { attack: 0.001, decay: 0.4, sustain: 0.1 },
-          filter: { type: 'bandpass', Q: 2, frequency: 2000 }
+          envelope: { attack: 0.001, decay: 0.4, sustain: 0.1 }
         }).connect(masterVolumeRef.current),
 
         hihat: new Tone.NoiseSynth({
           noise: { type: 'white' },
-          envelope: { attack: 0.001, decay: 0.05, sustain: 0 },
-          filter: { type: 'highpass', frequency: 4000 }
+          envelope: { attack: 0.001, decay: 0.05, sustain: 0 }
         }).connect(masterVolumeRef.current)
       };
       setIsDrumLoaded(true);
@@ -407,191 +417,381 @@ export default function LoopMachine() {
     };
   }, []);
 
+  // Animation variants for cells
+  const cellVariants = {
+    inactive: { scale: 1 },
+    active: { scale: 1.1, transition: { type: "spring", stiffness: 500 } },
+    pulse: { 
+      scale: [1, 1.05, 1],
+      opacity: [1, 0.8, 1],
+      transition: { duration: 0.3 }
+    },
+    initialLoad: (delayIndex: number) => ({
+      scale: [0, 1.1, 1],
+      opacity: [0, 1],
+      transition: { 
+        delay: delayIndex * 0.01,
+        duration: 0.5,
+        ease: "easeOut"
+      }
+    })
+  };
+
+  // Add state for preset loading animation
+  const [isInitialLoad, setIsInitialLoad] = useState(true);
+  
+  // Handle initial preset loading animation
+  useEffect(() => {
+    if (defaultPreset && isInitialLoad) {
+      // Set a timer to turn off initial load animation
+      const timer = setTimeout(() => {
+        setIsInitialLoad(false);
+      }, 1500);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [defaultPreset, isInitialLoad]);
+
+  // Add notification feedback
+  const notifyChange = (message: string) => {
+    toast({
+      title: message,
+      duration: 1000,
+    });
+  };
+
   return (
-    <div className="space-y-6">
-      <div className="flex flex-wrap gap-4 items-center">
-        <Button 
-          onClick={togglePlay}
-          variant={isPlaying ? "destructive" : "default"}
-          className="min-w-[100px]"
-        >
-          {isPlaying ? 'Stop' : 'Play'}
-        </Button>
-
-        <div className="flex items-center gap-4">
-          <span className="text-sm whitespace-nowrap">BPM: {bpm}</span>
-          <div className="w-32">
-            <Slider
-              value={[bpm]}
-              onValueChange={(value) => setBpm(value[0])}
-              min={60}
-              max={200}
-              step={1}
-            />
-          </div>
+    <div className="max-w-5xl mx-auto">
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+        className="grid gap-8"
+      >
+        {/* Title Section */}
+        <div className="flex items-center justify-between">
+          <motion.div 
+            initial={{ x: -20, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            transition={{ delay: 0.2 }}
+            className="flex items-center space-x-3"
+          >
+            <Disc3 className="h-8 w-8 text-primary" />
+            <h2 className="text-2xl font-bold">Loop Machine</h2>
+          </motion.div>
+          
+          {presets && (
+            <motion.div 
+              initial={{ x: 20, opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              transition={{ delay: 0.2 }}
+              className="flex items-center space-x-2"
+            >
+              <Select 
+                value={selectedPresetId?.toString() || ''} 
+                onValueChange={(value) => {
+                  if (value) {
+                    const preset = presets.find(p => p.id === parseInt(value));
+                    if (preset) {
+                      setSelectedPresetId(preset.id);
+                      loadPreset(preset);
+                    }
+                  }
+                }}
+              >
+                <SelectTrigger className="w-[180px]">
+                  <SelectValue placeholder="Select Preset" />
+                </SelectTrigger>
+                <SelectContent>
+                  {presets.map((preset) => (
+                    <SelectItem key={preset.id} value={preset.id.toString()}>
+                      {preset.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </motion.div>
+          )}
         </div>
 
-        <div className="flex items-center gap-4">
-          <Volume2 className="w-4 h-4" />
-          <div className="w-32">
-            <Slider
-              value={[volume]}
-              onValueChange={(value) => setVolume(value[0])}
-              min={-40}
-              max={0}
-              step={1}
-            />
-          </div>
+        {/* Controls Section */}
+        <motion.div 
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.3 }}
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
+        >
+          <Card className="p-4 bg-card flex flex-col">
+            <h3 className="text-sm font-medium mb-3 flex items-center gap-2">
+              <Play className="h-4 w-4" /> Playback
+            </h3>
+            <div className="flex items-center gap-3 mb-4">
+              <Button 
+                onClick={togglePlay}
+                variant={isPlaying ? "destructive" : "default"}
+                className="flex-grow flex items-center justify-center gap-2"
+                size="lg"
+              >
+                {isPlaying ? (
+                  <>
+                    <Square className="h-4 w-4" /> Stop
+                  </>
+                ) : (
+                  <>
+                    <Play className="h-4 w-4" /> Play
+                  </>
+                )}
+              </Button>
+            </div>
+            <div className="flex items-center gap-3 mb-4">
+              <span className="text-sm whitespace-nowrap min-w-[60px]">BPM: {bpm}</span>
+              <Slider
+                value={[bpm]}
+                onValueChange={(value) => {
+                  setBpm(value[0]);
+                  notifyChange(`BPM: ${value[0]}`);
+                }}
+                min={60}
+                max={200}
+                step={1}
+                className="flex-grow"
+              />
+            </div>
+            <div className="flex items-center gap-3">
+              <Volume2 className="w-4 h-4 min-w-[24px]" />
+              <Slider
+                value={[volume]}
+                onValueChange={(value) => setVolume(value[0])}
+                min={-40}
+                max={0}
+                step={1}
+                className="flex-grow"
+              />
+            </div>
+          </Card>
+          
+          <Card className="p-4 bg-card flex flex-col">
+            <h3 className="text-sm font-medium mb-3 flex items-center gap-2">
+              <Music className="h-4 w-4" /> Sound
+            </h3>
+            <div className="grid gap-3">
+              <div className="flex items-center gap-2">
+                <span className="text-sm min-w-[60px]">Instrument:</span>
+                <div className="flex-grow">
+                  <Select value={selectedSound} onValueChange={setSelectedSound}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Sound" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="synth">Synth</SelectItem>
+                      <SelectItem value="piano">Piano</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+              
+              <div className="flex items-center gap-2">
+                <span className="text-sm min-w-[60px]">Scale:</span>
+                <div className="flex-grow">
+                  <Select 
+                    value={selectedScale} 
+                    onValueChange={(value: ScaleType) => setSelectedScale(value)}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select Scale" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {(Object.keys(scaleNotes) as ScaleType[]).map((scale) => (
+                        <SelectItem key={scale} value={scale}>
+                          {scale}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+            </div>
+          </Card>
+          
+          <Card className="p-4 bg-card flex flex-col">
+            <h3 className="text-sm font-medium mb-3 flex items-center gap-2">
+              <Music2 className="h-4 w-4" /> Grid Setup
+            </h3>
+            <div className="grid gap-3">
+              <div className="flex items-center gap-2">
+                <span className="text-sm min-w-[60px]">Bars:</span>
+                <div className="flex-grow">
+                  <Select 
+                    value={numBars.toString()} 
+                    onValueChange={(value) => {
+                      const newBars = parseInt(value);
+                      setNumBars(newBars);
+                      setMelodyGrid(Array(BEATS_PER_BAR).fill(null).map(() => Array(BEATS_PER_BAR * newBars).fill(false)));
+                      setRhythmGrid(Array(3).fill(null).map(() => Array(BEATS_PER_BAR * newBars).fill(false)));
+                      setCurrentStep(0);
+                      if (isPlaying) {
+                        togglePlay();
+                      }
+                      notifyChange(`Grid set to ${newBars} ${newBars === 1 ? 'bar' : 'bars'}`);
+                    }}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Bars" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="1">1 Bar</SelectItem>
+                      <SelectItem value="2">2 Bars</SelectItem>
+                      <SelectItem value="3">3 Bars</SelectItem>
+                      <SelectItem value="4">4 Bars</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+              
+              <Button 
+                variant="outline"
+                onClick={() => {
+                  setMelodyGrid(Array(BEATS_PER_BAR).fill(null).map(() => Array(BEATS_PER_BAR * numBars).fill(false)));
+                  setRhythmGrid(Array(3).fill(null).map(() => Array(BEATS_PER_BAR * numBars).fill(false)));
+                  notifyChange("Grid cleared");
+                }}
+                className="w-full"
+              >
+                Clear Grid
+              </Button>
+            </div>
+          </Card>
+        </motion.div>
+
+        {/* Grid Section */}
+        <div className="grid md:grid-cols-2 gap-6">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4 }}
+          >
+            <Card className="p-6 overflow-hidden">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-semibold flex items-center gap-2">
+                  <Music className="h-5 w-5" /> 
+                  Melody
+                </h3>
+              </div>
+              
+              <div className="grid gap-2">
+                {melodyGrid.map((row, i) => (
+                  <div key={i} className="flex gap-1 items-center">
+                    <span className="w-12 text-sm font-medium text-right mr-2">{notes[i]}</span>
+                    <div className="flex gap-1">
+                      {row.map((cell, j) => (
+                        <motion.button
+                          key={`${i}-${j}`}
+                          custom={i * BEATS_PER_BAR + j} // Custom prop for staggered animation
+                          variants={cellVariants}
+                          initial={isInitialLoad ? "initialLoad" : "inactive"}
+                          animate={
+                            currentStep === j 
+                              ? "pulse" 
+                              : cell 
+                                ? "active" 
+                                : "inactive"
+                          }
+                          onMouseDown={() => handleMelodyDragStart(i, j)}
+                          onMouseEnter={() => handleMelodyDragEnter(i, j)}
+                          onTouchStart={() => handleMelodyDragStart(i, j)}
+                          onTouchMove={(e) => {
+                            const touch = e.touches[0];
+                            const element = document.elementFromPoint(touch.clientX, touch.clientY);
+                            const key = element?.getAttribute('data-key');
+                            if (key) {
+                              const [row, col] = key.split('-').map(Number);
+                              if (row !== undefined && col !== undefined) {
+                                handleMelodyDragEnter(row, col);
+                              }
+                            }
+                          }}
+                          data-key={`${i}-${j}`}
+                          className={`
+                            w-11 h-11 rounded-md transition-colors
+                            ${cell ? 'bg-primary shadow-lg' : 'bg-secondary hover:bg-secondary/80'}
+                            ${currentStep === j ? 'ring-2 ring-primary-foreground' : ''}
+                            touch-none
+                          `}
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </Card>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5 }}
+          >
+            <Card className="p-6 overflow-hidden">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-semibold flex items-center gap-2">
+                  <Drum className="h-5 w-5" /> 
+                  Rhythm
+                </h3>
+              </div>
+              
+              <div className="grid gap-4">
+                {rhythmGrid.map((row, i) => (
+                  <div key={i} className="flex gap-1 items-center">
+                    <span className="w-14 text-sm font-medium text-right mr-2">{drumLabels[i]}</span>
+                    <div className="flex gap-1">
+                      {row.map((cell, j) => (
+                        <motion.button
+                          key={`${i}-${j}`}
+                          custom={(i+BEATS_PER_BAR) * BEATS_PER_BAR + j} // Custom prop for staggered animation
+                          variants={cellVariants}
+                          initial={isInitialLoad ? "initialLoad" : "inactive"}
+                          animate={
+                            currentStep === j 
+                              ? "pulse" 
+                              : cell 
+                                ? "active" 
+                                : "inactive"
+                          }
+                          onMouseDown={() => handleRhythmDragStart(i, j)}
+                          onMouseEnter={() => handleRhythmDragEnter(i, j)}
+                          onTouchStart={() => handleRhythmDragStart(i, j)}
+                          onTouchMove={(e) => {
+                            const touch = e.touches[0];
+                            const element = document.elementFromPoint(touch.clientX, touch.clientY);
+                            const key = element?.getAttribute('data-key');
+                            if (key) {
+                              const [row, col] = key.split('-').map(Number);
+                              if (row !== undefined && col !== undefined) {
+                                handleRhythmDragEnter(row, col);
+                              }
+                            }
+                          }}
+                          data-key={`${i}-${j}`}
+                          className={`
+                            w-11 h-11 rounded-md transition-colors
+                            ${cell ? 'bg-primary shadow-lg' : 'bg-secondary hover:bg-secondary/80'}
+                            ${currentStep === j ? 'ring-2 ring-primary-foreground' : ''}
+                            touch-none
+                          `}
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </Card>
+          </motion.div>
         </div>
-
-        <Select value={selectedSound} onValueChange={setSelectedSound}>
-          <SelectTrigger className="w-32">
-            <SelectValue placeholder="Sound" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="synth">Synth</SelectItem>
-            <SelectItem value="piano">Piano</SelectItem>
-          </SelectContent>
-        </Select>
-
-        <Select 
-          value={selectedScale} 
-          onValueChange={(value: ScaleType) => setSelectedScale(value)}
-        >
-          <SelectTrigger className="w-40">
-            <SelectValue placeholder="Select Scale" />
-          </SelectTrigger>
-          <SelectContent>
-            {(Object.keys(scaleNotes) as ScaleType[]).map((scale) => (
-              <SelectItem key={scale} value={scale}>
-                {scale}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-
-        <Select 
-          value={numBars.toString()} 
-          onValueChange={(value) => {
-            const newBars = parseInt(value);
-            setNumBars(newBars);
-            setMelodyGrid(Array(BEATS_PER_BAR).fill(null).map(() => Array(BEATS_PER_BAR * newBars).fill(false)));
-            setRhythmGrid(Array(3).fill(null).map(() => Array(BEATS_PER_BAR * newBars).fill(false)));
-            setCurrentStep(0);
-            if (isPlaying) {
-              togglePlay();
-            }
-          }}
-        >
-          <SelectTrigger className="w-32">
-            <SelectValue placeholder="Bars" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="1">1 Bar</SelectItem>
-            <SelectItem value="2">2 Bars</SelectItem>
-            <SelectItem value="3">3 Bars</SelectItem>
-            <SelectItem value="4">4 Bars</SelectItem>
-          </SelectContent>
-        </Select>
-
-
-
-        <Button 
-          variant="outline"
-          onClick={() => {
-            setMelodyGrid(Array(BEATS_PER_BAR).fill(null).map(() => Array(BEATS_PER_BAR * numBars).fill(false)));
-            setRhythmGrid(Array(3).fill(null).map(() => Array(BEATS_PER_BAR * numBars).fill(false)));
-          }}
-        >
-          Clear
-        </Button>
-      </div>
-
-      <div className="grid gap-6">
-        <Card className="p-6">
-          <h3 className="text-lg font-semibold mb-4">Melody</h3>
-          <div className="grid gap-1">
-            {melodyGrid.map((row, i) => (
-              <div key={i} className="flex gap-1 items-center">
-                <span className="w-12 text-sm text-right mr-2">{notes[i]}</span>
-                <div className="flex gap-1">
-                  {row.map((cell, j) => (
-                    <button
-                      key={`${i}-${j}`}
-                      onMouseDown={() => handleMelodyDragStart(i, j)}
-                      onMouseEnter={() => handleMelodyDragEnter(i, j)}
-                      onTouchStart={() => handleMelodyDragStart(i, j)}
-                      onTouchMove={(e) => {
-                        // Get the touch element at the current position
-                        const touch = e.touches[0];
-                        const element = document.elementFromPoint(touch.clientX, touch.clientY);
-                        // Extract row and column from element's key if it exists
-                        const key = element?.getAttribute('data-key');
-                        if (key) {
-                          const [row, col] = key.split('-').map(Number);
-                          if (row !== undefined && col !== undefined) {
-                            handleMelodyDragEnter(row, col);
-                          }
-                        }
-                      }}
-                      data-key={`${i}-${j}`}
-                      className={`
-                        w-12 h-12 rounded transition-all
-                        ${cell ? 'bg-primary' : 'bg-secondary'}
-                        ${currentStep === j ? 'ring-2 ring-primary' : ''}
-                        hover:opacity-80
-                        touch-none
-                      `}
-                    />
-                  ))}
-                </div>
-              </div>
-            ))}
-          </div>
-        </Card>
-
-        <Card className="p-6">
-          <h3 className="text-lg font-semibold mb-4">Rhythm</h3>
-          <div className="grid gap-1">
-            {rhythmGrid.map((row, i) => (
-              <div key={i} className="flex gap-1 items-center">
-                <span className="w-12 text-sm text-right mr-2">{drumLabels[i]}</span>
-                <div className="flex gap-1">
-                  {row.map((cell, j) => (
-                    <button
-                      key={`${i}-${j}`}
-                      onMouseDown={() => handleRhythmDragStart(i, j)}
-                      onMouseEnter={() => handleRhythmDragEnter(i, j)}
-                      onTouchStart={() => handleRhythmDragStart(i, j)}
-                      onTouchMove={(e) => {
-                        // Get the touch element at the current position
-                        const touch = e.touches[0];
-                        const element = document.elementFromPoint(touch.clientX, touch.clientY);
-                        // Extract row and column from element's key if it exists
-                        const key = element?.getAttribute('data-key');
-                        if (key) {
-                          const [row, col] = key.split('-').map(Number);
-                          if (row !== undefined && col !== undefined) {
-                            handleRhythmDragEnter(row, col);
-                          }
-                        }
-                      }}
-                      data-key={`${i}-${j}`}
-                      className={`
-                        w-12 h-12 rounded transition-all
-                        ${cell ? 'bg-primary' : 'bg-secondary'}
-                        ${currentStep === j ? 'ring-2 ring-primary' : ''}
-                        hover:opacity-80
-                        touch-none
-                      `}
-                    />
-                  ))}
-                </div>
-              </div>
-            ))}
-          </div>
-        </Card>
-      </div>
+      </motion.div>
     </div>
   );
 }

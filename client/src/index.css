@@ -10,4 +10,72 @@
   body {
     @apply font-sans antialiased bg-background text-foreground;
   }
+  
+  :root {
+    --primary: 251 83% 60%;
+    --primary-foreground: 0 0% 98%;
+    
+    --ring: 251 83% 60%;
+    
+    --accent: 251 83% 95%;
+    --accent-foreground: 251 83% 30%;
+    
+    --radius: 0.8rem;
+  }
+  
+  .dark {
+    --primary: 251 83% 60%;
+    --primary-foreground: 0 0% 98%;
+    
+    --ring: 251 83% 60%;
+    
+    --accent: 251 83% 25%;
+    --accent-foreground: 0 0% 98%;
+  }
+}
+
+/* Loop Machine Animation Styles */
+@keyframes cellPulse {
+  0% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.05); opacity: 0.8; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.cell-active {
+  animation: cellPulse 0.3s ease;
+}
+
+.grid-cell-appear {
+  animation: gridCellAppear 0.5s ease-out forwards;
+}
+
+@keyframes gridCellAppear {
+  from { transform: scale(0); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+/* Loop Machine Grid Animation */
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+}
+
+.active-cell {
+  box-shadow: 0 0 8px 2px var(--color-primary);
+}
+
+.current-step {
+  position: relative;
+}
+
+.current-step::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: hsl(var(--primary));
 }
