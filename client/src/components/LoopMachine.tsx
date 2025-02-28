@@ -752,8 +752,51 @@ export default function LoopMachine() {
               <Button 
                 variant="outline"
                 onClick={() => {
-                  setMelodyGrid(Array(BEATS_PER_BAR).fill(null).map(() => Array(BEATS_PER_BAR * numBars).fill(false)));
-                  setRhythmGrid(Array(3).fill(null).map(() => Array(BEATS_PER_BAR * numBars).fill(false)));
+                  // Create new empty grids
+                  const newMelodyGrid = Array(BEATS_PER_BAR).fill(null).map(() => Array(BEATS_PER_BAR * numBars).fill(false));
+                  const newRhythmGrid = Array(3).fill(null).map(() => Array(BEATS_PER_BAR * numBars).fill(false));
+                  
+                  // Update state
+                  setMelodyGrid(newMelodyGrid);
+                  setRhythmGrid(newRhythmGrid);
+                  
+                  // If sequence is playing, update it with the cleared grids
+                  if (isPlaying && sequenceRef.current) {
+                    // Stop current sequence
+                    sequenceRef.current.dispose();
+                    
+                    // Create new sequence with empty grids
+                    sequenceRef.current = new Tone.Sequence((time, step) => {
+                      setCurrentStep(step);
+                      
+                      // With cleared grids, there won't be any active notes
+                      // But we'll keep the structure to maintain playback
+                      const activeMelodyNotes = newMelodyGrid.map((row, rowIndex) => 
+                        row[step] ? notes[rowIndex] : null
+                      ).filter(Boolean);
+                      
+                      if (activeMelodyNotes.length && melodyInstrumentRef.current) {
+                        melodyInstrumentRef.current.triggerAttackRelease(activeMelodyNotes, '8n', time);
+                      }
+                      
+                      newRhythmGrid.forEach((row, rowIndex) => {
+                        if (row[step] && rhythmInstrumentRef.current && isDrumLoaded) {
+                          switch (rowIndex) {
+                            case 0:
+                              rhythmInstrumentRef.current.kick.triggerAttackRelease('C1', '8n', time);
+                              break;
+                            case 1:
+                              rhythmInstrumentRef.current.snare.triggerAttackRelease('8n', time);
+                              break;
+                            case 2:
+                              rhythmInstrumentRef.current.hihat.triggerAttackRelease('8n', time);
+                              break;
+                          }
+                        }
+                      });
+                    }, Array.from({ length: BEATS_PER_BAR * numBars }, (_, i) => i), '8n').start(0);
+                  }
+                  
                   notifyChange("Grid cleared");
                 }}
                 className="w-full"
