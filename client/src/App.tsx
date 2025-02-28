@@ -38,6 +38,7 @@ import EditProject from "@/pages/admin/projects/[id]/edit";
 import AdminLoopMachinePresets from "@/pages/admin/loop-machine";
 import NewLoopMachinePreset from "@/pages/admin/loop-machine/new";
 import EditLoopMachinePreset from "@/pages/admin/loop-machine/[id]/edit";
+import LoopMachinePage from "@/pages/loop-machine"; // Added import for the new page
 
 export default function App() {
   return (
@@ -75,6 +76,7 @@ export default function App() {
                 <ProtectedRoute path="/admin/loop-machine" component={AdminLoopMachinePresets} />
                 <ProtectedRoute path="/admin/loop-machine/new" component={NewLoopMachinePreset} />
                 <ProtectedRoute path="/admin/loop-machine/:id/edit" component={EditLoopMachinePreset} />
+                <Route path="/loop-machine" component={LoopMachinePage} /> {/* Added route for loop-machine page */}
                 <Route component={NotFound} />
               </Switch>
             </main>
