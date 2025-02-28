@@ -678,7 +678,7 @@ export default function LoopMachine() {
                 </h3>
               </div>
 
-              <div className="grid gap-2">
+              <div className="grid gap-2 pr-4"> {/* Added right padding */}
                 {melodyGrid.map((row, i) => (
                   <div key={i} className="flex gap-1 items-center">
                     <span className="w-12 text-sm font-medium text-right mr-2">{notes[i]}</span>
@@ -741,7 +741,7 @@ export default function LoopMachine() {
                 </h3>
               </div>
 
-              <div className="grid gap-4">
+              <div className="grid gap-4 pr-4"> {/* Added right padding */}
                 {rhythmGrid.map((row, i) => (
                   <div key={i} className="flex gap-1 items-center">
                     <span className="w-14 text-sm font-medium text-right mr-2">{drumLabels[i]}</span>
