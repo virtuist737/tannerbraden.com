@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { ResponsiveContainer, LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip } from "recharts";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Eye, Clock, MousePointer, PenSquare, Mail, Smartphone, History, Heart, Star, Code } from "lucide-react";
+import { Eye, Clock, MousePointer, PenSquare, Mail, Smartphone, History, Heart, Star, Code, Music } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
 import { useQuery } from "@tanstack/react-query";
@@ -200,6 +200,21 @@ const Dashboard = () => {
               <CardContent>
                 <p className="text-sm text-muted-foreground">
                   Manage newsletter subscribers
+                </p>
+              </CardContent>
+            </Card>
+          </Link>
+          <Link href="/admin/loop-machine">
+            <Card className="hover:bg-accent transition-colors cursor-pointer">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Music className="h-5 w-5" />
+                  Loop Machine Presets
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground">
+                  Manage default settings and presets for the Loop Machine
                 </p>
               </CardContent>
             </Card>
