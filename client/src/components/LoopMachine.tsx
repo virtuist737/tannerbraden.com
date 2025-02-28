@@ -1,11 +1,13 @@
-import { useEffect, useState, useCallback, useRef, useMemo } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import * as Tone from 'tone';
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card } from "@/components/ui/card";
-import { Volume2 } from 'lucide-react';
+import { Volume2, Save, BookMarked } from 'lucide-react';
 import { useToast } from "@/hooks/use-toast";
+import { LoopMachinePreset } from "@shared/schema";
 
 const BEATS_PER_BAR = 8;
 const DEFAULT_BPM = 120;
@@ -13,6 +15,19 @@ const DEFAULT_BPM = 120;
 // Drum configuration
 const drumLabels = ['Kick', 'Snare', 'Hi-Hat'];
 
+// Define scale notes
+const scaleNotes = {
+  'Pentatonic Major': ['E5', 'D5', 'C5', 'A4', 'G4', 'E4', 'D4', 'C4'],
+  'Pentatonic Minor': ['F5', 'Eb5', 'C5', 'Bb4', 'G4', 'F4', 'Eb4', 'C4'],
+  'Ionian Mode': ['C5', 'B4', 'A4', 'G4', 'F4', 'E4', 'D4', 'C4'],
+  'Harmonic Minor': ['C5', 'B4', 'Ab4', 'G4', 'F4', 'Eb4', 'D4', 'C4'],
+  'Melodic Minor': ['C5', 'B4', 'A4', 'G4', 'F4', 'Eb4', 'D4', 'C4'],
+  'Blues Scale': ['Eb5', 'C5', 'Bb4', 'G4', 'F#4', 'F4', 'Eb4', 'C4'],
+  'Dorian Mode': ['C5', 'Bb4', 'A4', 'G4', 'F4', 'Eb4', 'D4', 'C4'],
+  'Mixolydian Mode': ['C5', 'Bb4', 'A4', 'G4', 'F4', 'E4', 'D4', 'C4'],
+  'Phrygian Mode': ['C5', 'Bb4', 'Ab4', 'G4', 'F4', 'Eb4', 'Db4', 'C4'],
+  'Japanese Hirajoshi': ['Eb5', 'D5', 'C5', 'Ab4', 'G4', 'Eb4', 'D4', 'C4'],
+} as const;
 
 type ScaleType = keyof typeof scaleNotes;
 
@@ -29,6 +44,7 @@ export default function LoopMachine() {
     Array(3).fill(null).map(() => Array(BEATS_PER_BAR*2).fill(false))
   );
   const [selectedSound, setSelectedSound] = useState('synth');
+  const [selectedPresetId, setSelectedPresetId] = useState<number | null>(null);
 
   // State for drag operations
   const [isDragging, setIsDragging] = useState(false);
@@ -43,31 +59,63 @@ export default function LoopMachine() {
   const sequenceRef = useRef<any>();
   const masterVolumeRef = useRef<any>();
 
-  const scales = [
-    'Pentatonic Major',
-    'Pentatonic Minor',
-    'Ionian Mode',
-    'Harmonic Minor',
-    'Melodic Minor',
-    'Blues Scale',
-    'Dorian Mode',
-    'Mixolydian Mode',
-    'Phrygian Mode',
-    'Japanese Hirajoshi',
-  ];
+  // Fetch default preset
+  const { data: defaultPreset, isLoading: isLoadingPreset } = useQuery({
+    queryKey: ['/api/loop-presets/default'],
+    enabled: true,
+    retry: false,
+    onSuccess: (data: any) => {
+      if (data) {
+        setSelectedPresetId(data.id);
+        loadPreset(data);
+      }
+    },
+    onError: () => {
+      // If there's no default preset, use the defaults already set
+      toast({
+        title: "No default preset found",
+        description: "Using built-in default settings",
+      });
+    }
+  });
 
-  const scaleNotes = {
-    'Pentatonic Major': ['E5', 'D5', 'C5', 'A4', 'G4', 'E4', 'D4', 'C4'],
-    'Pentatonic Minor': ['F5', 'Eb5', 'C5', 'Bb4', 'G4', 'F4', 'Eb4', 'C4'],
-    'Ionian Mode': ['C5', 'B4', 'A4', 'G4', 'F4', 'E4', 'D4', 'C4'],
-    'Harmonic Minor': ['C5', 'B4', 'Ab4', 'G4', 'F4', 'Eb4', 'D4', 'C4'],
-    'Melodic Minor': ['C5', 'B4', 'A4', 'G4', 'F4', 'Eb4', 'D4', 'C4'],
-    'Blues Scale': ['Eb5', 'C5', 'Bb4', 'G4', 'F#4', 'F4', 'Eb4', 'C4'],
-    'Dorian Mode': ['C5', 'Bb4', 'A4', 'G4', 'F4', 'Eb4', 'D4', 'C4'],
-    'Mixolydian Mode': ['C5', 'Bb4', 'A4', 'G4', 'F4', 'E4', 'D4', 'C4'],
-    'Phrygian Mode': ['C5', 'Bb4', 'Ab4', 'G4', 'F4', 'Eb4', 'Db4', 'C4'],
-    'Japanese Hirajoshi': ['Eb5', 'D5', 'C5', 'Ab4', 'G4', 'Eb4', 'D4', 'C4'],
-  } as const;
+  // Fetch all presets for the preset selector
+  const { data: presets } = useQuery({
+    queryKey: ['/api/loop-presets'],
+    retry: false,
+    enabled: true
+  });
+
+  // Function to load a preset
+  const loadPreset = (preset: LoopMachinePreset) => {
+    setBpm(preset.bpm);
+    setVolume(preset.volume);
+    setSelectedSound(preset.selectedSound);
+    setSelectedScale(preset.selectedScale as ScaleType);
+    setNumBars(preset.numBars);
+    
+    try {
+      // Only set grids if they are valid arrays
+      if (Array.isArray(preset.melodyGrid) && 
+          preset.melodyGrid.length > 0 && 
+          Array.isArray(preset.melodyGrid[0])) {
+        setMelodyGrid(preset.melodyGrid as boolean[][]);
+      }
+      
+      if (Array.isArray(preset.rhythmGrid) && 
+          preset.rhythmGrid.length > 0 && 
+          Array.isArray(preset.rhythmGrid[0])) {
+        setRhythmGrid(preset.rhythmGrid as boolean[][]);
+      }
+    } catch (error) {
+      console.error("Error loading grid data from preset:", error);
+    }
+    
+    toast({
+      title: "Preset loaded",
+      description: `Loaded preset: ${preset.name}`,
+    });
+  };
 
   const [selectedScale, setSelectedScale] = useState<ScaleType>('Pentatonic Major');
   const notes = scaleNotes[selectedScale];
