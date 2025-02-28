@@ -18,19 +18,19 @@ export default function AdminLoopMachinePresets() {
 
   // Fetch all presets
   const { data: presets, isLoading, error } = useQuery({
-    queryKey: ["/api/loop-machine-presets"],
+    queryKey: ["/api/loop-presets"],
     select: (data: LoopMachinePreset[]) => data
   });
 
   // Delete mutation
   const deletePresetMutation = useMutation({
     mutationFn: async (id: number) => {
-      await apiRequest(`/api/loop-machine-presets/${id}`, {
+      await apiRequest(`/api/loop-presets/${id}`, {
         method: "DELETE"
       });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/loop-machine-presets"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/loop-presets"] });
       toast({
         title: "Preset deleted",
         description: "The preset has been successfully deleted."
@@ -49,12 +49,12 @@ export default function AdminLoopMachinePresets() {
   // Set default preset mutation
   const setDefaultPresetMutation = useMutation({
     mutationFn: async (id: number) => {
-      await apiRequest(`/api/loop-machine-presets/${id}/default`, {
+      await apiRequest(`/api/loop-presets/${id}/set-default`, {
         method: "POST"
       });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/loop-machine-presets"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/loop-presets"] });
       toast({
         title: "Default preset updated",
         description: "The default preset has been updated successfully."

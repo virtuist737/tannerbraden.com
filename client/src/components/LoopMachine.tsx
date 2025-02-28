@@ -60,30 +60,25 @@ export default function LoopMachine() {
   const masterVolumeRef = useRef<any>();
 
   // Fetch default preset
-  const { data: defaultPreset, isLoading: isLoadingPreset } = useQuery({
+  const { data: defaultPreset, isLoading: isLoadingPreset } = useQuery<LoopMachinePreset>({
     queryKey: ['/api/loop-presets/default'],
     enabled: true,
-    retry: false,
-    onSuccess: (data: any) => {
-      if (data) {
-        setSelectedPresetId(data.id);
-        loadPreset(data);
-      }
-    },
-    onError: () => {
-      // If there's no default preset, use the defaults already set
-      toast({
-        title: "No default preset found",
-        description: "Using built-in default settings",
-      });
-    }
+    retry: false
   });
-
-  // Fetch all presets for the preset selector
-  const { data: presets } = useQuery({
+  
+  // Handle successful preset loading
+  useEffect(() => {
+    if (defaultPreset) {
+      setSelectedPresetId(defaultPreset.id);
+      loadPreset(defaultPreset);
+    }
+  }, [defaultPreset]);
+  
+  // Fetch all presets for the dropdown
+  const { data: presets } = useQuery<LoopMachinePreset[]>({
     queryKey: ['/api/loop-presets'],
-    retry: false,
-    enabled: true
+    enabled: true,
+    retry: false
   });
 
   // Function to load a preset

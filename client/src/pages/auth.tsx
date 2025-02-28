@@ -27,7 +27,7 @@ export default function AuthPage() {
 
   useEffect(() => {
     if (user) {
-      setLocation("/");
+      setLocation("/admin/loop-machine");
     }
   }, [user, setLocation]);
 
@@ -51,9 +51,9 @@ export default function AuthPage() {
       <div className="grid grid-cols-2 place-content-center w-full gap-12">
         <div className="flex flex-col justify-center space-y-6">
           <div className="space-y-2 text-center">
-            <h1 className="text-3xl font-bold">Admin Login</h1>
+            <h1 className="text-3xl font-bold">Loop Machine Admin</h1>
             <p className="text-muted-foreground">
-              Access your personal website's admin dashboard
+              Access the Loop Machine preset management system
             </p>
           </div>
 
@@ -112,20 +112,20 @@ export default function AuthPage() {
         <div className="flex flex-col justify-center">
           <div className="space-y-6">
             <h2 className="text-3xl font-bold tracking-tighter">
-              Personal Website Admin
+              Loop Machine Preset System
             </h2>
             <ul className="space-y-4 text-muted-foreground">
               <li className="flex items-center gap-2">
-                ✨ Manage your portfolio projects
+                🎵 Manage custom sound presets
               </li>
               <li className="flex items-center gap-2">
-                📝 Write and publish blog posts
+                🎛️ Configure default BPM and volume settings
               </li>
               <li className="flex items-center gap-2">
-                📊 View website analytics
+                🎹 Create custom melody and rhythm patterns
               </li>
               <li className="flex items-center gap-2">
-                💌 Manage newsletter subscribers
+                🌟 Set default presets for all users
               </li>
             </ul>
           </div>
