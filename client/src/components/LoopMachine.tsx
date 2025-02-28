@@ -77,7 +77,7 @@ export default function LoopMachine() {
     enabled: true,
     retry: false
   });
-  
+
   // Handle successful preset loading
   useEffect(() => {
     if (defaultPreset) {
@@ -85,7 +85,7 @@ export default function LoopMachine() {
       loadPreset(defaultPreset);
     }
   }, [defaultPreset]);
-  
+
   // Fetch all presets for the dropdown
   const { data: presets } = useQuery<LoopMachinePreset[]>({
     queryKey: ['/api/loop-presets'],
@@ -100,7 +100,7 @@ export default function LoopMachine() {
     setSelectedSound(preset.selectedSound);
     setSelectedScale(preset.selectedScale as ScaleType);
     setNumBars(preset.numBars);
-    
+
     try {
       // Only set grids if they are valid arrays
       if (Array.isArray(preset.melodyGrid) && 
@@ -108,7 +108,7 @@ export default function LoopMachine() {
           Array.isArray(preset.melodyGrid[0])) {
         setMelodyGrid(preset.melodyGrid as boolean[][]);
       }
-      
+
       if (Array.isArray(preset.rhythmGrid) && 
           preset.rhythmGrid.length > 0 && 
           Array.isArray(preset.rhythmGrid[0])) {
@@ -117,7 +117,7 @@ export default function LoopMachine() {
     } catch (error) {
       console.error("Error loading grid data from preset:", error);
     }
-    
+
     toast({
       title: "Preset loaded",
       description: `Loaded preset: ${preset.name}`,
@@ -439,7 +439,7 @@ export default function LoopMachine() {
 
   // Add state for preset loading animation
   const [isInitialLoad, setIsInitialLoad] = useState(true);
-  
+
   // Handle initial preset loading animation
   useEffect(() => {
     if (defaultPreset && isInitialLoad) {
@@ -447,7 +447,7 @@ export default function LoopMachine() {
       const timer = setTimeout(() => {
         setIsInitialLoad(false);
       }, 1500);
-      
+
       return () => clearTimeout(timer);
     }
   }, [defaultPreset, isInitialLoad]);
@@ -479,7 +479,7 @@ export default function LoopMachine() {
             <Disc3 className="h-8 w-8 text-primary" />
             <h2 className="text-2xl font-bold">Loop Machine</h2>
           </motion.div>
-          
+
           {presets && (
             <motion.div 
               initial={{ x: 20, opacity: 0 }}
@@ -569,7 +569,7 @@ export default function LoopMachine() {
               />
             </div>
           </Card>
-          
+
           <Card className="p-4 bg-card flex flex-col">
             <h3 className="text-sm font-medium mb-3 flex items-center gap-2">
               <Music className="h-4 w-4" /> Sound
@@ -589,7 +589,7 @@ export default function LoopMachine() {
                   </Select>
                 </div>
               </div>
-              
+
               <div className="flex items-center gap-2">
                 <span className="text-sm min-w-[60px]">Scale:</span>
                 <div className="flex-grow">
@@ -612,7 +612,7 @@ export default function LoopMachine() {
               </div>
             </div>
           </Card>
-          
+
           <Card className="p-4 bg-card flex flex-col">
             <h3 className="text-sm font-medium mb-3 flex items-center gap-2">
               <Music2 className="h-4 w-4" /> Grid Setup
@@ -647,7 +647,7 @@ export default function LoopMachine() {
                   </Select>
                 </div>
               </div>
-              
+
               <Button 
                 variant="outline"
                 onClick={() => {
@@ -670,14 +670,14 @@ export default function LoopMachine() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4 }}
           >
-            <Card className="p-6 overflow-hidden">
+            <Card className="p-6 overflow-x-auto relative"> {/* Changed overflow-hidden to overflow-x-auto and added relative */}
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-lg font-semibold flex items-center gap-2">
                   <Music className="h-5 w-5" /> 
                   Melody
                 </h3>
               </div>
-              
+
               <div className="grid gap-2">
                 {melodyGrid.map((row, i) => (
                   <div key={i} className="flex gap-1 items-center">
@@ -733,14 +733,14 @@ export default function LoopMachine() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.5 }}
           >
-            <Card className="p-6 overflow-hidden">
+            <Card className="p-6 overflow-x-auto relative"> {/* Changed overflow-hidden to overflow-x-auto and added relative */}
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-lg font-semibold flex items-center gap-2">
                   <Drum className="h-5 w-5" /> 
                   Rhythm
                 </h3>
               </div>
-              
+
               <div className="grid gap-4">
                 {rhythmGrid.map((row, i) => (
                   <div key={i} className="flex gap-1 items-center">
