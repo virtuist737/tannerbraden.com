@@ -8,8 +8,10 @@ class AnalyticsTracker {
   private isTracking: boolean = false;
   private maxScrollDepth: number = 0;
   private sessionId: string = '';
+  private pageViewId: number | null = null;
   private debounceTimer: ReturnType<typeof setTimeout> | null = null;
   private exitTracking: boolean = false;
+  private currentPath: string = '';
 
   constructor() {
     // Generate a session ID if one doesn't exist
@@ -55,14 +57,28 @@ class AnalyticsTracker {
    */
   private async recordPageView(path: string, scrollDepth: number): Promise<void> {
     try {
-      await apiRequest(`/api/analytics/pageview`, {
+      console.log('Recording page view:', { path, scrollDepth, sessionId: this.sessionId });
+      
+      this.currentPath = path;
+      
+      const response = await apiRequest(`/api/analytics/pageview`, {
         method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
         body: JSON.stringify({
           path,
           scrollDepth,
           sessionId: this.sessionId
         }),
       });
+      
+      // Parse the response to get the page view ID
+      const data = await response.json();
+      if (data && data.pageViewId) {
+        this.pageViewId = data.pageViewId;
+        console.log('Received page view ID:', this.pageViewId);
+      }
     } catch (error) {
       console.error('Failed to record page view:', error);
     }
@@ -73,13 +89,24 @@ class AnalyticsTracker {
    */
   private async updatePageMetrics(duration: number): Promise<void> {
     try {
+      console.log('Updating page metrics:', { 
+        duration, 
+        scrollDepth: this.maxScrollDepth, 
+        sessionId: this.sessionId,
+        isExit: this.exitTracking
+      });
+      
       await apiRequest(`/api/analytics/pageview/update`, {
         method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
         body: JSON.stringify({
+          pageViewId: this.pageViewId,
           duration,
           scrollDepth: this.maxScrollDepth,
-          sessionId: this.sessionId,
-          isExit: this.exitTracking
+          isExit: this.exitTracking,
+          isBounce: duration < 10 // Consider less than 10 seconds as bounce
         }),
       });
     } catch (error) {

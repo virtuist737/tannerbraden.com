@@ -82,9 +82,9 @@ export default function App() {
                 <ProtectedRoute path="/admin/timeline" component={AdminTimeline} />
                 <ProtectedRoute path="/admin/timeline/new" component={NewTimelineEntry} />
                 <ProtectedRoute path="/admin/timeline/:id/edit" component={EditTimelineEntry} />
-                <ProtectedRoute path="/admin/favorites" component={FavoritesList} />
-                <ProtectedRoute path="/admin/favorites/new" component={NewFavorite} />
-                <ProtectedRoute path="/admin/favorites/:id/edit" component={EditFavorite} />
+                <ProtectedRoute path="/admin/favorites" component={() => <FavoritesList />} />
+                <ProtectedRoute path="/admin/favorites/new" component={() => <NewFavorite />} />
+                <ProtectedRoute path="/admin/favorites/:id/edit" component={() => <EditFavorite />} />
                 <ProtectedRoute path="/admin/projects" component={AdminProjects} />
                 <ProtectedRoute path="/admin/projects/new" component={NewProject} />
                 <ProtectedRoute path="/admin/projects/:id/edit" component={EditProject} />

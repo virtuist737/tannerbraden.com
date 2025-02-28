@@ -280,7 +280,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
 
-      res.status(201).json({ message: "Page view recorded", pageViewId: pageView.id });
+      res.status(201).json({ 
+        message: "Page view recorded", 
+        pageViewId: pageView.id,
+        sessionId: sessionId 
+      });
     } catch (error) {
       console.error("Error recording page view:", error);
       res.status(500).json({ error: "Failed to record page view" });
@@ -290,6 +294,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Endpoint to update existing page view (for exit tracking, scroll depth, etc.)
   app.post("/api/analytics/pageview/update", async (req, res) => {
     try {
+      console.log("Analytics pageview update request body:", req.body);
       const { pageViewId, duration, scrollDepth, isExit, isBounce } = req.body;
       
       if (!pageViewId) {
@@ -303,6 +308,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (isExit !== undefined) updates.isExit = isExit;
       if (isBounce !== undefined) updates.isBounce = isBounce;
       
+      console.log(`Updating pageview ${pageViewId} with:`, updates);
       const updatedView = await storage.updatePageView(pageViewId, updates);
       
       if (!updatedView) {
