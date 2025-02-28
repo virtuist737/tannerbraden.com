@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -77,26 +77,48 @@ export default function LoopMachinePresetForm({
 
   // Get values from initialValues if provided (for editing) or use defaults
   const formValues = initialValues ? {
-    name: initialValues.name,
+    name: initialValues.name || "",
     description: initialValues.description || "",
-    bpm: initialValues.bpm,
-    volume: initialValues.volume,
-    selectedSound: initialValues.selectedSound as "synth" | "piano",
-    selectedScale: initialValues.selectedScale as any,
-    numBars: initialValues.numBars,
-    // Make sure any JSON fields are properly parsed
-    melodyGrid: Array.isArray(initialValues.melodyGrid) 
-      ? initialValues.melodyGrid 
-      : typeof initialValues.melodyGrid === 'string' 
-        ? JSON.parse(initialValues.melodyGrid as unknown as string)
-        : defaultValues.melodyGrid,
-    rhythmGrid: Array.isArray(initialValues.rhythmGrid) 
-      ? initialValues.rhythmGrid 
-      : typeof initialValues.rhythmGrid === 'string' 
-        ? JSON.parse(initialValues.rhythmGrid as unknown as string) 
-        : defaultValues.rhythmGrid,
-    isDefault: initialValues.isDefault,
+    bpm: initialValues.bpm || 120,
+    volume: initialValues.volume || -10,
+    selectedSound: (initialValues.selectedSound as "synth" | "piano") || "synth",
+    selectedScale: (initialValues.selectedScale as any) || "Pentatonic Major",
+    numBars: initialValues.numBars || 2,
+    // Handle grid data that could be arrays or stringified JSON
+    melodyGrid: (() => {
+      if (Array.isArray(initialValues.melodyGrid)) {
+        return initialValues.melodyGrid;
+      } else if (typeof initialValues.melodyGrid === 'string') {
+        try {
+          return JSON.parse(initialValues.melodyGrid);
+        } catch (e) {
+          console.error("Error parsing melodyGrid:", e);
+          return defaultValues.melodyGrid;
+        }
+      } else {
+        console.log("Using default melodyGrid");
+        return defaultValues.melodyGrid;
+      }
+    })(),
+    rhythmGrid: (() => {
+      if (Array.isArray(initialValues.rhythmGrid)) {
+        return initialValues.rhythmGrid;
+      } else if (typeof initialValues.rhythmGrid === 'string') {
+        try {
+          return JSON.parse(initialValues.rhythmGrid);
+        } catch (e) {
+          console.error("Error parsing rhythmGrid:", e);
+          return defaultValues.rhythmGrid;
+        }
+      } else {
+        console.log("Using default rhythmGrid");
+        return defaultValues.rhythmGrid;
+      }
+    })(),
+    isDefault: initialValues.isDefault || false,
   } : defaultValues;
+  
+  console.log("Form values:", formValues);
 
   const form = useForm<LoopMachinePresetFormValues>({
     resolver: zodResolver(loopMachinePresetFormSchema),
@@ -124,6 +146,52 @@ export default function LoopMachinePresetForm({
 
   // Calculate grid dimensions based on number of bars
   const gridCols = numBars * 16; // 16 steps per bar
+  
+  // Initial setup and cleanup side effects
+  useEffect(() => {
+    if (initialValues) {
+      console.log("Initial values:", initialValues);
+    }
+    
+    // Initialize form fields on mount
+    return () => {
+      console.log("Form component unmounting");
+    };
+  }, []); // Run only on mount
+
+  // Make sure we have appropriate grids based on actual data and activeTab
+  useEffect(() => {
+    console.log("Grid update triggered by tab change or numBars change");
+    
+    // Ensure melody grid has correct dimensions
+    let currentMelodyGrid = form.getValues("melodyGrid");
+    if (!currentMelodyGrid || !Array.isArray(currentMelodyGrid) || currentMelodyGrid.length === 0) {
+      console.log("Initializing melody grid with empty grid");
+      currentMelodyGrid = createEmptyGrid(8, gridCols);
+      setValue("melodyGrid", currentMelodyGrid);
+    } else {
+      console.log("Existing melody grid dimensions:", 
+        currentMelodyGrid.length, "rows ×", 
+        currentMelodyGrid[0]?.length || 0, "columns");
+    }
+    
+    // Ensure rhythm grid has correct dimensions
+    let currentRhythmGrid = form.getValues("rhythmGrid");
+    if (!currentRhythmGrid || !Array.isArray(currentRhythmGrid) || currentRhythmGrid.length === 0) {
+      console.log("Initializing rhythm grid with empty grid");
+      currentRhythmGrid = createEmptyGrid(3, gridCols);
+      setValue("rhythmGrid", currentRhythmGrid);
+    } else {
+      console.log("Existing rhythm grid dimensions:", 
+        currentRhythmGrid.length, "rows ×", 
+        currentRhythmGrid[0]?.length || 0, "columns");
+    }
+    
+    // Force refresh on tab change to ensure grid is rendered properly
+    setTimeout(() => {
+      resizeGrids();
+    }, 0);
+  }, [activeTab, numBars, form]);
 
   // Resize grids when numBars changes
   const resizeGrids = () => {

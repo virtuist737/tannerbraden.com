@@ -20,8 +20,14 @@ export default function EditLoopMachinePreset() {
   // Fetch preset data
   const { data: preset, isLoading, error } = useQuery<LoopMachinePreset>({
     queryKey: ["/api/loop-presets", presetId],
-    enabled: !!presetId && !isNaN(presetId)
+    enabled: !!presetId && !isNaN(presetId),
+    staleTime: 0, // Always refetch to get the latest data
+    refetchOnWindowFocus: false, // Don't refetch on window focus
+    refetchInterval: false,
   });
+  
+  // Log the data for debugging
+  console.log("Preset data from query:", preset);
 
   // Update preset mutation
   const updatePresetMutation = useMutation({
