@@ -17,11 +17,8 @@ export default function AdminLoopMachinePresets() {
   const [presetToDelete, setPresetToDelete] = useState<number | null>(null);
 
   // Fetch all presets
-  const { data: presets, isLoading, error } = useQuery({
+  const { data: presets, isLoading, error } = useQuery<LoopMachinePreset[]>({
     queryKey: ["/api/loop-presets"],
-    queryFn: async () => {
-      return await apiRequest<LoopMachinePreset[]>("/api/loop-presets");
-    },
     retry: 3
   });
 
@@ -124,9 +121,9 @@ export default function AdminLoopMachinePresets() {
           <div className="bg-destructive/10 text-destructive p-4 rounded-md">
             <p>Error loading presets: {(error as Error).message}</p>
           </div>
-        ) : presets && presets.length > 0 ? (
+        ) : presets && Array.isArray(presets) && presets.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {presets.map((preset) => (
+            {presets.map((preset: LoopMachinePreset) => (
               <Card key={preset.id} className={preset.isDefault ? "border-primary" : ""}>
                 <CardHeader>
                   <div className="flex items-center justify-between">
