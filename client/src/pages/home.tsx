@@ -20,7 +20,7 @@ const Home = () => {
   });
 
   return (
-    <div className="flex flex-col min-h-screen bg-gradient-to-b from-background to-primary/5">
+    <div className="flex flex-col min-h-screen">
       <Helmet>
         <title>Tanner Braden</title>
         <meta 
