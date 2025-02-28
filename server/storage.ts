@@ -1,4 +1,4 @@
-import { eq, sql } from "drizzle-orm";
+import { eq, sql, and, not } from "drizzle-orm";
 import { db } from "./db";
 import session from "express-session";
 import connectPg from "connect-pg-simple";
@@ -13,6 +13,7 @@ import {
   interests,
   favorites,
   projects,
+  loopMachinePresets,
   type User,
   type InsertUser,
   type BlogPost,
@@ -29,6 +30,8 @@ import {
   type InsertFavorite,
   type Project,
   type InsertProject,
+  type LoopMachinePreset,
+  type InsertLoopMachinePreset,
 } from "@shared/schema";
 
 const PostgresSessionStore = connectPg(session);
@@ -98,6 +101,15 @@ export interface IStorage {
   updateProject(id: number, updates: Partial<InsertProject>): Promise<Project | undefined>;
   deleteProject(id: number): Promise<boolean>;
   updateProjectImage(id: number, imageUrl: string): Promise<Project>;
+  
+  // Loop Machine Preset operations
+  createLoopMachinePreset(preset: InsertLoopMachinePreset): Promise<LoopMachinePreset>;
+  getLoopMachinePreset(id: number): Promise<LoopMachinePreset | undefined>;
+  listLoopMachinePresets(): Promise<LoopMachinePreset[]>;
+  updateLoopMachinePreset(id: number, updates: Partial<InsertLoopMachinePreset>): Promise<LoopMachinePreset | undefined>;
+  deleteLoopMachinePreset(id: number): Promise<boolean>;
+  getDefaultLoopMachinePreset(): Promise<LoopMachinePreset | undefined>;
+  setDefaultLoopMachinePreset(id: number): Promise<LoopMachinePreset>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -405,6 +417,93 @@ export class DatabaseStorage implements IStorage {
       .where(eq(projects.id, id))
       .returning();
     return updated;
+  }
+
+  // Loop Machine Preset operations
+  async createLoopMachinePreset(preset: InsertLoopMachinePreset): Promise<LoopMachinePreset> {
+    // If this preset is set as default, clear any existing default first
+    if (preset.isDefault) {
+      await db
+        .update(loopMachinePresets)
+        .set({ isDefault: false })
+        .where(eq(loopMachinePresets.isDefault, true));
+    }
+    
+    const [newPreset] = await db.insert(loopMachinePresets).values(preset).returning();
+    return newPreset;
+  }
+
+  async getLoopMachinePreset(id: number): Promise<LoopMachinePreset | undefined> {
+    const [preset] = await db.select().from(loopMachinePresets).where(eq(loopMachinePresets.id, id));
+    return preset;
+  }
+
+  async listLoopMachinePresets(): Promise<LoopMachinePreset[]> {
+    return db
+      .select()
+      .from(loopMachinePresets)
+      .orderBy(loopMachinePresets.name);
+  }
+
+  async updateLoopMachinePreset(id: number, updates: Partial<InsertLoopMachinePreset>): Promise<LoopMachinePreset | undefined> {
+    // If this preset is being set as default, clear any existing default first
+    if (updates.isDefault) {
+      await db
+        .update(loopMachinePresets)
+        .set({ isDefault: false })
+        .where(and(eq(loopMachinePresets.isDefault, true), not(eq(loopMachinePresets.id, id))));
+    }
+    
+    const [updatedPreset] = await db
+      .update(loopMachinePresets)
+      .set({
+        ...updates,
+        updatedAt: new Date(),
+      })
+      .where(eq(loopMachinePresets.id, id))
+      .returning();
+    
+    return updatedPreset;
+  }
+
+  async deleteLoopMachinePreset(id: number): Promise<boolean> {
+    const [deletedPreset] = await db
+      .delete(loopMachinePresets)
+      .where(eq(loopMachinePresets.id, id))
+      .returning();
+    return !!deletedPreset;
+  }
+
+  async getDefaultLoopMachinePreset(): Promise<LoopMachinePreset | undefined> {
+    const [preset] = await db
+      .select()
+      .from(loopMachinePresets)
+      .where(eq(loopMachinePresets.isDefault, true));
+    return preset;
+  }
+
+  async setDefaultLoopMachinePreset(id: number): Promise<LoopMachinePreset> {
+    // Clear any existing default preset
+    await db
+      .update(loopMachinePresets)
+      .set({ isDefault: false })
+      .where(eq(loopMachinePresets.isDefault, true));
+    
+    // Set the new default preset
+    const [updatedPreset] = await db
+      .update(loopMachinePresets)
+      .set({ 
+        isDefault: true,
+        updatedAt: new Date()
+      })
+      .where(eq(loopMachinePresets.id, id))
+      .returning();
+    
+    if (!updatedPreset) {
+      throw new Error(`Loop machine preset with id ${id} not found`);
+    }
+    
+    return updatedPreset;
   }
 }
 

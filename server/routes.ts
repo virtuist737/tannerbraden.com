@@ -7,7 +7,8 @@ import {
   insertTimelineSchema,
   insertFavoriteSchema,
   insertInterestSchema,
-  insertProjectSchema
+  insertProjectSchema,
+  insertLoopMachinePresetSchema
 } from "@shared/schema";
 import { isAuthenticated } from "./auth";
 import * as UAParser from "ua-parser-js";
@@ -608,6 +609,122 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error fetching project:", error);
       res.status(500).json({ error: "Failed to fetch project" });
+    }
+  });
+
+  // Loop Machine Preset Routes
+  app.get("/api/loop-presets", async (req, res) => {
+    try {
+      const presets = await storage.listLoopMachinePresets();
+      res.json(presets);
+    } catch (error) {
+      console.error("Error fetching loop machine presets:", error);
+      res.status(500).json({ error: "Failed to fetch loop machine presets" });
+    }
+  });
+
+  app.get("/api/loop-presets/default", async (req, res) => {
+    try {
+      const preset = await storage.getDefaultLoopMachinePreset();
+      if (!preset) {
+        return res.status(404).json({ error: "No default preset found" });
+      }
+      res.json(preset);
+    } catch (error) {
+      console.error("Error fetching default loop machine preset:", error);
+      res.status(500).json({ error: "Failed to fetch default loop machine preset" });
+    }
+  });
+
+  app.get("/api/loop-presets/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ error: "Invalid preset ID" });
+      }
+      const preset = await storage.getLoopMachinePreset(id);
+      if (!preset) {
+        return res.status(404).json({ error: "Preset not found" });
+      }
+      res.json(preset);
+    } catch (error) {
+      console.error("Error fetching loop machine preset:", error);
+      res.status(500).json({ error: "Failed to fetch loop machine preset" });
+    }
+  });
+
+  app.post("/api/loop-presets", isAuthenticated, async (req, res) => {
+    try {
+      const parsedBody = insertLoopMachinePresetSchema.safeParse(req.body);
+      if (!parsedBody.success) {
+        return res.status(400).json({ 
+          error: "Invalid preset data", 
+          details: parsedBody.error 
+        });
+      }
+
+      const preset = await storage.createLoopMachinePreset(parsedBody.data);
+      res.status(201).json(preset);
+    } catch (error) {
+      console.error("Error creating loop machine preset:", error);
+      res.status(500).json({ error: "Failed to create loop machine preset" });
+    }
+  });
+
+  app.patch("/api/loop-presets/:id", isAuthenticated, async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ error: "Invalid preset ID" });
+      }
+
+      const parsedBody = insertLoopMachinePresetSchema.partial().safeParse(req.body);
+      if (!parsedBody.success) {
+        return res.status(400).json({ 
+          error: "Invalid preset data", 
+          details: parsedBody.error 
+        });
+      }
+
+      const preset = await storage.updateLoopMachinePreset(id, parsedBody.data);
+      if (!preset) {
+        return res.status(404).json({ error: "Preset not found" });
+      }
+      res.json(preset);
+    } catch (error) {
+      console.error("Error updating loop machine preset:", error);
+      res.status(500).json({ error: "Failed to update loop machine preset" });
+    }
+  });
+
+  app.delete("/api/loop-presets/:id", isAuthenticated, async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ error: "Invalid preset ID" });
+      }
+      const success = await storage.deleteLoopMachinePreset(id);
+      if (!success) {
+        return res.status(404).json({ error: "Preset not found" });
+      }
+      res.status(204).end();
+    } catch (error) {
+      console.error("Error deleting loop machine preset:", error);
+      res.status(500).json({ error: "Failed to delete loop machine preset" });
+    }
+  });
+
+  app.post("/api/loop-presets/:id/set-default", isAuthenticated, async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ error: "Invalid preset ID" });
+      }
+      const preset = await storage.setDefaultLoopMachinePreset(id);
+      res.json(preset);
+    } catch (error) {
+      console.error("Error setting default loop machine preset:", error);
+      res.status(500).json({ error: "Failed to set default loop machine preset" });
     }
   });
 
