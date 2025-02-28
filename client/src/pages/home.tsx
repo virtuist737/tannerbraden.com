@@ -22,26 +22,26 @@ const Home = () => {
   return (
     <div className="flex flex-col min-h-screen">
       <Helmet>
-        <title>Tanner Braden</title>
-        <meta 
+        <title>Tanner Braden - Digital Creator & Consciousness Explorer</title>
+        <meta
           name="description"
-          content="Creating apps and content to reducing human suffering and increase the quality of human consciousness."
+          content="Creating digital applications and content focused on elevating human consciousness. Developing solutions that help people achieve greater awareness and personal growth."
         />
-        <meta 
-          name="keywords" 
-          content="consciousness, suffering, virtues, virtuist, neurodivergence, partnerships, growth, digital marketing, program development, partner programs" 
+        <meta
+          name="keywords"
+          content="consciousness technology, digital wellbeing, mindfulness apps, human potential, personal growth"
         />
-        <meta property="og:title" content="Tanner Braden" />
-        <meta 
-          property="og:description" 
-          content="Creating apps and content to reducing human suffering and increase the quality of human consciousness."
+        <meta property="og:title" content="Tanner Braden - Digital Creator & Consciousness Explorer" />
+        <meta
+          property="og:description"
+          content="Creating digital applications and content focused on elevating human consciousness."
         />
         <meta property="og:type" content="website" />
         <meta property="og:url" content={window.location.href} />
-        <meta name="twitter:title" content="Tanner Braden" />
-        <meta 
+        <meta name="twitter:title" content="Tanner Braden - Digital Creator & Consciousness Explorer" />
+        <meta
           name="twitter:description"
-          content="Creating apps and content to reducing human suffering and increase the quality of human consciousness."
+          content="Creating digital applications and content focused on elevating human consciousness."
         />
       </Helmet>
 

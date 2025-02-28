@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { Helmet } from 'react-helmet-async';
 
 const Blog = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -43,6 +44,30 @@ const Blog = () => {
   }
 
   return (
+    <>
+      <Helmet>
+        <title>Blog - Tanner Braden</title>
+        <meta
+          name="description"
+          content="Thoughts, ideas, and insights on consciousness development, technology for wellbeing, and personal growth strategies."
+        />
+        <meta
+          name="keywords"
+          content="consciousness blog, digital wellbeing, mindfulness technology, human potential, personal growth"
+        />
+        <meta property="og:title" content="Blog - Tanner Braden" />
+        <meta
+          property="og:description"
+          content="Thoughts, ideas, and insights on consciousness development, technology for wellbeing, and personal growth."
+        />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content={window.location.href} />
+        <meta name="twitter:title" content="Blog - Tanner Braden" />
+        <meta
+          name="twitter:description"
+          content="Thoughts, ideas, and insights on consciousness development, technology for wellbeing, and personal growth."
+        />
+      </Helmet>
     <div className="container py-12">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -100,6 +125,7 @@ const Blog = () => {
         )}
       </motion.div>
     </div>
+    </>
   );
 };
 

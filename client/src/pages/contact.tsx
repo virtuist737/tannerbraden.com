@@ -14,6 +14,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Linkedin, Twitter } from "lucide-react";
+import { Helmet } from 'react-helmet-async';
 
 const contactFormSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
@@ -41,6 +42,30 @@ const Contact = () => {
   };
 
   return (
+    <>
+      <Helmet>
+        <title>Contact - Tanner Braden</title>
+        <meta
+          name="description"
+          content="Connect with me about consciousness-enhancing projects, collaboration opportunities, or questions about my work."
+        />
+        <meta
+          name="keywords"
+          content="contact, collaboration, consciousness technology, digital wellbeing, mindfulness tech"
+        />
+        <meta property="og:title" content="Contact - Tanner Braden" />
+        <meta
+          property="og:description"
+          content="Connect with me about consciousness-enhancing projects or collaboration opportunities."
+        />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content={window.location.href} />
+        <meta name="twitter:title" content="Contact - Tanner Braden" />
+        <meta
+          name="twitter:description"
+          content="Connect with me about consciousness-enhancing projects or collaboration opportunities."
+        />
+      </Helmet>
     <div className="container py-12">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -157,6 +182,7 @@ const Contact = () => {
         </div>
       </motion.div>
     </div>
+    </>
   );
 };
 
