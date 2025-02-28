@@ -635,7 +635,7 @@ export default function LoopMachine() {
                          selectedSound === 'synth-square' ? 'Square Synth' : 
                          selectedSound === 'synth-sawtooth' ? 'Sawtooth Synth' : 
                          selectedSound === 'synth-sine' ? 'Sine Synth' : 
-                         selectedSound === 'synth-fm' ? 'FM Synth' : 'Sound'}
+                         selectedSound === 'synth-fm' ? 'FM Synth' : 'Triangle Synth'}
                       </SelectValue>
                     </SelectTrigger>
                     <SelectContent>
