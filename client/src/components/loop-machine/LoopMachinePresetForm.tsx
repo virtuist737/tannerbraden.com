@@ -77,7 +77,13 @@ export default function LoopMachinePresetForm({
 
   // Get values from initialValues if provided (for editing) or use defaults
   const formValues = initialValues ? {
-    ...initialValues,
+    name: initialValues.name,
+    description: initialValues.description || "",
+    bpm: initialValues.bpm,
+    volume: initialValues.volume,
+    selectedSound: initialValues.selectedSound as "synth" | "piano",
+    selectedScale: initialValues.selectedScale as any,
+    numBars: initialValues.numBars,
     // Make sure any JSON fields are properly parsed
     melodyGrid: Array.isArray(initialValues.melodyGrid) 
       ? initialValues.melodyGrid 
@@ -89,6 +95,7 @@ export default function LoopMachinePresetForm({
       : typeof initialValues.rhythmGrid === 'string' 
         ? JSON.parse(initialValues.rhythmGrid as unknown as string) 
         : defaultValues.rhythmGrid,
+    isDefault: initialValues.isDefault,
   } : defaultValues;
 
   const form = useForm<LoopMachinePresetFormValues>({

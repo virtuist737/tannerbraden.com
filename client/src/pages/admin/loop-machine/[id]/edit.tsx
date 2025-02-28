@@ -18,12 +18,8 @@ export default function EditLoopMachinePreset() {
   const presetId = parseInt(id);
 
   // Fetch preset data
-  const { data: preset, isLoading, error } = useQuery({
-    queryKey: ["/api/loop-machine-presets", presetId],
-    queryFn: async () => {
-      const data = await apiRequest<LoopMachinePreset>(`/api/loop-machine-presets/${presetId}`);
-      return data;
-    },
+  const { data: preset, isLoading, error } = useQuery<LoopMachinePreset>({
+    queryKey: ["/api/loop-presets", presetId],
     enabled: !!presetId && !isNaN(presetId)
   });
 
@@ -32,18 +28,19 @@ export default function EditLoopMachinePreset() {
     mutationFn: async (data: Partial<InsertLoopMachinePreset>) => {
       return await apiRequest<LoopMachinePreset>(`/api/loop-presets/${presetId}`, {
         method: 'PATCH',
-        body: JSON.stringify({ data }),
+        body: JSON.stringify(data),
       });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/loop-machine-presets'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/loop-presets'] });
       toast({
         title: "Success",
         description: "Loop machine preset updated successfully",
       });
       navigate("/admin/loop-machine");
     },
-    onError: () => {
+    onError: (error) => {
+      console.error("Update error:", error);
       toast({
         title: "Error",
         description: "Failed to update loop machine preset",
@@ -147,50 +144,6 @@ export default function EditLoopMachinePreset() {
             isSubmitting={updatePresetMutation.isPending}
           />
         </div>
-
-        {/* Kept the original error/loading handling for completeness */}
-        {isLoading ? (
-          <div className="flex justify-center p-8">
-            <div className="animate-pulse space-y-4 w-full max-w-4xl">
-              <div className="h-8 bg-muted rounded w-1/3"></div>
-              <div className="h-24 bg-muted rounded"></div>
-              <div className="h-24 bg-muted rounded"></div>
-              <div className="h-12 bg-muted rounded w-1/4 ml-auto"></div>
-            </div>
-          </div>
-        ) : error ? (
-          <div className="bg-destructive/10 text-destructive p-4 rounded-md">
-            <p>Error loading preset: {(error as Error).message}</p>
-            <Button
-              className="mt-4"
-              variant="outline"
-              onClick={() => navigate("/admin/loop-machine")}
-            >
-              Return to Presets
-            </Button>
-          </div>
-        ) : preset ? (
-          <div className="max-w-4xl mx-auto">
-            <LoopMachinePresetForm
-              initialData={preset}
-              onSubmit={handleSubmit}
-              isSubmitting={updatePresetMutation.isPending}
-            />
-          </div>
-        ) : (
-          <div className="text-center p-12 border rounded-md">
-            <h3 className="mt-4 text-lg font-medium">Preset not found</h3>
-            <p className="mt-2 text-muted-foreground">
-              The preset you're looking for doesn't exist or has been deleted.
-            </p>
-            <Button
-              className="mt-4"
-              onClick={() => navigate("/admin/loop-machine")}
-            >
-              Return to Presets
-            </Button>
-          </div>
-        )}
       </div>
     </ProtectedRoute>
   );
