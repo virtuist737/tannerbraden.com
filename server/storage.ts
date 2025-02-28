@@ -56,9 +56,14 @@ export interface IStorage {
   listNewsletterSubscribers(): Promise<NewsletterSubscription[]>;
 
   // Analytics operations
-  recordPageView(path: string, userAgent?: string, referrer?: string): Promise<PageView>;
+  recordPageView(path: string, userAgent?: string, referrer?: string, sessionId?: string): Promise<PageView>;
   updatePageView(id: number, updates: Partial<PageView>): Promise<PageView | undefined>;
   getPageViews(startDate: Date, endDate: Date): Promise<PageView[]>;
+  getPageViewsByPath(startDate: Date, endDate: Date): Promise<{ path: string; count: number; date: string }[]>;
+  getTopPages(limit?: number): Promise<{ path: string; count: number }[]>;
+  getDeviceStats(): Promise<Record<string, number>>;
+  getBrowserStats(): Promise<Record<string, number>>;
+  getPageViewTrends(days?: number): Promise<{ date: string; count: number }[]>;
 
   // Session operations
   createUserSession(sessionId: string, userId?: number): Promise<UserSession>;
@@ -202,7 +207,8 @@ export class DatabaseStorage implements IStorage {
   async recordPageView(
     path: string,
     userAgent?: string,
-    referrer?: string
+    referrer?: string,
+    sessionId?: string
   ): Promise<PageView> {
     const [pageView] = await db
       .insert(pageViews)
@@ -225,6 +231,97 @@ export class DatabaseStorage implements IStorage {
       .select()
       .from(pageViews)
       .where(sql`${pageViews.timestamp} BETWEEN ${startDate} AND ${endDate}`);
+  }
+  
+  async getPageViewsByPath(startDate: Date, endDate: Date): Promise<{ path: string; count: number; date: string }[]> {
+    const result = await db.execute(sql`
+      SELECT 
+        path, 
+        COUNT(*) as count, 
+        DATE_TRUNC('day', timestamp) as date
+      FROM page_views
+      WHERE timestamp BETWEEN ${startDate} AND ${endDate}
+      GROUP BY path, DATE_TRUNC('day', timestamp)
+      ORDER BY date ASC, count DESC
+    `);
+    
+    return result.rows.map(row => ({
+      path: String(row.path || ''),
+      count: Number(row.count || 0),
+      date: String(row.date || '')
+    }));
+  }
+  
+  async getTopPages(limit: number = 10): Promise<{ path: string; count: number }[]> {
+    const result = await db.execute(sql`
+      SELECT path, COUNT(*) as count
+      FROM page_views
+      GROUP BY path
+      ORDER BY count DESC
+      LIMIT ${limit}
+    `);
+    
+    return result.rows.map(row => ({
+      path: String(row.path || ''),
+      count: Number(row.count || 0)
+    }));
+  }
+  
+  async getDeviceStats(): Promise<Record<string, number>> {
+    const result = await db.execute(sql`
+      SELECT device_type, COUNT(*) as count
+      FROM page_views
+      WHERE device_type IS NOT NULL
+      GROUP BY device_type
+      ORDER BY count DESC
+    `);
+    
+    const stats: Record<string, number> = {};
+    for (const row of result.rows) {
+      const deviceType = String(row.device_type || 'unknown');
+      stats[deviceType] = Number(row.count || 0);
+    }
+    
+    return stats;
+  }
+  
+  async getBrowserStats(): Promise<Record<string, number>> {
+    const result = await db.execute(sql`
+      SELECT browser, COUNT(*) as count
+      FROM page_views
+      WHERE browser IS NOT NULL
+      GROUP BY browser
+      ORDER BY count DESC
+    `);
+    
+    const stats: Record<string, number> = {};
+    for (const row of result.rows) {
+      const browser = String(row.browser || 'unknown');
+      stats[browser] = Number(row.count || 0);
+    }
+    
+    return stats;
+  }
+  
+  async getPageViewTrends(days: number = 30): Promise<{ date: string; count: number }[]> {
+    const endDate = new Date();
+    const startDate = new Date();
+    startDate.setDate(startDate.getDate() - days);
+    
+    const result = await db.execute(sql`
+      SELECT 
+        DATE_TRUNC('day', timestamp) as date,
+        COUNT(*) as count
+      FROM page_views
+      WHERE timestamp BETWEEN ${startDate} AND ${endDate}
+      GROUP BY DATE_TRUNC('day', timestamp)
+      ORDER BY date ASC
+    `);
+    
+    return result.rows.map(row => ({
+      date: String(row.date || ''),
+      count: Number(row.count || 0)
+    }));
   }
 
   // Session operations

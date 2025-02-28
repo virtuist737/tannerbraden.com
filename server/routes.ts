@@ -253,15 +253,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Analytics Routes
   app.post("/api/analytics/pageview", async (req, res) => {
     try {
-      const { path, scrollDepth } = req.body;
+      console.log("Analytics pageview request body:", req.body);
+      
+      const { path, scrollDepth, sessionId } = req.body || {};
       const userAgent = req.headers["user-agent"];
       const referrer = req.headers.referer;
+      
+      // Default to home page if path is missing
+      const pagePath = path || '/';
+
+      console.log("Processing analytics for path:", pagePath);
 
       // Parse user agent for detailed device info
       const parser = new UAParser.UAParser(userAgent);
       const result = parser.getResult();
 
-      const pageView = await storage.recordPageView(path, userAgent, referrer);
+      const pageView = await storage.recordPageView(pagePath, userAgent, referrer, sessionId);
       if (pageView) {
         await storage.updatePageView(pageView.id, {
           deviceType: result.device.type || "desktop",
@@ -273,9 +280,39 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
 
-      res.status(201).json({ message: "Page view recorded" });
+      res.status(201).json({ message: "Page view recorded", pageViewId: pageView.id });
     } catch (error) {
+      console.error("Error recording page view:", error);
       res.status(500).json({ error: "Failed to record page view" });
+    }
+  });
+
+  // Endpoint to update existing page view (for exit tracking, scroll depth, etc.)
+  app.post("/api/analytics/pageview/update", async (req, res) => {
+    try {
+      const { pageViewId, duration, scrollDepth, isExit, isBounce } = req.body;
+      
+      if (!pageViewId) {
+        return res.status(400).json({ error: "Page view ID is required" });
+      }
+
+      const updates: Record<string, any> = {};
+      
+      if (duration !== undefined) updates.duration = duration;
+      if (scrollDepth !== undefined) updates.scrollDepth = scrollDepth;
+      if (isExit !== undefined) updates.isExit = isExit;
+      if (isBounce !== undefined) updates.isBounce = isBounce;
+      
+      const updatedView = await storage.updatePageView(pageViewId, updates);
+      
+      if (!updatedView) {
+        return res.status(404).json({ error: "Page view not found" });
+      }
+      
+      res.json({ message: "Page view updated", pageView: updatedView });
+    } catch (error) {
+      console.error("Error updating page view:", error);
+      res.status(500).json({ error: "Failed to update page view" });
     }
   });
 
@@ -285,31 +322,89 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const endDate = new Date(req.query.endDate as string || new Date());
 
       const pageViews = await storage.getPageViews(startDate, endDate);
+      const deviceStats = await storage.getDeviceStats();
+      const browserStats = await storage.getBrowserStats();
+      const pageViewTrends = await storage.getPageViewTrends(30);
+      const topPages = await storage.getTopPages(10);
 
       // Calculate aggregate metrics
-      const totalViews = pageViews.length;
-      const bounceRate = pageViews.filter(view => view.isBounce).length / totalViews;
-      const averageEngagement = pageViews.reduce((sum, view) => sum + (view.duration || 0), 0) / totalViews;
-
-      const deviceBreakdown = pageViews.reduce((acc, view) => {
-        const deviceType = view.deviceType || 'unknown';
-        acc[deviceType] = (acc[deviceType] || 0) + 1;
-        return acc;
-      }, {} as Record<string, number>);
+      const totalViews = pageViews.length || 0;
+      const bounceRate = totalViews > 0 
+        ? pageViews.filter(view => view.isBounce).length / totalViews
+        : 0;
+      const averageEngagement = totalViews > 0
+        ? pageViews.reduce((sum, view) => sum + (view.duration || 0), 0) / totalViews
+        : 0;
 
       const analytics = {
-        pageViews,
+        pageViews: pageViewTrends,
         metrics: {
           totalViews,
           bounceRate,
           averageEngagement,
-          deviceBreakdown,
-        }
+          deviceBreakdown: deviceStats,
+        },
+        browserStats,
+        topPages,
+        rawPageViews: pageViews.slice(0, 100) // Limit raw data to 100 items
       };
 
       res.json(analytics);
     } catch (error) {
-      res.status(500).json({ error: "Failed to fetch page views" });
+      console.error("Error fetching analytics:", error);
+      res.status(500).json({ error: "Failed to fetch analytics data" });
+    }
+  });
+  
+  // Get analytics for specific page paths
+  app.get("/api/analytics/pages", isAuthenticated, async (req, res) => {
+    try {
+      const days = parseInt(req.query.days as string || "30");
+      const startDate = new Date();
+      startDate.setDate(startDate.getDate() - days);
+      const endDate = new Date();
+      
+      const pageViewsByPath = await storage.getPageViewsByPath(startDate, endDate);
+      const topPages = await storage.getTopPages(10);
+      
+      res.json({
+        pageViewsByPath,
+        topPages
+      });
+    } catch (error) {
+      console.error("Error fetching page analytics:", error);
+      res.status(500).json({ error: "Failed to fetch page analytics" });
+    }
+  });
+  
+  // Get device analytics
+  app.get("/api/analytics/devices", isAuthenticated, async (req, res) => {
+    try {
+      const deviceStats = await storage.getDeviceStats();
+      const browserStats = await storage.getBrowserStats();
+      
+      res.json({
+        deviceStats,
+        browserStats
+      });
+    } catch (error) {
+      console.error("Error fetching device analytics:", error);
+      res.status(500).json({ error: "Failed to fetch device analytics" });
+    }
+  });
+  
+  // Get trend data for time series charts
+  app.get("/api/analytics/trends", isAuthenticated, async (req, res) => {
+    try {
+      const days = parseInt(req.query.days as string || "30");
+      const trends = await storage.getPageViewTrends(days);
+      
+      res.json({
+        trends
+      });
+    } catch (error) {
+      console.error("Error fetching trend analytics:", error);
+      res.status(500).json({ error: "Failed to fetch trend analytics" });
     }
   });
 

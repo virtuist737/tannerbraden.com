@@ -1,4 +1,4 @@
-import { Route, Switch } from "wouter";
+import { Route, Switch, useLocation } from "wouter";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { AuthProvider } from "@/hooks/use-auth";
@@ -6,6 +6,8 @@ import { ProtectedRoute } from "@/lib/protected-route";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import { queryClient } from "@/lib/queryClient";
+import { useEffect } from "react";
+import { trackPageView, endPageTracking } from "@/lib/analytics";
 
 // Pages
 import Home from "@/pages/home";
@@ -41,6 +43,19 @@ import EditLoopMachinePreset from "@/pages/admin/loop-machine/[id]/edit";
 import LoopMachinePage from "@/pages/loop-machine"; // Added import for the new page
 
 export default function App() {
+  const [location] = useLocation();
+
+  // Use effect to track page views when the location changes
+  useEffect(() => {
+    // Make sure to use the location as a string path
+    trackPageView(typeof location === 'string' ? location : '/');
+
+    // Cleanup function
+    return () => {
+      endPageTracking();
+    };
+  }, [location]);
+
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
@@ -76,7 +91,7 @@ export default function App() {
                 <ProtectedRoute path="/admin/loop-machine" component={AdminLoopMachinePresets} />
                 <ProtectedRoute path="/admin/loop-machine/new" component={NewLoopMachinePreset} />
                 <ProtectedRoute path="/admin/loop-machine/:id/edit" component={EditLoopMachinePreset} />
-                <Route path="/loop-machine" component={LoopMachinePage} /> {/* Added route for loop-machine page */}
+                <Route path="/loop-machine" component={LoopMachinePage} />
                 <Route component={NotFound} />
               </Switch>
             </main>
