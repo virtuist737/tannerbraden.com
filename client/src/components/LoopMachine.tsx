@@ -22,14 +22,14 @@ export default function LoopMachine() {
   const [currentStep, setCurrentStep] = useState(0);
   const [bpm, setBpm] = useState(DEFAULT_BPM);
   const [volume, setVolume] = useState(-10);
-  const [melodyGrid, setMelodyGrid] = useState(() =>
-    Array(BEATS_PER_BAR).fill(null).map(() => Array(BEATS_PER_BAR * 2).fill(false))
+  const [melodyGrid, setMelodyGrid] = useState(() => 
+    Array(BEATS_PER_BAR).fill(null).map(() => Array(BEATS_PER_BAR*2).fill(false))
   );
-  const [rhythmGrid, setRhythmGrid] = useState(() =>
-    Array(3).fill(null).map(() => Array(BEATS_PER_BAR * 2).fill(false))
+  const [rhythmGrid, setRhythmGrid] = useState(() => 
+    Array(3).fill(null).map(() => Array(BEATS_PER_BAR*2).fill(false))
   );
   const [selectedSound, setSelectedSound] = useState('synth');
-
+  
   const { toast } = useToast();
   const [isDrumLoaded, setIsDrumLoaded] = useState(false); // Add loading state
 
@@ -193,7 +193,7 @@ export default function LoopMachine() {
         sequenceRef.current = new Tone.Sequence((time, step) => {
           setCurrentStep(step);
 
-          const activeMelodyNotes = melodyGrid.map((row, rowIndex) =>
+          const activeMelodyNotes = melodyGrid.map((row, rowIndex) => 
             row[step] ? notes[rowIndex] : null
           ).filter(Boolean);
 
@@ -255,62 +255,16 @@ export default function LoopMachine() {
     };
   }, []);
 
-  const presetMelodyGrid = [
-    [true, false, true, false, true, false, true, false, true, false, true, false, true, false, true, false],
-    [false, true, false, true, false, true, false, true, false, true, false, true, false, true, false, true],
-    [false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false],
-    [false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false],
-    [false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false],
-    [false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false],
-    [false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false],
-    [false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false],
-  ];
-
-  const presetRhythmGrid = [
-    [true, false, true, false, true, false, true, false, true, false, true, false, true, false, true, false],
-    [false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false],
-    [true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true],
-  ];
-
-
-  const resetToPreset = () => {
-    setMelodyGrid(presetMelodyGrid);
-    setRhythmGrid(presetRhythmGrid);
-  };
-
-  const clearPatterns = () => {
-    setMelodyGrid(Array(BEATS_PER_BAR).fill(null).map(() => Array(BEATS_PER_BAR * numBars).fill(false)));
-    setRhythmGrid(Array(3).fill(null).map(() => Array(BEATS_PER_BAR * numBars).fill(false)));
-  };
-
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap gap-4 items-center">
-        <div className="flex space-x-2">
-          <Button
-            onClick={togglePlay}
-            variant={isPlaying ? "destructive" : "default"}
-            className="min-w-[100px]"
-          >
-            {isPlaying ? 'Stop' : 'Play'}
-          </Button>
-
-          <Button
-            onClick={resetToPreset}
-            variant="outline"
-            className="whitespace-nowrap"
-          >
-            Load Preset
-          </Button>
-
-          <Button
-            onClick={clearPatterns}
-            variant="outline"
-            className="whitespace-nowrap"
-          >
-            Clear All
-          </Button>
-        </div>
+        <Button 
+          onClick={togglePlay}
+          variant={isPlaying ? "destructive" : "default"}
+          className="min-w-[100px]"
+        >
+          {isPlaying ? 'Stop' : 'Play'}
+        </Button>
 
         <div className="flex items-center gap-4">
           <span className="text-sm whitespace-nowrap">BPM: {bpm}</span>
@@ -348,8 +302,8 @@ export default function LoopMachine() {
           </SelectContent>
         </Select>
 
-        <Select
-          value={selectedScale}
+        <Select 
+          value={selectedScale} 
           onValueChange={(value: ScaleType) => setSelectedScale(value)}
         >
           <SelectTrigger className="w-40">
@@ -364,8 +318,8 @@ export default function LoopMachine() {
           </SelectContent>
         </Select>
 
-        <Select
-          value={numBars.toString()}
+        <Select 
+          value={numBars.toString()} 
           onValueChange={(value) => {
             const newBars = parseInt(value);
             setNumBars(newBars);
@@ -388,9 +342,9 @@ export default function LoopMachine() {
           </SelectContent>
         </Select>
 
+        
 
-
-        <Button
+        <Button 
           variant="outline"
           onClick={() => {
             setMelodyGrid(Array(BEATS_PER_BAR).fill(null).map(() => Array(BEATS_PER_BAR * numBars).fill(false)));
