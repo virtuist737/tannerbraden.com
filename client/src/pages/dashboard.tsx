@@ -147,12 +147,6 @@ const Dashboard = () => {
               <RefreshCw className="h-4 w-4 mr-2" />
               Refresh
             </Button>
-            <Button asChild>
-              <Link href="/admin/blog/new">
-                <PenSquare className="h-4 w-4 mr-2" />
-                New Post
-              </Link>
-            </Button>
           </div>
         </div>
 
