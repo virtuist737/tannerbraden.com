@@ -272,9 +272,17 @@ export default function LoopMachinePresetForm({
     setValue("rhythmGrid", newRhythmGrid);
   };
 
+  // Debug form data before submit
+  const handleFormSubmit = (data: LoopMachinePresetFormValues) => {
+    console.log("Submitting form data:", data);
+    console.log("melodyGrid dimensions:", data.melodyGrid?.length, "x", data.melodyGrid?.[0]?.length);
+    console.log("rhythmGrid dimensions:", data.rhythmGrid?.length, "x", data.rhythmGrid?.[0]?.length);
+    onSubmit(data);
+  };
+
   return (
     <Form {...form}>
-      <form onSubmit={handleSubmit(onSubmit)}>
+      <form onSubmit={handleSubmit(handleFormSubmit)}>
         <Tabs 
           defaultValue="basic" 
           value={activeTab} 

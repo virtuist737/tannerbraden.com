@@ -32,13 +32,24 @@ export default function EditLoopMachinePreset() {
   // Update preset mutation
   const updatePresetMutation = useMutation({
     mutationFn: async (data: Partial<InsertLoopMachinePreset>) => {
+      console.log("Submitting data to API:", data);
+      
+      // Ensure grid data is not lost
+      if (!data.melodyGrid || !data.rhythmGrid) {
+        console.warn("Grid data missing from form submission!");
+      }
+      
       return await apiRequest<LoopMachinePreset>(`/api/loop-presets/${presetId}`, {
         method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json'
+        },
         body: JSON.stringify(data),
       });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/loop-presets'] });
+      queryClient.invalidateQueries({ queryKey: [`/api/loop-presets/${presetId}`] });
       toast({
         title: "Success",
         description: "Loop machine preset updated successfully",
@@ -56,6 +67,9 @@ export default function EditLoopMachinePreset() {
   });
 
   const handleSubmit = (data: InsertLoopMachinePreset) => {
+    console.log("Form submitted with data:", data);
+    console.log("melodyGrid:", data.melodyGrid);
+    console.log("rhythmGrid:", data.rhythmGrid);
     updatePresetMutation.mutate(data);
   };
 

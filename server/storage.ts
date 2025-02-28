@@ -446,6 +446,8 @@ export class DatabaseStorage implements IStorage {
   }
 
   async updateLoopMachinePreset(id: number, updates: Partial<InsertLoopMachinePreset>): Promise<LoopMachinePreset | undefined> {
+    console.log(`Updating loop machine preset ${id} with:`, JSON.stringify(updates, null, 2));
+    
     // If this preset is being set as default, clear any existing default first
     if (updates.isDefault) {
       await db
@@ -454,15 +456,47 @@ export class DatabaseStorage implements IStorage {
         .where(and(eq(loopMachinePresets.isDefault, true), not(eq(loopMachinePresets.id, id))));
     }
     
+    // Make sure melodyGrid and rhythmGrid are properly set
+    const dataToUpdate = { ...updates };
+    
+    // Log the grid data types
+    if (dataToUpdate.melodyGrid) {
+      console.log("melodyGrid type:", typeof dataToUpdate.melodyGrid);
+      console.log("melodyGrid is array:", Array.isArray(dataToUpdate.melodyGrid));
+    }
+    
+    if (dataToUpdate.rhythmGrid) {
+      console.log("rhythmGrid type:", typeof dataToUpdate.rhythmGrid);
+      console.log("rhythmGrid is array:", Array.isArray(dataToUpdate.rhythmGrid));
+    }
+    
+    // For JSONB columns, we need to make sure the data is in the right format
+    if (dataToUpdate.melodyGrid && typeof dataToUpdate.melodyGrid === 'string') {
+      try {
+        dataToUpdate.melodyGrid = JSON.parse(dataToUpdate.melodyGrid);
+      } catch (e) {
+        console.error("Error parsing melodyGrid:", e);
+      }
+    }
+    
+    if (dataToUpdate.rhythmGrid && typeof dataToUpdate.rhythmGrid === 'string') {
+      try {
+        dataToUpdate.rhythmGrid = JSON.parse(dataToUpdate.rhythmGrid);
+      } catch (e) {
+        console.error("Error parsing rhythmGrid:", e);
+      }
+    }
+    
     const [updatedPreset] = await db
       .update(loopMachinePresets)
       .set({
-        ...updates,
+        ...dataToUpdate,
         updatedAt: new Date(),
       })
       .where(eq(loopMachinePresets.id, id))
       .returning();
     
+    console.log("Updated preset:", JSON.stringify(updatedPreset, null, 2));
     return updatedPreset;
   }
 

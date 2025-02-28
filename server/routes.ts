@@ -678,14 +678,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "Invalid preset ID" });
       }
 
+      console.log("PATCH request body for loop preset:", JSON.stringify(req.body, null, 2));
+      
       const parsedBody = insertLoopMachinePresetSchema.partial().safeParse(req.body);
       if (!parsedBody.success) {
+        console.error("Loop preset validation error:", parsedBody.error);
         return res.status(400).json({ 
           error: "Invalid preset data", 
           details: parsedBody.error 
         });
       }
 
+      console.log("Parsed data to update:", JSON.stringify(parsedBody.data, null, 2));
+      
       const preset = await storage.updateLoopMachinePreset(id, parsedBody.data);
       if (!preset) {
         return res.status(404).json({ error: "Preset not found" });
