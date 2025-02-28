@@ -437,12 +437,21 @@ export default function LoopMachine() {
       }
     };
 
+    // Use a short timeout to ensure the touchend on the cell happens first
+    const handleGlobalTouchEnd = () => {
+      if (isDragging) {
+        setTimeout(() => {
+          handleDragEnd();
+        }, 10);
+      }
+    };
+
     window.addEventListener('mouseup', handleGlobalMouseUp);
-    window.addEventListener('touchend', handleGlobalMouseUp);
+    window.addEventListener('touchend', handleGlobalTouchEnd);
 
     return () => {
       window.removeEventListener('mouseup', handleGlobalMouseUp);
-      window.removeEventListener('touchend', handleGlobalMouseUp);
+      window.removeEventListener('touchend', handleGlobalTouchEnd);
     };
   }, [isDragging]);
 
@@ -855,6 +864,13 @@ export default function LoopMachine() {
                           onMouseDown={() => handleMelodyDragStart(i, j)}
                           onMouseEnter={() => handleMelodyDragEnter(i, j)}
                           onTouchStart={() => handleMelodyDragStart(i, j)}
+                          onTouchEnd={(e) => {
+                            // If this was just a tap (no movement), toggle the cell
+                            if (!isDragging || dragTarget !== 'melody') {
+                              toggleMelodyCell(i, j);
+                            }
+                            e.preventDefault(); // Prevent default to avoid issues on some mobile browsers
+                          }}
                           onTouchMove={(e) => {
                             const touch = e.touches[0];
                             const element = document.elementFromPoint(touch.clientX, touch.clientY);
@@ -918,6 +934,13 @@ export default function LoopMachine() {
                           onMouseDown={() => handleRhythmDragStart(i, j)}
                           onMouseEnter={() => handleRhythmDragEnter(i, j)}
                           onTouchStart={() => handleRhythmDragStart(i, j)}
+                          onTouchEnd={(e) => {
+                            // If this was just a tap (no movement), toggle the cell
+                            if (!isDragging || dragTarget !== 'rhythm') {
+                              toggleRhythmCell(i, j);
+                            }
+                            e.preventDefault(); // Prevent default to avoid issues on some mobile browsers
+                          }}
                           onTouchMove={(e) => {
                             const touch = e.touches[0];
                             const element = document.elementFromPoint(touch.clientX, touch.clientY);
