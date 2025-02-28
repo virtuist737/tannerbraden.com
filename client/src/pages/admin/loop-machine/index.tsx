@@ -21,51 +21,54 @@ export default function AdminLoopMachinePresets() {
     queryKey: ["/api/loop-presets"],
     queryFn: async () => {
       return await apiRequest<LoopMachinePreset[]>("/api/loop-presets");
-    }
+    },
+    retry: 3
   });
 
   // Delete mutation
   const deletePresetMutation = useMutation({
     mutationFn: async (id: number) => {
       await apiRequest(`/api/loop-presets/${id}`, {
-        method: "DELETE"
+        method: 'DELETE'
       });
+      return id;
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/loop-presets"] });
+    onSuccess: (id) => {
+      queryClient.invalidateQueries({ queryKey: ['/api/loop-presets'] });
       toast({
         title: "Preset deleted",
         description: "The preset has been successfully deleted."
       });
       setPresetToDelete(null);
     },
-    onError: (error: Error) => {
+    onError: (error) => {
       toast({
         title: "Error",
-        description: `Failed to delete preset: ${error.message}`,
+        description: "Failed to delete preset. Please try again.",
         variant: "destructive"
       });
     }
   });
 
-  // Set default preset mutation
+  // Set default mutation
   const setDefaultPresetMutation = useMutation({
     mutationFn: async (id: number) => {
-      await apiRequest(`/api/loop-presets/${id}/set-default`, {
-        method: "POST"
+      const response = await apiRequest(`/api/loop-presets/${id}/set-default`, {
+        method: 'POST'
       });
+      return response;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/loop-presets"] });
+      queryClient.invalidateQueries({ queryKey: ['/api/loop-presets'] });
       toast({
         title: "Default preset updated",
         description: "The default preset has been updated successfully."
       });
     },
-    onError: (error: Error) => {
+    onError: (error) => {
       toast({
         title: "Error",
-        description: `Failed to set default preset: ${error.message}`,
+        description: "Failed to update default preset. Please try again.",
         variant: "destructive"
       });
     }
