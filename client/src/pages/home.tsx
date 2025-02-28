@@ -25,24 +25,24 @@ const Home = () => {
         <title>Tanner Braden - Digital Creator & Consciousness Explorer</title>
         <meta
           name="description"
-          content="Creating digital applications and content focused on elevating human consciousness. Developing solutions that help people achieve greater awareness and personal growth."
+          content="Creating apps and content designed to elevate human consciousness. Dedicated to building scalable solutions for mindfulness, awareness, and personal growth."
         />
         <meta
           name="keywords"
           content="consciousness technology, digital wellbeing, mindfulness apps, human potential, personal growth"
         />
-        <meta property="og:title" content="Tanner Braden - Digital Creator & Consciousness Explorer" />
+        <meta property="og:title" content="Tanner Braden - Digital Creator" />
         <meta
           property="og:description"
-          content="Creating digital applications and content focused on elevating human consciousness."
+          content="Creating apps and content designed to elevate human consciousness. Dedicated to building scalable solutions for mindfulness, awareness, and personal growth."
         />
         <meta property="og:type" content="website" />
         <meta property="og:url" content={window.location.href} />
         <meta property="og:image" content="https://res.cloudinary.com/dvk20sglr/image/upload/v1739851169/tanner2.0_dark-500x500_f0dznv.png" />
-        <meta name="twitter:title" content="Tanner Braden - Digital Creator & Consciousness Explorer" />
+        <meta name="twitter:title" content="Tanner Braden - Digital Creator" />
         <meta
           name="twitter:description"
-          content="Creating digital applications and content focused on elevating human consciousness."
+          content="Creating apps and content designed to elevate human consciousness. Dedicated to building scalable solutions for mindfulness, awareness, and personal growth."
         />
         <meta name="twitter:image" content="https://res.cloudinary.com/dvk20sglr/image/upload/v1739851169/tanner2.0_dark-500x500_f0dznv.png" />
       </Helmet>

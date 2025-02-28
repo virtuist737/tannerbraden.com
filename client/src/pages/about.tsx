@@ -76,7 +76,7 @@ const About = () => {
         <title>About - Tanner Braden</title>
         <meta
           name="description"
-          content="Discover my journey in creating technology and content focused on expanding human consciousness and fostering personal growth."
+          content="Discover my journey in creating technology and content focused on elevating human consciousness and fostering personal growth."
         />
         <meta
           name="keywords"
@@ -85,14 +85,14 @@ const About = () => {
         <meta property="og:title" content="About - Tanner Braden" />
         <meta
           property="og:description"
-          content="Discover my journey in creating technology and content focused on expanding human consciousness."
+          content="Discover my journey in creating technology and content focused on elevating human consciousness."
         />
         <meta property="og:type" content="website" />
         <meta property="og:url" content={window.location.href} />
         <meta name="twitter:title" content="About - Tanner Braden" />
         <meta
           name="twitter:description"
-          content="Discover my journey in creating technology and content focused on expanding human consciousness."
+          content="Discover my journey in creating technology and content focused on elevating human consciousness."
         />
       </Helmet>
       <div className="min-h-screen">
