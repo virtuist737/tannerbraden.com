@@ -98,7 +98,7 @@ export default function LoopMachine() {
     setBpm(preset.bpm);
     setVolume(preset.volume);
     setSelectedSound(preset.selectedSound);
-    setSelectedScale(preset.selectedScale as ScaleType);
+    updateScaleSelection(preset.selectedScale as ScaleType);
     setNumBars(preset.numBars);
 
     try {
@@ -126,6 +126,48 @@ export default function LoopMachine() {
 
   const [selectedScale, setSelectedScale] = useState<ScaleType>('Pentatonic Major');
   const notes = scaleNotes[selectedScale];
+
+  // Handle scale changes during playback
+  const updateScaleSelection = useCallback((newScale: ScaleType) => {
+    setSelectedScale(newScale);
+    
+    // If a sequence is playing, update it to use the new scale
+    if (isPlaying && sequenceRef.current) {
+      const newNotes = scaleNotes[newScale];
+      
+      // Stop current sequence
+      sequenceRef.current.dispose();
+      
+      // Create new sequence with current settings but new scale
+      sequenceRef.current = new Tone.Sequence((time, step) => {
+        setCurrentStep(step);
+
+        const activeMelodyNotes = melodyGrid.map((row, rowIndex) => 
+          row[step] ? newNotes[rowIndex] : null
+        ).filter(Boolean);
+
+        if (activeMelodyNotes.length && melodyInstrumentRef.current) {
+          melodyInstrumentRef.current.triggerAttackRelease(activeMelodyNotes, '8n', time);
+        }
+
+        rhythmGrid.forEach((row, rowIndex) => {
+          if (row[step] && rhythmInstrumentRef.current && isDrumLoaded) {
+            switch (rowIndex) {
+              case 0:
+                rhythmInstrumentRef.current.kick.triggerAttackRelease('C1', '8n', time);
+                break;
+              case 1:
+                rhythmInstrumentRef.current.snare.triggerAttackRelease('8n', time);
+                break;
+              case 2:
+                rhythmInstrumentRef.current.hihat.triggerAttackRelease('8n', time);
+                break;
+            }
+          }
+        });
+      }, Array.from({ length: BEATS_PER_BAR * numBars }, (_, i) => i), '8n').start(0);
+    }
+  }, [isPlaying, melodyGrid, rhythmGrid, numBars, isDrumLoaded]);
 
   useEffect(() => {
     try {
@@ -654,7 +696,7 @@ export default function LoopMachine() {
                 <div className="flex-grow">
                   <Select 
                     value={selectedScale} 
-                    onValueChange={(value: ScaleType) => setSelectedScale(value)}
+                    onValueChange={(value: ScaleType) => updateScaleSelection(value)}
                   >
                     <SelectTrigger>
                       <SelectValue placeholder="Select Scale" />
