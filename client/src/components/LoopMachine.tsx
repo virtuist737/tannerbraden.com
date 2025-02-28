@@ -510,6 +510,25 @@ export default function LoopMachine() {
     });
   };
 
+  // Show loading state while the preset is loading
+  if (isLoadingPreset) {
+    return (
+      <div className="max-w-5xl mx-auto">
+        <div className="py-8 text-center">
+          <div className="animate-pulse space-y-4">
+            <div className="h-8 bg-muted rounded w-1/3 mx-auto"></div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="h-32 bg-muted rounded"></div>
+              ))}
+            </div>
+            <div className="h-64 bg-muted rounded"></div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="max-w-5xl mx-auto">
       <motion.div 
