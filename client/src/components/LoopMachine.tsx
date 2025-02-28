@@ -303,8 +303,8 @@ export default function LoopMachine() {
     );
     setMelodyGrid(newGrid);
 
-    // Always play sound when toggling, regardless of new state
-    if (melodyInstrumentRef.current) {
+    // Only play sound when activating a cell
+    if (newGrid[row][col] && melodyInstrumentRef.current) {
       melodyInstrumentRef.current.triggerAttackRelease(notes[row], "8n");
     }
   };
@@ -317,8 +317,8 @@ export default function LoopMachine() {
     );
     setRhythmGrid(newGrid);
 
-    // Always play sound when toggling, regardless of new state
-    if (rhythmInstrumentRef.current && isDrumLoaded) {
+    // Only play sound when activating a cell
+    if (newGrid[row][col] && rhythmInstrumentRef.current && isDrumLoaded) {
       switch (row) {
         case 0:
           rhythmInstrumentRef.current.kick.triggerAttackRelease('C1', '8n');
@@ -346,8 +346,8 @@ export default function LoopMachine() {
     newGrid[row][col] = newCellValue;
     setMelodyGrid(newGrid);
 
-    // Always play sound on click/touch, regardless of state change
-    if (melodyInstrumentRef.current) {
+    // Only play sound when activating a cell
+    if (newCellValue && melodyInstrumentRef.current) {
       melodyInstrumentRef.current.triggerAttackRelease(notes[row], "8n");
     }
   };
@@ -360,8 +360,8 @@ export default function LoopMachine() {
         newGrid[row][col] = dragValue;
         setMelodyGrid(newGrid);
 
-        // Play sound when dragging into new cells
-        if (melodyInstrumentRef.current) {
+        // Only play sound if activating a cell
+        if (dragValue && melodyInstrumentRef.current) {
           melodyInstrumentRef.current.triggerAttackRelease(notes[row], "8n");
         }
       }
@@ -381,8 +381,8 @@ export default function LoopMachine() {
     newGrid[row][col] = newCellValue;
     setRhythmGrid(newGrid);
 
-    // Always play sound on click/touch, regardless of state change
-    if (rhythmInstrumentRef.current && isDrumLoaded) {
+    // Only play sound when activating a cell
+    if (newCellValue && rhythmInstrumentRef.current && isDrumLoaded) {
       switch (row) {
         case 0:
           rhythmInstrumentRef.current.kick.triggerAttackRelease('C1', '8n');
@@ -405,8 +405,8 @@ export default function LoopMachine() {
         newGrid[row][col] = dragValue;
         setRhythmGrid(newGrid);
 
-        // Play sound when dragging into new cells
-        if (rhythmInstrumentRef.current && isDrumLoaded) {
+        // Only play sound if activating a cell
+        if (dragValue && rhythmInstrumentRef.current && isDrumLoaded) {
           switch (row) {
             case 0:
               rhythmInstrumentRef.current.kick.triggerAttackRelease('C1', '8n');
