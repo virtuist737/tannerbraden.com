@@ -8,6 +8,13 @@
       "when": 1740766337145,
       "tag": "0000_grey_toxin",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1709475845000,
+      "tag": "0001_drop_loop_machine",
+      "breakpoints": true
     }
   ]
 }

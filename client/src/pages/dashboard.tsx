@@ -725,21 +725,7 @@ const Dashboard = () => {
               </CardContent>
             </Card>
           </Link>
-          <Link href="/admin/loop-machine">
-            <Card className="hover:bg-accent transition-colors cursor-pointer">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Music className="h-5 w-5" />
-                  Loop Machine Presets
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm text-muted-foreground">
-                  Manage default settings and presets for the Loop Machine
-                </p>
-              </CardContent>
-            </Card>
-          </Link>
+
         </div>
       </motion.div>
     </div>
