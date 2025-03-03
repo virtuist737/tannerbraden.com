@@ -13,7 +13,6 @@ import {
   interests,
   favorites,
   projects,
-  loopMachinePresets,
   type User,
   type InsertUser,
   type BlogPost,
@@ -30,8 +29,6 @@ import {
   type InsertFavorite,
   type Project,
   type InsertProject,
-  type LoopMachinePreset,
-  type InsertLoopMachinePreset,
 } from "@shared/schema";
 
 const PostgresSessionStore = connectPg(session);
@@ -106,15 +103,6 @@ export interface IStorage {
   updateProject(id: number, updates: Partial<InsertProject>): Promise<Project | undefined>;
   deleteProject(id: number): Promise<boolean>;
   updateProjectImage(id: number, imageUrl: string): Promise<Project>;
-  
-  // Loop Machine Preset operations
-  createLoopMachinePreset(preset: InsertLoopMachinePreset): Promise<LoopMachinePreset>;
-  getLoopMachinePreset(id: number): Promise<LoopMachinePreset | undefined>;
-  listLoopMachinePresets(): Promise<LoopMachinePreset[]>;
-  updateLoopMachinePreset(id: number, updates: Partial<InsertLoopMachinePreset>): Promise<LoopMachinePreset | undefined>;
-  deleteLoopMachinePreset(id: number): Promise<boolean>;
-  getDefaultLoopMachinePreset(): Promise<LoopMachinePreset | undefined>;
-  setDefaultLoopMachinePreset(id: number): Promise<LoopMachinePreset>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -514,127 +502,6 @@ export class DatabaseStorage implements IStorage {
       .where(eq(projects.id, id))
       .returning();
     return updated;
-  }
-
-  // Loop Machine Preset operations
-  async createLoopMachinePreset(preset: InsertLoopMachinePreset): Promise<LoopMachinePreset> {
-    // If this preset is set as default, clear any existing default first
-    if (preset.isDefault) {
-      await db
-        .update(loopMachinePresets)
-        .set({ isDefault: false })
-        .where(eq(loopMachinePresets.isDefault, true));
-    }
-    
-    const [newPreset] = await db.insert(loopMachinePresets).values(preset).returning();
-    return newPreset;
-  }
-
-  async getLoopMachinePreset(id: number): Promise<LoopMachinePreset | undefined> {
-    const [preset] = await db.select().from(loopMachinePresets).where(eq(loopMachinePresets.id, id));
-    return preset;
-  }
-
-  async listLoopMachinePresets(): Promise<LoopMachinePreset[]> {
-    return db
-      .select()
-      .from(loopMachinePresets)
-      .orderBy(loopMachinePresets.name);
-  }
-
-  async updateLoopMachinePreset(id: number, updates: Partial<InsertLoopMachinePreset>): Promise<LoopMachinePreset | undefined> {
-    console.log(`Updating loop machine preset ${id} with:`, JSON.stringify(updates, null, 2));
-    
-    // If this preset is being set as default, clear any existing default first
-    if (updates.isDefault) {
-      await db
-        .update(loopMachinePresets)
-        .set({ isDefault: false })
-        .where(and(eq(loopMachinePresets.isDefault, true), not(eq(loopMachinePresets.id, id))));
-    }
-    
-    // Make sure melodyGrid and rhythmGrid are properly set
-    const dataToUpdate = { ...updates };
-    
-    // Log the grid data types
-    if (dataToUpdate.melodyGrid) {
-      console.log("melodyGrid type:", typeof dataToUpdate.melodyGrid);
-      console.log("melodyGrid is array:", Array.isArray(dataToUpdate.melodyGrid));
-    }
-    
-    if (dataToUpdate.rhythmGrid) {
-      console.log("rhythmGrid type:", typeof dataToUpdate.rhythmGrid);
-      console.log("rhythmGrid is array:", Array.isArray(dataToUpdate.rhythmGrid));
-    }
-    
-    // For JSONB columns, we need to make sure the data is in the right format
-    if (dataToUpdate.melodyGrid && typeof dataToUpdate.melodyGrid === 'string') {
-      try {
-        dataToUpdate.melodyGrid = JSON.parse(dataToUpdate.melodyGrid);
-      } catch (e) {
-        console.error("Error parsing melodyGrid:", e);
-      }
-    }
-    
-    if (dataToUpdate.rhythmGrid && typeof dataToUpdate.rhythmGrid === 'string') {
-      try {
-        dataToUpdate.rhythmGrid = JSON.parse(dataToUpdate.rhythmGrid);
-      } catch (e) {
-        console.error("Error parsing rhythmGrid:", e);
-      }
-    }
-    
-    const [updatedPreset] = await db
-      .update(loopMachinePresets)
-      .set({
-        ...dataToUpdate,
-        updatedAt: new Date(),
-      })
-      .where(eq(loopMachinePresets.id, id))
-      .returning();
-    
-    console.log("Updated preset:", JSON.stringify(updatedPreset, null, 2));
-    return updatedPreset;
-  }
-
-  async deleteLoopMachinePreset(id: number): Promise<boolean> {
-    const [deletedPreset] = await db
-      .delete(loopMachinePresets)
-      .where(eq(loopMachinePresets.id, id))
-      .returning();
-    return !!deletedPreset;
-  }
-
-  async getDefaultLoopMachinePreset(): Promise<LoopMachinePreset | undefined> {
-    const [preset] = await db
-      .select()
-      .from(loopMachinePresets)
-      .where(eq(loopMachinePresets.isDefault, true));
-    return preset;
-  }
-
-  async setDefaultLoopMachinePreset(id: number): Promise<LoopMachinePreset> {
-    // Clear any existing default preset
-    await db
-      .update(loopMachinePresets)
-      .set({ isDefault: false })
-      .where(eq(loopMachinePresets.isDefault, true));
-    
-    // Set the new default preset
-    const [updatedPreset] = await db
-      .update(loopMachinePresets)
-      .set({ 
-        isDefault: true,
-        updatedAt: new Date()
-      })
-      .where(eq(loopMachinePresets.id, id))
-      .returning();
-    
-    if (!updatedPreset) {
-      throw new Error(`Loop machine preset with id ${id} not found`);
-    }
-    
-    return updatedPreset;
   }
 }
 

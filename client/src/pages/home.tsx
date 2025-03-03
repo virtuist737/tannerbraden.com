@@ -8,7 +8,7 @@ import Projects from "@/components/home/Projects";
 import BlogCard from "@/components/blog/BlogCard";
 import { useQuery } from "@tanstack/react-query";
 import type { BlogPost } from "@shared/schema";
-import LoopMachine from '@/components/LoopMachine';
+
 
 const Home = () => {
   // Blog posts query
@@ -89,30 +89,7 @@ const Home = () => {
         </motion.div>
       </section>
 
-      {/* Loop Machine Section */}
-      <section className="py-16">
-        <div className="container">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="space-y-8"
-          >
-            <div className="text-center space-y-4 mb-8">
-              <h2 className="text-3xl font-bold tracking-tighter md:text-4xl">
-                <span className="inline-block text-primary animate-pulse">♫</span> Loop Machine <span className="inline-block text-primary animate-pulse">♫</span>
-              </h2>
-              <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-                Create your own musical loops with this interactive sequencer.
-                Click on the grid cells to create melodies and rhythms!
-              </p>
-            </div>
-            <div className="bg-card rounded-xl shadow-lg p-4 md:p-8 border border-primary/10">
-              <LoopMachine />
-            </div>
-          </motion.div>
-        </div>
-      </section>
+
 
       {/* Featured Projects Section */}
       <Projects />

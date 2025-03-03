@@ -195,55 +195,9 @@ export type InsertFavorite = z.infer<typeof insertFavoriteSchema>;
 export type Timeline = typeof timeline.$inferSelect;
 export type InsertTimeline = z.infer<typeof insertTimelineSchema>;
 
-// Add after existing types
-// Loop machine preset schema
-export const loopMachinePresets = pgTable("loop_machine_presets", {
-  id: serial("id").primaryKey(),
-  name: text("name").notNull(),
-  description: text("description"),
-  bpm: integer("bpm").notNull().default(120),
-  volume: integer("volume").notNull().default(-10),
-  selectedSound: text("selected_sound").notNull().default("synth"),
-  selectedScale: text("selected_scale").notNull().default("Pentatonic Major"),
-  numBars: integer("num_bars").notNull().default(2),
-  melodyGrid: jsonb("melody_grid").notNull(),
-  rhythmGrid: jsonb("rhythm_grid").notNull(),
-  isDefault: boolean("is_default").notNull().default(false),
-  createdAt: timestamp("created_at").notNull().defaultNow(),
-  updatedAt: timestamp("updated_at").notNull().defaultNow(),
-});
 
-export const insertLoopMachinePresetSchema = createInsertSchema(loopMachinePresets).omit({
-  id: true,
-  createdAt: true,
-  updatedAt: true,
-}).extend({
-  name: z.string().min(1, "Name is required"),
-  description: z.string().optional().nullable(),
-  bpm: z.number().int().min(60).max(200).default(120),
-  volume: z.number().int().min(-40).max(0).default(-10),
-  selectedSound: z.enum(["synth", "piano"]).default("synth"),
-  selectedScale: z.enum([
-    "Pentatonic Major",
-    "Pentatonic Minor",
-    "Ionian Mode",
-    "Harmonic Minor",
-    "Melodic Minor",
-    "Blues Scale",
-    "Dorian Mode",
-    "Mixolydian Mode",
-    "Phrygian Mode",
-    "Japanese Hirajoshi"
-  ]).default("Pentatonic Major"),
-  numBars: z.number().int().min(1).max(4).default(2),
-  melodyGrid: z.array(z.array(z.boolean())),
-  rhythmGrid: z.array(z.array(z.boolean())),
-  isDefault: z.boolean().default(false),
-});
 
 // Add Button type for TypeScript
 export type Button = z.infer<typeof buttonSchema>;
 export type Project = typeof projects.$inferSelect;
 export type InsertProject = z.infer<typeof insertProjectSchema>;
-export type LoopMachinePreset = typeof loopMachinePresets.$inferSelect;
-export type InsertLoopMachinePreset = z.infer<typeof insertLoopMachinePresetSchema>;
