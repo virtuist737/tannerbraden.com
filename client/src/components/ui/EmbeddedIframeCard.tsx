@@ -1,11 +1,7 @@
 
 import { Card, CardContent } from "@/components/ui/card";
 
-interface EmbeddedIframeCardProps {
-  embedUrl?: string;
-}
-
-export const EmbeddedIframeCard = ({ embedUrl = "https://grriidd.replit.app/embed.html" }: EmbeddedIframeCardProps) => {
+export const EmbeddedIframeCard = (embedUrl?: string) => {
   return (
     <Card className="overflow-hidden rounded-2xl shadow-lg">
       <CardContent className="p-0">
