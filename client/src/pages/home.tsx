@@ -8,7 +8,7 @@ import Projects from "@/components/home/Projects";
 import BlogCard from "@/components/blog/BlogCard";
 import { useQuery } from "@tanstack/react-query";
 import type { BlogPost } from "@shared/schema";
-import { GrriiddCard } from "@/components/ui/GrriiddCard";
+import { EmbeddedIframeCard } from "@/components/ui/GrriiddCard";
 
 
 const Home = () => {
@@ -91,7 +91,7 @@ const Home = () => {
       </section>
 
       <section className="container py-12">
-        <GrriiddCard embedUrl="https://grriidd.replit.app/embed.html" />
+        <EmbeddedIframeCard embedUrl="https://grriidd.replit.app/embed.html" />
       </section>
 
       {/* Featured Projects Section */}
