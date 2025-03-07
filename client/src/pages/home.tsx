@@ -18,6 +18,10 @@ const Home = () => {
       .sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime())
       .slice(0, 3)
   });
+  
+  // Get the current hostname to use in the iframe URL
+  const hostname = typeof window !== 'undefined' ? window.location.hostname : '';
+  const embedUrl = hostname ? `https://${hostname}/embed.html` : 'about:blank';
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -109,7 +113,31 @@ const Home = () => {
             </p>
           </div>
 
-          {isLoadingPosts ? (
+          <section className="container py-12">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="space-y-6"
+        >
+          <div className="space-y-2">
+            <h2 className="text-3xl font-bold tracking-tighter">Featured Content</h2>
+            <p className="text-muted-foreground">
+              Explore the latest interactive content
+            </p>
+          </div>
+          
+          <iframe 
+            src={embedUrl}
+            width="100%" 
+            height="800" 
+            style={{ border: 'none' }} 
+            allow="microphone; camera; autoplay; fullscreen; payment"
+          ></iframe>
+        </motion.div>
+      </section>
+
+{isLoadingPosts ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {[1, 2, 3].map((i) => (
                 <div key={i} className="animate-pulse space-y-4">
