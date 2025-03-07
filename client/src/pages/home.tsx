@@ -8,6 +8,7 @@ import Projects from "@/components/home/Projects";
 import BlogCard from "@/components/blog/BlogCard";
 import { useQuery } from "@tanstack/react-query";
 import type { BlogPost } from "@shared/schema";
+import { GrriiddCard } from "@/components/ui/GrriiddCard";
 
 
 const Home = () => {
@@ -18,15 +19,11 @@ const Home = () => {
       .sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime())
       .slice(0, 3)
   });
-  
-  // Get the current hostname to use in the iframe URL
-  const hostname = typeof window !== 'undefined' ? window.location.hostname : '';
-  const embedUrl = hostname ? `https://${hostname}/embed.html` : 'about:blank';
 
   return (
     <div className="flex flex-col min-h-screen">
       <Helmet>
-        <title>Tanner Braden - Digital Creator & Consciousness Explorer</title>
+        <title>Tanner Braden - Digital Creator</title>
         <meta
           name="description"
           content="Creating apps and content designed to elevate human consciousness. Dedicated to building scalable solutions for mindfulness, awareness, and personal growth."
@@ -93,7 +90,9 @@ const Home = () => {
         </motion.div>
       </section>
 
-
+      <section className="container py-12">
+        <GrriiddCard embedUrl="https://grriidd.replit.app/embed.html" />
+      </section>
 
       {/* Featured Projects Section */}
       <Projects />
@@ -109,33 +108,9 @@ const Home = () => {
           <div className="text-center space-y-4">
             <h2 className="text-3xl font-bold tracking-tighter">Latest Articles</h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Explore my latest thoughts and insights on technology, partnerships, and human consciousness.
+              Explore my latest thoughts and insights on technology and consciousness.
             </p>
           </div>
-
-          <section className="container py-12">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="space-y-6"
-        >
-          <div className="space-y-2">
-            <h2 className="text-3xl font-bold tracking-tighter">Featured Content</h2>
-            <p className="text-muted-foreground">
-              Explore the latest interactive content
-            </p>
-          </div>
-          
-          <iframe 
-            src={embedUrl}
-            width="100%" 
-            height="800" 
-            style={{ border: 'none' }} 
-            allow="microphone; camera; autoplay; fullscreen; payment"
-          ></iframe>
-        </motion.div>
-      </section>
 
 {isLoadingPosts ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
