@@ -96,7 +96,7 @@ const Home = () => {
       {/* GRRIIDD Section */}
 
       <section className="container py-12">
-        <div className="text-center space-y-4">
+        <div className="text-center space-y-4 mb-8">
           <h2 className="text-3xl font-bold tracking-tighter">Latest Articles</h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
             Explore my latest thoughts and insights on technology and consciousness.
