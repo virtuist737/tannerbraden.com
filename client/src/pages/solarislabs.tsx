@@ -14,6 +14,17 @@ const LoadingSpinner = () => (
   </div>
 );
 
+// Custom styles for project cards
+const styles = {
+  projectCard: {
+    overflow: 'visible',
+  },
+  projectImage: {
+    width: '100%',
+    display: 'block',
+  }
+};
+
 const SolarisLabs = () => {
   const { data: projects = [], isLoading } = useQuery<Project[]>({
     queryKey: ["/api/projects"],
@@ -36,6 +47,36 @@ const SolarisLabs = () => {
           <h1 className="text-4xl font-bold tracking-tighter">Solaris Labs</h1>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
             Innovating at the intersection of technology and human flourishing.
+
+  {/* Assuming this goes where the project cards are rendered */}
+  {projects && (
+    <Masonry
+      breakpointCols={breakpointColumnsObj}
+      className="flex -ml-4 w-auto"
+      columnClassName="pl-4 bg-background"
+    >
+      {projects.map((project) => (
+        <motion.div
+          key={project.id}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="mb-4"
+        >
+          <Card style={styles.projectCard}>
+            {project.imageUrl && (
+              <div className="w-full">
+                <img 
+                  src={project.imageUrl} 
+                  alt={project.title}
+                  style={styles.projectImage}
+                  className="rounded-t-lg"
+                />
+              </div>
+            )}
+            <CardContent className="pt-6">
+              {/* Rest of the card content */}
+
           </p>
         </div>
 

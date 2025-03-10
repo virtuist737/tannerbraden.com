@@ -15,6 +15,12 @@ const breakpointColumnsObj = {
   640: 1,  // sm
 };
 
+// Add custom CSS for project images
+const projectImageStyle = {
+  width: '100%',
+  display: 'block',
+};
+
 const Projects = () => {
   const { data: projects, isLoading } = useQuery<Project[]>({
     queryKey: ["/api/projects"],

@@ -1,0 +1,27 @@
+
+/* Project card styles */
+.project-card {
+  overflow: visible;
+}
+
+.project-image-container {
+  width: 100%;
+  overflow: visible;
+}
+
+.project-image {
+  width: 100%;
+  display: block;
+}
+
+/* Masonry grid styles */
+.masonry-grid {
+  display: flex;
+  width: auto;
+  margin-left: -16px;
+}
+
+.masonry-grid-column {
+  padding-left: 16px;
+  background-clip: padding-box;
+}
