@@ -63,11 +63,11 @@ const SolarisLabs = () => {
               >
                 <Card className="h-full flex flex-col overflow-hidden hover:shadow-lg transition-shadow duration-300">
                   <CardHeader className="p-0">
-                    <div className="relative w-full overflow-hidden">
+                    <div className="relative w-full aspect-video overflow-hidden">
                       <img
                         src={project.imageUrl}
                         alt={project.title}
-                        className="w-full"
+                        className="w-full h-full object-cover"
                         loading="lazy"
                         onError={(e) => {
                           const target = e.target as HTMLImageElement;
