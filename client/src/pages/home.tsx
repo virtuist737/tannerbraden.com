@@ -74,12 +74,7 @@ const Home = () => {
             I create apps and content to reduce human suffering and increase the quality of human consciousness.
           </p>
           <div className="flex items-center justify-center gap-4 mt-8">
-            <Link href="/solarislabs">
-              <Button className="gap-2">
-                Solaris Labs
-                <ArrowRight className="h-4 w-4" />
-              </Button>
-            </Link>
+            
             <Link href="/contact">
               <Button variant="outline">
                 Let's Connect
