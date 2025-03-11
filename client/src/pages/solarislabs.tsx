@@ -14,16 +14,8 @@ const LoadingSpinner = () => (
   </div>
 );
 
-// Custom styles for project cards
-const styles = {
-  projectCard: {
-    overflow: 'visible',
-  },
-  projectImage: {
-    width: '100%',
-    display: 'block',
-  }
-};
+// Import CSS for consistent project card styling
+import "../styles/project-cards.css";
 
 const SolarisLabs = () => {
   const { data: projects = [], isLoading } = useQuery<Project[]>({
@@ -104,11 +96,11 @@ const SolarisLabs = () => {
               >
                 <Card className="h-full flex flex-col overflow-hidden hover:shadow-lg transition-shadow duration-300">
                   <CardHeader className="p-0">
-                    <div className="relative w-full aspect-video overflow-hidden">
+                    <div className="w-full project-image-container">
                       <img
                         src={project.imageUrl}
                         alt={project.title}
-                        className="w-full h-full object-cover"
+                        className="project-image"
                         loading="lazy"
                         onError={(e) => {
                           const target = e.target as HTMLImageElement;

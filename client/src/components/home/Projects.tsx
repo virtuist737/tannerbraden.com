@@ -15,11 +15,8 @@ const breakpointColumnsObj = {
   640: 1,  // sm
 };
 
-// Add custom CSS for project images
-const projectImageStyle = {
-  width: '100%',
-  display: 'block',
-};
+// Custom styles are now in project-cards.css
+import "../../styles/project-cards.css";
 
 const Projects = () => {
   const { data: projects, isLoading } = useQuery<Project[]>({
@@ -67,11 +64,11 @@ const Projects = () => {
             >
               <Card className="h-full flex flex-col overflow-hidden hover:shadow-lg transition-shadow duration-300">
                 <CardHeader className="p-0">
-                  <div className="relative w-full aspect-video">
+                  <div className="w-full project-image-container">
                     <img
                       src={project.imageUrl}
                       alt={project.title}
-                      className="w-full h-full object-cover"
+                      className="project-image"
                       loading="lazy"
                     />
                   </div>
