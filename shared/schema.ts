@@ -31,31 +31,7 @@ export const blogPosts = pgTable("blog_posts", {
   publishedAt: timestamp("published_at").notNull().defaultNow(),
 });
 
-// Analytics - Page Views with enhanced tracking
-export const pageViews = pgTable("page_views", {
-  id: serial("id").primaryKey(),
-  path: text("path").notNull(),
-  timestamp: timestamp("timestamp").notNull().defaultNow(),
-  duration: integer("duration"),
-  userAgent: text("user_agent"),
-  referrer: text("referrer"),
-  deviceType: text("device_type"),
-  browser: text("browser"),
-  platform: text("platform"),
-  isExit: boolean("is_exit").default(false),
-  isBounce: boolean("is_bounce").default(false),
-  scrollDepth: integer("scroll_depth"),
-});
 
-// Analytics - User Sessions
-export const userSessions = pgTable("user_sessions", {
-  id: serial("id").primaryKey(),
-  sessionId: text("session_id").notNull(),
-  userId: integer("user_id").references(() => users.id),
-  startTime: timestamp("start_time").notNull().defaultNow(),
-  endTime: timestamp("end_time"),
-  data: jsonb("data"),
-});
 
 // Newsletter Subscriptions
 export const newsletterSubscriptions = pgTable("newsletter_subscriptions", {
@@ -183,8 +159,7 @@ export type InsertBlogPost = z.infer<typeof insertBlogPostSchema>;
 export type NewsletterSubscription = typeof newsletterSubscriptions.$inferSelect;
 export type InsertNewsletterSubscription = z.infer<typeof insertNewsletterSubscriptionSchema>;
 
-export type PageView = typeof pageViews.$inferSelect;
-export type UserSession = typeof userSessions.$inferSelect;
+
 
 export type Interest = typeof interests.$inferSelect;
 export type InsertInterest = z.infer<typeof insertInterestSchema>;

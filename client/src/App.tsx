@@ -6,8 +6,7 @@ import { ProtectedRoute } from "@/lib/protected-route";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import { queryClient } from "@/lib/queryClient";
-import { useEffect } from "react";
-import { trackPageView, endPageTracking } from "@/lib/analytics";
+
 
 // Pages
 import Home from "@/pages/home";
@@ -42,16 +41,7 @@ import EditProject from "@/pages/admin/projects/[id]/edit";
 export default function App() {
   const [location] = useLocation();
 
-  // Use effect to track page views when the location changes
-  useEffect(() => {
-    // Make sure to use the location as a string path
-    trackPageView(typeof location === 'string' ? location : '/');
 
-    // Cleanup function
-    return () => {
-      endPageTracking();
-    };
-  }, [location]);
 
   return (
     <QueryClientProvider client={queryClient}>
