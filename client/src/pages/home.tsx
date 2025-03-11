@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { ArrowRight, AtSign } from "lucide-react";
+import { Info, ArrowRight, AtSign } from "lucide-react";
 import { Link } from "wouter";
 import { Helmet } from 'react-helmet-async';
 import { Button } from "@/components/ui/button";
@@ -75,6 +75,12 @@ const Home = () => {
           </p>
           <div className="flex items-center justify-center gap-4 mt-8">
             
+            <Link href="/contact">
+              <Button>
+                About Me
+                <Info className="h-4 w-4" />
+              </Button>
+            </Link>
             <Link href="/contact">
               <Button variant="outline">
                 Let's Connect
