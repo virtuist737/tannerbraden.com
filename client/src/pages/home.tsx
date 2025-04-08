@@ -75,7 +75,7 @@ const Home = () => {
           </p>
           <div className="flex items-center justify-center gap-4 mt-8">
             
-            <Link href="/contact">
+            <Link href="/about">
               <Button>
                 About Me
                 <Info className="h-4 w-4" />
