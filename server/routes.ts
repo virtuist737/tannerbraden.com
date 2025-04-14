@@ -15,7 +15,7 @@ import { upload } from "./lib/upload";
 import path from "path";
 import fs from "fs";
 import { fileURLToPath } from 'url';
-import { uploadToCloudinary } from './lib/cloudinary';
+import { uploadToObjectStorage } from './lib/objectStorage';
 
 // ESM module dirname equivalent
 const __filename = fileURLToPath(import.meta.url);
