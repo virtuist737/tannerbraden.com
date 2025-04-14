@@ -23,27 +23,28 @@ const Home = () => {
   return (
     <div className="flex flex-col min-h-screen">
       <Helmet>
-        <title>Tanner Braden - Digital Creator</title>
+        <title>Tanner Braden - Innovative Digital Creator & Audio Designer</title>
         <meta
           name="description"
-          content="Creating apps and content designed to elevate human consciousness. Dedicated to building scalable solutions for mindfulness, awareness, and personal growth."
+          content="Tanner Braden is a forward-thinking digital creator specializing in audio design, web development, and interactive experiences that elevate human consciousness and foster mindfulness in the digital age."
         />
         <meta
           name="keywords"
-          content="consciousness technology, digital wellbeing, mindfulness apps, human potential, personal growth"
+          content="digital creator, audio designer, web developer, consciousness technology, mindfulness innovation, interactive experiences, digital wellbeing, creative technology, music production"
         />
-        <meta property="og:title" content="Tanner Braden - Digital Creator" />
+        <meta property="og:title" content="Tanner Braden - Innovative Digital Creator & Audio Designer" />
         <meta
           property="og:description"
-          content="Creating apps and content designed to elevate human consciousness. Dedicated to building scalable solutions for mindfulness, awareness, and personal growth."
+          content="Tanner Braden is a forward-thinking digital creator specializing in audio design, web development, and interactive experiences that elevate human consciousness and foster mindfulness in the digital age."
         />
         <meta property="og:type" content="website" />
         <meta property="og:url" content={window.location.href} />
         <meta property="og:image" content="https://res.cloudinary.com/dvk20sglr/image/upload/v1739851169/tanner2.0_dark-500x500_f0dznv.png" />
-        <meta name="twitter:title" content="Tanner Braden - Digital Creator" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Tanner Braden - Innovative Digital Creator & Audio Designer" />
         <meta
           name="twitter:description"
-          content="Creating apps and content designed to elevate human consciousness. Dedicated to building scalable solutions for mindfulness, awareness, and personal growth."
+          content="Tanner Braden is a forward-thinking digital creator specializing in audio design, web development, and interactive experiences that elevate human consciousness and foster mindfulness in the digital age."
         />
         <meta name="twitter:image" content="https://res.cloudinary.com/dvk20sglr/image/upload/v1739851169/tanner2.0_dark-500x500_f0dznv.png" />
       </Helmet>

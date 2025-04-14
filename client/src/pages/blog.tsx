@@ -15,7 +15,16 @@ const Blog = () => {
   });
 
   // Get unique categories from posts
-  const categories = ["All", ...new Set(posts?.map(post => post.category) || [])];
+  const getUniqueCategories = () => {
+    if (!posts || posts.length === 0) return ["All"];
+    const categorySet = new Set<string>();
+    posts.forEach(post => {
+      if (post.category) categorySet.add(post.category);
+    });
+    return ["All", ...Array.from(categorySet)];
+  };
+  
+  const categories = getUniqueCategories();
 
   const filteredPosts = posts?.filter((post) => {
     const matchesSearch = post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||

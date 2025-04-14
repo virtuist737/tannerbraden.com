@@ -44,27 +44,30 @@ const Contact = () => {
   return (
     <>
       <Helmet>
-        <title>Contact - Tanner Braden</title>
+        <title>Contact - Tanner Braden | Digital Creator & Audio Designer</title>
         <meta
           name="description"
-          content="Connect with me about consciousness-enhancing projects, collaboration opportunities, or questions about my work."
+          content="Connect with Tanner Braden for creative collaborations, audio design projects, web development opportunities, or to discuss innovative ideas around consciousness and digital wellbeing."
         />
         <meta
           name="keywords"
-          content="contact, collaboration, consciousness technology, digital wellbeing, mindfulness tech"
+          content="contact digital creator, audio design collaboration, web development projects, creative technology partnership, consciousness innovation, digital content creation, audio production consultation"
         />
-        <meta property="og:title" content="Contact - Tanner Braden" />
+        <meta property="og:title" content="Contact - Tanner Braden | Digital Creator & Audio Designer" />
         <meta
           property="og:description"
-          content="Connect with me about consciousness-enhancing projects or collaboration opportunities."
+          content="Connect with Tanner Braden for creative collaborations, audio design projects, web development opportunities, or to discuss innovative ideas around consciousness and digital wellbeing."
         />
         <meta property="og:type" content="website" />
         <meta property="og:url" content={window.location.href} />
-        <meta name="twitter:title" content="Contact - Tanner Braden" />
+        <meta property="og:image" content="https://res.cloudinary.com/dvk20sglr/image/upload/v1739851169/tanner2.0_dark-500x500_f0dznv.png" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Contact - Tanner Braden | Digital Creator & Audio Designer" />
         <meta
           name="twitter:description"
-          content="Connect with me about consciousness-enhancing projects or collaboration opportunities."
+          content="Connect with Tanner Braden for creative collaborations, audio design projects, web development opportunities, or to discuss innovative ideas around consciousness and digital wellbeing."
         />
+        <meta name="twitter:image" content="https://res.cloudinary.com/dvk20sglr/image/upload/v1739851169/tanner2.0_dark-500x500_f0dznv.png" />
       </Helmet>
     <div className="container py-12">
       <motion.div
