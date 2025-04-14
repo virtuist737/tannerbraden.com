@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Info, ArrowRight, AtSign } from "lucide-react";
+import { Info, ArrowRight, AtSign, ExternalLink } from "lucide-react";
 import { Link } from "wouter";
 import { Helmet } from 'react-helmet-async';
 import { Button } from "@/components/ui/button";
@@ -103,6 +103,14 @@ const Home = () => {
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
             Play around with this music looper I made.
           </p>
+        </div>
+        <div className="flex justify-center mb-8">
+          <Link href="https://grriidd.replit.app">
+            <Button variant="outline">
+              Visit Web App
+              <ExternalLink className="h-4 w-4" />
+            </Button>
+          </Link>
         </div>
         <EmbeddedIframeCard embedUrl="https://grriidd.replit.app/embed.html" />
       </section>
