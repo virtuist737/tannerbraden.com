@@ -15,11 +15,6 @@ const Footer = () => {
               <Link href="/about">
                 <a className="text-muted-foreground hover:text-primary">About</a>
               </Link>
-              <Link href="/portfolio">
-                <a className="text-muted-foreground hover:text-primary">
-                  Portfolio
-                </a>
-              </Link>
               <Link href="/blog">
                 <a className="text-muted-foreground hover:text-primary">Blog</a>
               </Link>
