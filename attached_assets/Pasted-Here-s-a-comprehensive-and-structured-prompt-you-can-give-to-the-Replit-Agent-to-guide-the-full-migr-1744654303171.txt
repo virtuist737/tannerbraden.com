@@ -1,0 +1,63 @@
+Here’s a comprehensive and structured prompt you can give to the Replit Agent to guide the full migration from Cloudinary to Replit Object Storage, while cleaning up all outdated or redundant code:
+
+⸻
+
+Prompt for Replit Agent
+
+We’re currently using Cloudinary for image uploads and storage in our app, but we want to migrate fully to Replit Object Storage. Your job is to rebuild the entire image handling pipeline to use Replit Object Storage, and remove all Cloudinary-related code. The new solution should maintain the existing functionality, adhere to modern best practices, and keep the codebase clean and type-safe.
+
+🔧 Current System Overview
+
+Our image handling is implemented in:
+	•	ImageUpload.tsx (React)
+	•	Drag-and-drop and file selection
+	•	Single & multiple image upload
+	•	Validates file type (image-only) and size (max 5MB)
+	•	Shows upload progress
+	•	Displays image previews / gallery for multiple uploads
+	•	Upload endpoint: POST /api/upload/{entityType}/{entityId}
+	•	Uses multer with memoryStorage
+	•	Uploads files to Cloudinary via uploadToCloudinary()
+	•	Stores returned Cloudinary URL in the database (PostgreSQL via Prisma)
+
+📦 What Needs to Change
+
+Core goal: Replace Cloudinary with Replit Object Storage and remove all Cloudinary-specific code.
+
+✅ Tasks
+
+Frontend (ImageUpload.tsx)
+	•	Keep the current drag-and-drop, validation, preview, and progress functionality.
+	•	After upload, display image URLs from Replit Object Storage instead of Cloudinary.
+
+Backend API (/api/upload/[entityType]/[entityId])
+	•	Replace uploadToCloudinary() with logic to upload to Replit Object Storage.
+	•	Use multer as is (unless better Replit-native middleware exists).
+	•	Use Replit’s official Object Storage SDK/API to upload and get public image URLs.
+	•	Save these image URLs to the database exactly like we did with Cloudinary.
+
+Database
+	•	No schema change needed unless Replit URLs require additional metadata (e.g., file ID, bucket info). If so, update the Prisma schema accordingly and migrate.
+
+Cleanup
+	•	Completely remove:
+	•	uploadToCloudinary function
+	•	Any Cloudinary SDK imports or env variables
+	•	References to Cloudinary in tsconfig, scripts, or docs
+	•	Replace or rename variables/functions like cloudinaryUrl → imageUrl or objectStorageUrl for clarity.
+
+🧪 Requirements
+	•	TypeScript-safe
+	•	Clear error handling at each step
+	•	Clean, readable, modular code (no leftovers or commented-out Cloudinary code)
+	•	Fully working image gallery support for multi-image uploads
+	•	Replit Object Storage must be the only storage mechanism used after this
+
+🧠 Optional Enhancements (if time allows)
+	•	Add automatic filename normalization or timestamping to avoid collisions
+	•	Ensure public URLs are safely sharable and CDN-optimized if supported by Replit
+	•	Make uploads resumable or retryable if Replit API allows it
+
+⸻
+
+Let me know if you’d like me to generate example code snippets or a checklist to help you track the migration process!
