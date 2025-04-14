@@ -41,10 +41,14 @@ export const uploadToObjectStorage = async (file: Express.Multer.File, folder: s
     // Objects are accessible at this pattern:
     // https://{replid}.id.repl.co/api/objects/{objectPath}
     // We will use express to serve these objects from our object storage
+    // Get the deployment ID if we're in a deployment
+    const deploymentID = process.env.REPL_DEPLOYMENT ? process.env.REPL_ID : null;
     const replID = process.env.REPL_ID || 'development';
-    const baseUrl = process.env.NODE_ENV === 'production' 
-      ? `https://${replID}.id.repl.co`
-      : `http://localhost:5000`;
+    
+    // Use deployment URL if deployed, otherwise use development URL
+    const baseUrl = deploymentID 
+      ? `https://${deploymentID}.id.repl.co`
+      : `http://0.0.0.0:5000`;
     
     // Create the public URL for the file
     const publicUrl = `${baseUrl}/api/objects/${objectPath}`;
