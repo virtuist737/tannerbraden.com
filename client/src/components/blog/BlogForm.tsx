@@ -45,13 +45,12 @@ interface BlogFormProps {
 }
 
 const CATEGORIES = [
-  "Web Development",
-  "React",
-  "TypeScript",
-  "JavaScript",
-  "CSS",
-  "Programming",
-  "Tech News",
+  "Philosophy",
+  "Technology",
+  "Mindfulness",
+  "Personal Growth",
+  "Consciousness",
+  "Artificial Intelligence"
 ];
 
 const BlogForm = ({ initialData, onSubmit, isSubmitting }: BlogFormProps) => {
