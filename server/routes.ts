@@ -15,7 +15,7 @@ import { upload } from "./lib/upload";
 import path from "path";
 import fs from "fs";
 import { fileURLToPath } from 'url';
-import { uploadToObjectStorage } from './lib/objectStorage';
+import { uploadToObjectStorage, getObjectPathFromUrl, deleteFromObjectStorage, objectStore } from './lib/objectStorage';
 
 // ESM module dirname equivalent
 const __filename = fileURLToPath(import.meta.url);
@@ -205,16 +205,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
 
-      // Upload to Cloudinary
-      const cloudinaryUrl = await uploadToCloudinary(req.file, entityType);
+      // Upload to Replit Object Storage
+      const imageUrl = await uploadToObjectStorage(req.file, entityType);
 
       // Only update the database for non-content images
       if (!isContentImage && id !== undefined) {
-        await updateFunction(id, cloudinaryUrl);
+        await updateFunction(id, imageUrl);
       }
 
-      // Return the Cloudinary URL
-      res.json({ imageUrl: cloudinaryUrl });
+      // Return the image URL
+      res.json({ imageUrl });
     } catch (error) {
       console.error(`Error uploading ${entityType} image:`, error);
       res.status(500).json({ error: "Failed to upload image" });
@@ -547,6 +547,56 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error fetching project:", error);
       res.status(500).json({ error: "Failed to fetch project" });
+    }
+  });
+  
+  // Add route to serve images from Object Storage
+  app.get("/api/objects/:path(*)", async (req, res) => {
+    try {
+      const objectPath = req.params.path;
+      if (!objectPath) {
+        return res.status(400).json({ error: "Invalid object path" });
+      }
+      
+      // Download the image from Object Storage
+      const result = await objectStore.downloadAsBytes(objectPath);
+      
+      if (!result.ok) {
+        console.error(`Error fetching object: ${objectPath}`, result.error);
+        return res.status(404).json({ error: "File not found" });
+      }
+      
+      // Get the file extension to determine content type
+      const fileExtension = path.extname(objectPath).toLowerCase();
+      let contentType = 'application/octet-stream'; // Default content type
+      
+      // Set the appropriate content type based on file extension
+      switch (fileExtension) {
+        case '.jpg':
+        case '.jpeg':
+          contentType = 'image/jpeg';
+          break;
+        case '.png':
+          contentType = 'image/png';
+          break;
+        case '.gif':
+          contentType = 'image/gif';
+          break;
+        case '.svg':
+          contentType = 'image/svg+xml';
+          break;
+        case '.webp':
+          contentType = 'image/webp';
+          break;
+      }
+      
+      // Set content type and return the file
+      res.set('Content-Type', contentType);
+      res.set('Cache-Control', 'public, max-age=31536000'); // Cache for 1 year
+      res.send(result.value[0]);
+    } catch (error) {
+      console.error("Error serving object:", error);
+      res.status(500).json({ error: "Failed to serve file" });
     }
   });
 

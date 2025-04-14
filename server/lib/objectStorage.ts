@@ -3,7 +3,7 @@ import crypto from 'crypto';
 import path from 'path';
 
 // Initialize the object store client
-const objectStore = new Client();
+export const objectStore = new Client();
 
 /**
  * Uploads a file to Replit Object Storage
@@ -26,20 +26,33 @@ export const uploadToObjectStorage = async (file: Express.Multer.File, folder: s
     // Create the full path with folder structure
     const objectPath = `portfolio/${folder}/${filename}`;
     
-    // Upload the file to object storage
-    await objectStore.put(
+    // Upload the file to object storage using the uploadFromBytes method
+    const result = await objectStore.uploadFromBytes(
       objectPath,
       file.buffer,
-      { contentType: file.mimetype }
+      { compress: true }
     );
     
-    // Generate a public URL for the file
-    const publicUrl = await objectStore.getSignedUrl(objectPath, { ttl: Infinity });
+    if (!result.ok) {
+      throw new Error(`Upload failed: ${result.error}`);
+    }
+    
+    // Get the base URL for the bucket
+    // Objects are accessible at this pattern:
+    // https://{replid}.id.repl.co/api/objects/{objectPath}
+    // We will use express to serve these objects from our object storage
+    const replID = process.env.REPL_ID || 'development';
+    const baseUrl = process.env.NODE_ENV === 'production' 
+      ? `https://${replID}.id.repl.co`
+      : `http://localhost:5000`;
+    
+    // Create the public URL for the file
+    const publicUrl = `${baseUrl}/api/objects/${objectPath}`;
     
     return publicUrl;
   } catch (error) {
     console.error('Object Storage upload error:', error);
-    throw new Error('Failed to upload image to Object Storage');
+    throw new Error(`Failed to upload image to Object Storage: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }
 };
 
@@ -49,25 +62,29 @@ export const uploadToObjectStorage = async (file: Express.Multer.File, folder: s
  */
 export const deleteFromObjectStorage = async (objectPath: string): Promise<void> => {
   try {
-    await objectStore.delete(objectPath);
+    const result = await objectStore.delete(objectPath);
+    if (!result.ok) {
+      throw new Error(`Delete failed: ${result.error}`);
+    }
   } catch (error) {
     console.error('Object Storage delete error:', error);
-    throw new Error('Failed to delete image from Object Storage');
+    throw new Error(`Failed to delete image from Object Storage: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }
 };
 
 /**
- * Extracts the object path from a signed URL
- * @param signedUrl The signed URL of the object
+ * Extracts the object path from our URL format
+ * @param imageUrl The image URL in our format
  * @returns The object path that can be used for operations like delete
  */
-export const getObjectPathFromUrl = (signedUrl: string): string => {
+export const getObjectPathFromUrl = (imageUrl: string): string => {
   try {
     // Parse the URL to extract the pathname
-    const url = new URL(signedUrl);
-    // The pathname should contain the full object path
-    // Extract the path from the URL pattern
-    const regex = /\/v1\/object\/([^?]+)/;
+    const url = new URL(imageUrl);
+    
+    // The pattern for our URLs is /api/objects/{objectPath}
+    // So we need to remove the /api/objects/ prefix
+    const regex = /\/api\/objects\/(.*)/;
     const match = url.pathname.match(regex);
     
     if (match && match[1]) {
