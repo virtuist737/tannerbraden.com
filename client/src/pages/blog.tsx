@@ -46,27 +46,30 @@ const Blog = () => {
   return (
     <>
       <Helmet>
-        <title>Blog - Tanner Braden</title>
+        <title>Blog - Tanner Braden | Digital Creator</title>
         <meta
           name="description"
-          content="Thoughts, ideas, and insights on consciousness development, technology for wellbeing, and personal growth strategies."
+          content="Explore insights and perspectives from Tanner Braden, a digital creator focused on consciousness development, innovative technology for wellbeing, and transformative personal growth strategies."
         />
         <meta
           name="keywords"
-          content="consciousness blog, digital wellbeing, mindfulness technology, human potential, personal growth"
+          content="digital creator blog, consciousness exploration, mindfulness technology, creative innovation, personal transformation, audio production, web development, digital content creation"
         />
-        <meta property="og:title" content="Blog - Tanner Braden" />
+        <meta property="og:title" content="Blog - Tanner Braden | Digital Creator" />
         <meta
           property="og:description"
-          content="Thoughts, ideas, and insights on consciousness development, technology for wellbeing, and personal growth."
+          content="Explore insights and perspectives from Tanner Braden, a digital creator focused on consciousness development, innovative technology for wellbeing, and transformative personal growth strategies."
         />
         <meta property="og:type" content="website" />
         <meta property="og:url" content={window.location.href} />
-        <meta name="twitter:title" content="Blog - Tanner Braden" />
+        {posts?.[0]?.coverImage && <meta property="og:image" content={posts[0].coverImage} />}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Blog - Tanner Braden | Digital Creator" />
         <meta
           name="twitter:description"
-          content="Thoughts, ideas, and insights on consciousness development, technology for wellbeing, and personal growth."
+          content="Explore insights and perspectives from Tanner Braden, a digital creator focused on consciousness development, innovative technology for wellbeing, and transformative personal growth strategies."
         />
+        {posts?.[0]?.coverImage && <meta name="twitter:image" content={posts[0].coverImage} />}
       </Helmet>
     <div className="container py-12">
       <motion.div
