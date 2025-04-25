@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -29,6 +30,8 @@ import { type BlogPost } from "@shared/schema";
 import { ImageUpload } from "@/components/shared/ImageUpload";
 import { ImagePlus, Link2, Bold, Italic, Heading2, List, ListOrdered, Quote } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Switch } from "@/components/ui/switch";
+import { Textarea } from "@/components/ui/textarea";
 
 const blogFormSchema = insertBlogPostSchema.extend({
   title: z.string().min(1, "Title is required"),
@@ -36,6 +39,12 @@ const blogFormSchema = insertBlogPostSchema.extend({
   excerpt: z.string().min(1, "Excerpt is required"),
   coverImage: z.string().optional(),
   category: z.string().min(1, "Category is required"),
+  // SEO fields
+  seoTitle: z.string().max(60, "SEO Title should be under 60 characters").optional(),
+  seoDescription: z.string().max(160, "SEO Description should be under 160 characters").optional(),
+  seoKeywords: z.string().optional(),
+  canonicalUrl: z.string().url("Must be a valid URL").optional().or(z.literal("")),
+  isIndexed: z.boolean().default(true),
 });
 
 interface BlogFormProps {
@@ -63,6 +72,12 @@ const BlogForm = ({ initialData, onSubmit, isSubmitting }: BlogFormProps) => {
       coverImage: initialData?.coverImage || "",
       category: initialData?.category || "",
       slug: initialData?.slug || "",
+      // SEO fields
+      seoTitle: initialData?.seoTitle || "",
+      seoDescription: initialData?.seoDescription || "",
+      seoKeywords: initialData?.seoKeywords || "",
+      canonicalUrl: initialData?.canonicalUrl || "",
+      isIndexed: initialData?.isIndexed ?? true,
     },
   });
 
@@ -373,6 +388,121 @@ const BlogForm = ({ initialData, onSubmit, isSubmitting }: BlogFormProps) => {
             </FormItem>
           )}
         />
+
+        {/* SEO Section */}
+        <Tabs defaultValue="basic">
+          <TabsList className="mb-4">
+            <TabsTrigger value="basic">Basic</TabsTrigger>
+            <TabsTrigger value="seo">SEO</TabsTrigger>
+          </TabsList>
+          <TabsContent value="basic">
+            <p className="text-sm text-muted-foreground mb-4">
+              Basic settings are already configured. Switch to the SEO tab to optimize your post for search engines.
+            </p>
+          </TabsContent>
+          <TabsContent value="seo" className="space-y-4">
+            <div className="grid gap-4 md:grid-cols-2">
+              <FormField
+                control={form.control}
+                name="seoTitle"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>SEO Title <span className="text-xs text-muted-foreground">(Optional)</span></FormLabel>
+                    <FormControl>
+                      <Input {...field} maxLength={60} />
+                    </FormControl>
+                    <p className="text-xs text-muted-foreground">
+                      Characters: {field.value?.length || 0}/60 
+                      {(field.value?.length || 0) > 60 && <span className="text-red-500"> (Too long!)</span>}
+                    </p>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="canonicalUrl"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Canonical URL <span className="text-xs text-muted-foreground">(Optional)</span></FormLabel>
+                    <FormControl>
+                      <Input {...field} placeholder="https://example.com/original-post" />
+                    </FormControl>
+                    <p className="text-xs text-muted-foreground">Use this if the content is published elsewhere first.</p>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            <FormField
+              control={form.control}
+              name="seoDescription"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>SEO Description <span className="text-xs text-muted-foreground">(Optional)</span></FormLabel>
+                  <FormControl>
+                    <Textarea 
+                      {...field} 
+                      maxLength={160}
+                      className="resize-none"
+                      placeholder="Brief description for search results (defaults to excerpt if left empty)"
+                    />
+                  </FormControl>
+                  <p className="text-xs text-muted-foreground">
+                    Characters: {field.value?.length || 0}/160
+                    {(field.value?.length || 0) > 160 && <span className="text-red-500"> (Too long!)</span>}
+                  </p>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="seoKeywords"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Keywords <span className="text-xs text-muted-foreground">(Optional)</span></FormLabel>
+                  <FormControl>
+                    <Input 
+                      {...field} 
+                      placeholder="SEO keywords separated by commas" 
+                    />
+                  </FormControl>
+                  <p className="text-xs text-muted-foreground">
+                    3-5 relevant keywords separated by commas
+                  </p>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="isIndexed"
+              render={({ field }) => (
+                <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                  <div className="space-y-0.5">
+                    <FormLabel className="text-base">
+                      Index in Search Engines
+                    </FormLabel>
+                    <FormDescription>
+                      Allow search engines to index this post
+                    </FormDescription>
+                  </div>
+                  <FormControl>
+                    <Switch
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                    />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+          </TabsContent>
+        </Tabs>
 
         <div className="flex justify-end">
           <Button type="submit" disabled={isSubmitting}>

@@ -59,7 +59,7 @@ const Blog = () => {
         title: "Blog",
         description: "Explore insights and perspectives from Tanner Braden, a digital creator focused on consciousness development, innovative technology for wellbeing, and transformative personal growth strategies.",
         keywords: "digital creator blog, consciousness exploration, mindfulness technology, creative innovation, personal transformation, audio production, web development, digital content creation",
-        image: posts?.[0]?.coverImage,
+        image: posts?.[0]?.coverImage || undefined,
       })} />
     <div className="container py-12">
       <motion.div
