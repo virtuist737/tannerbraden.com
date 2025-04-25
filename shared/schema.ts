@@ -29,6 +29,12 @@ export const blogPosts = pgTable("blog_posts", {
   authorId: integer("author_id").references(() => users.id),
   category: text("category").notNull(),
   publishedAt: timestamp("published_at").notNull().defaultNow(),
+  // SEO fields
+  seoTitle: text("seo_title"),
+  seoDescription: text("seo_description"),
+  seoKeywords: text("seo_keywords"),
+  canonicalUrl: text("canonical_url"),
+  isIndexed: boolean("is_indexed").notNull().default(true),
 });
 
 
@@ -107,6 +113,11 @@ export const insertBlogPostSchema = createInsertSchema(blogPosts).omit({
   publishedAt: true,
 }).extend({
   coverImage: z.string().optional(),  // Make explicitly optional in zod schema
+  seoTitle: z.string().max(60, "SEO Title should be under 60 characters").optional(),
+  seoDescription: z.string().max(160, "SEO Description should be under 160 characters").optional(),
+  seoKeywords: z.string().optional(),
+  canonicalUrl: z.string().url("Must be a valid URL").optional(),
+  isIndexed: z.boolean().optional().default(true),
 });
 
 export const insertNewsletterSubscriptionSchema = createInsertSchema(newsletterSubscriptions).pick({
