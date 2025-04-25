@@ -14,6 +14,7 @@ import About from "@/pages/about";
 import Blog from "@/pages/blog";
 import BlogPost from "@/pages/blog/[slug]";
 import Contact from "@/pages/contact";
+import Projects from "@/pages/projects";
 
 import Auth from "@/pages/auth";
 import NotFound from "@/pages/not-found";
@@ -55,6 +56,7 @@ export default function App() {
                 <Route path="/about" component={About} />
                 <Route path="/blog" component={Blog} />
                 <Route path="/blog/:slug" component={BlogPost} />
+                <Route path="/projects" component={Projects} />
                 <Route path="/contact" component={Contact} />
                 
                 <Route path="/auth" component={Auth} />
