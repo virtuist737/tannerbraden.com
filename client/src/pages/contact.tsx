@@ -14,7 +14,8 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Linkedin, Twitter } from "lucide-react";
-import { Helmet } from 'react-helmet-async';
+import SEO from "@/components/shared/SEO";
+import { generateSEOMetadata } from "@/lib/seo";
 
 const contactFormSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
@@ -43,32 +44,12 @@ const Contact = () => {
 
   return (
     <>
-      <Helmet>
-        <title>Contact - Tanner Braden | Digital Creator & Audio Designer</title>
-        <meta
-          name="description"
-          content="Connect with Tanner Braden for creative collaborations, audio design projects, web development opportunities, or to discuss innovative ideas around consciousness and digital wellbeing."
-        />
-        <meta
-          name="keywords"
-          content="contact digital creator, audio design collaboration, web development projects, creative technology partnership, consciousness innovation, digital content creation, audio production consultation"
-        />
-        <meta property="og:title" content="Contact - Tanner Braden | Digital Creator & Audio Designer" />
-        <meta
-          property="og:description"
-          content="Connect with Tanner Braden for creative collaborations, audio design projects, web development opportunities, or to discuss innovative ideas around consciousness and digital wellbeing."
-        />
-        <meta property="og:type" content="website" />
-        <meta property="og:url" content={window.location.href} />
-        <meta property="og:image" content="https://res.cloudinary.com/dvk20sglr/image/upload/v1739851169/tanner2.0_dark-500x500_f0dznv.png" />
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="Contact - Tanner Braden | Digital Creator & Audio Designer" />
-        <meta
-          name="twitter:description"
-          content="Connect with Tanner Braden for creative collaborations, audio design projects, web development opportunities, or to discuss innovative ideas around consciousness and digital wellbeing."
-        />
-        <meta name="twitter:image" content="https://res.cloudinary.com/dvk20sglr/image/upload/v1739851169/tanner2.0_dark-500x500_f0dznv.png" />
-      </Helmet>
+      <SEO data={generateSEOMetadata({
+        title: "Contact",
+        description: "Connect with Tanner Braden for creative collaborations, audio design projects, web development opportunities, or to discuss innovative ideas around consciousness and digital wellbeing.",
+        keywords: "contact digital creator, audio design collaboration, web development projects, creative technology partnership, consciousness innovation, digital content creation, audio production consultation",
+        image: "https://res.cloudinary.com/dvk20sglr/image/upload/v1739851169/tanner2.0_dark-500x500_f0dznv.png",
+      })} />
     <div className="container py-12">
       <motion.div
         initial={{ opacity: 0, y: 20 }}

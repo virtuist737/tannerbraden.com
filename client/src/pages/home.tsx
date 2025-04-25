@@ -1,7 +1,6 @@
 import { motion } from "framer-motion";
 import { Info, ArrowRight, AtSign, ExternalLink } from "lucide-react";
 import { Link } from "wouter";
-import { Helmet } from 'react-helmet-async';
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import Projects from "@/components/home/Projects";
@@ -9,6 +8,8 @@ import BlogCard from "@/components/blog/BlogCard";
 import { useQuery } from "@tanstack/react-query";
 import type { BlogPost } from "@shared/schema";
 import { EmbeddedIframeCard } from "@/components/ui/EmbeddedIframeCard";
+import SEO from "@/components/shared/SEO";
+import { generateSEOMetadata } from "@/lib/seo";
 
 
 const Home = () => {
@@ -22,32 +23,12 @@ const Home = () => {
 
   return (
     <div className="flex flex-col min-h-screen">
-      <Helmet>
-        <title>Tanner Braden - Innovative Digital Creator & Audio Designer</title>
-        <meta
-          name="description"
-          content="Tanner Braden is a forward-thinking digital creator specializing in audio design, web development, and interactive experiences that elevate human consciousness and foster mindfulness in the digital age."
-        />
-        <meta
-          name="keywords"
-          content="digital creator, audio designer, web developer, consciousness technology, mindfulness innovation, interactive experiences, digital wellbeing, creative technology, music production"
-        />
-        <meta property="og:title" content="Tanner Braden - Innovative Digital Creator & Audio Designer" />
-        <meta
-          property="og:description"
-          content="Tanner Braden is a forward-thinking digital creator specializing in audio design, web development, and interactive experiences that elevate human consciousness and foster mindfulness in the digital age."
-        />
-        <meta property="og:type" content="website" />
-        <meta property="og:url" content={window.location.href} />
-        <meta property="og:image" content="https://res.cloudinary.com/dvk20sglr/image/upload/v1739851169/tanner2.0_dark-500x500_f0dznv.png" />
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="Tanner Braden - Innovative Digital Creator & Audio Designer" />
-        <meta
-          name="twitter:description"
-          content="Tanner Braden is a forward-thinking digital creator specializing in audio design, web development, and interactive experiences that elevate human consciousness and foster mindfulness in the digital age."
-        />
-        <meta name="twitter:image" content="https://res.cloudinary.com/dvk20sglr/image/upload/v1739851169/tanner2.0_dark-500x500_f0dznv.png" />
-      </Helmet>
+      <SEO data={generateSEOMetadata({
+        title: "Tanner Braden - Innovative Digital Creator & Audio Designer",
+        description: "Tanner Braden is a forward-thinking digital creator specializing in audio design, web development, and interactive experiences that elevate human consciousness and foster mindfulness in the digital age.",
+        keywords: "digital creator, audio designer, web developer, consciousness technology, mindfulness innovation, interactive experiences, digital wellbeing, creative technology, music production",
+        image: "https://res.cloudinary.com/dvk20sglr/image/upload/v1739851169/tanner2.0_dark-500x500_f0dznv.png",
+      })} />
 
       {/* Hero Section */}
       <section className="container py-24 space-y-8">

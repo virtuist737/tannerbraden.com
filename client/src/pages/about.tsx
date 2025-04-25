@@ -22,7 +22,8 @@ import TimelineComponent from "@/components/about/Timeline";
 import { ImageUpload } from "@/components/shared/ImageUpload";
 import { useQueryClient } from "@tanstack/react-query";
 import Masonry from 'react-masonry-css';
-import { Helmet } from 'react-helmet-async';
+import SEO from "@/components/shared/SEO";
+import { generateSEOMetadata } from "@/lib/seo";
 
 const breakpointColumnsObj = {
   default: 5,
@@ -72,32 +73,12 @@ const About = () => {
 
   return (
     <>
-      <Helmet>
-        <title>About - Tanner Braden | Digital Creator & Audio Designer</title>
-        <meta
-          name="description"
-          content="Learn about Tanner Braden's journey as a digital creator, audio designer, and consciousness explorer. Discover the inspiration behind my creative work and innovative technology projects."
-        />
-        <meta
-          name="keywords"
-          content="digital creator, audio design, consciousness explorer, web development, interactive experiences, creative technology, mindfulness innovation, personal journey"
-        />
-        <meta property="og:title" content="About - Tanner Braden | Digital Creator & Audio Designer" />
-        <meta
-          property="og:description"
-          content="Learn about Tanner Braden's journey as a digital creator, audio designer, and consciousness explorer. Discover the inspiration behind my creative work and innovative technology projects."
-        />
-        <meta property="og:type" content="website" />
-        <meta property="og:url" content={window.location.href} />
-        <meta property="og:image" content="https://res.cloudinary.com/dvk20sglr/image/upload/v1739851169/tanner2.0_dark-500x500_f0dznv.png" />
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="About - Tanner Braden | Digital Creator & Audio Designer" />
-        <meta
-          name="twitter:description"
-          content="Learn about Tanner Braden's journey as a digital creator, audio designer, and consciousness explorer. Discover the inspiration behind my creative work and innovative technology projects."
-        />
-        <meta name="twitter:image" content="https://res.cloudinary.com/dvk20sglr/image/upload/v1739851169/tanner2.0_dark-500x500_f0dznv.png" />
-      </Helmet>
+      <SEO data={generateSEOMetadata({
+        title: "About",
+        description: "Learn about Tanner Braden's journey as a digital creator, audio designer, and consciousness explorer. Discover the inspiration behind my creative work and innovative technology projects.",
+        keywords: "digital creator, audio design, consciousness explorer, web development, interactive experiences, creative technology, mindfulness innovation, personal journey",
+        image: "https://res.cloudinary.com/dvk20sglr/image/upload/v1739851169/tanner2.0_dark-500x500_f0dznv.png",
+      })} />
       <div className="min-h-screen">
         <div className="container max-w-7xl mx-auto px-4 py-12 space-y-16">
           <section className="max-w-4xl mx-auto">
