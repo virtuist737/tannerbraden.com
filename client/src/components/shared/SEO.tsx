@@ -21,6 +21,9 @@ export default function SEO({ data }: SEOProps) {
     articleSection,
     noIndex,
   } = data;
+  
+  // Log SEO data for debugging
+  console.log('SEO Component rendered with title:', title);
 
   return (
     <Helmet>
