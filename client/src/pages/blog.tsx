@@ -4,7 +4,8 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Helmet } from 'react-helmet-async';
+import SEO from "@/components/shared/SEO";
+import { generateSEOMetadata } from "@/lib/seo";
 
 const Blog = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -54,32 +55,12 @@ const Blog = () => {
 
   return (
     <>
-      <Helmet>
-        <title>Blog - Tanner Braden | Digital Creator</title>
-        <meta
-          name="description"
-          content="Explore insights and perspectives from Tanner Braden, a digital creator focused on consciousness development, innovative technology for wellbeing, and transformative personal growth strategies."
-        />
-        <meta
-          name="keywords"
-          content="digital creator blog, consciousness exploration, mindfulness technology, creative innovation, personal transformation, audio production, web development, digital content creation"
-        />
-        <meta property="og:title" content="Blog - Tanner Braden | Digital Creator" />
-        <meta
-          property="og:description"
-          content="Explore insights and perspectives from Tanner Braden, a digital creator focused on consciousness development, innovative technology for wellbeing, and transformative personal growth strategies."
-        />
-        <meta property="og:type" content="website" />
-        <meta property="og:url" content={window.location.href} />
-        {posts?.[0]?.coverImage && <meta property="og:image" content={posts[0].coverImage} />}
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="Blog - Tanner Braden | Digital Creator" />
-        <meta
-          name="twitter:description"
-          content="Explore insights and perspectives from Tanner Braden, a digital creator focused on consciousness development, innovative technology for wellbeing, and transformative personal growth strategies."
-        />
-        {posts?.[0]?.coverImage && <meta name="twitter:image" content={posts[0].coverImage} />}
-      </Helmet>
+      <SEO data={generateSEOMetadata({
+        title: "Blog",
+        description: "Explore insights and perspectives from Tanner Braden, a digital creator focused on consciousness development, innovative technology for wellbeing, and transformative personal growth strategies.",
+        keywords: "digital creator blog, consciousness exploration, mindfulness technology, creative innovation, personal transformation, audio production, web development, digital content creation",
+        image: posts?.[0]?.coverImage,
+      })} />
     <div className="container py-12">
       <motion.div
         initial={{ opacity: 0, y: 20 }}

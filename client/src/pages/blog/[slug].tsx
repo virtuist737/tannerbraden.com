@@ -6,7 +6,8 @@ import { Badge } from "@/components/ui/badge";
 import type { BlogPost } from "@shared/schema";
 import { useQuery } from "@tanstack/react-query";
 import { format } from "date-fns";
-import { Helmet } from 'react-helmet-async';
+import SEO from "@/components/shared/SEO";
+import { generateBlogSEOMetadata } from "@/lib/seo";
 
 const BlogPostPage = () => {
   const { slug } = useParams();
@@ -51,28 +52,7 @@ const BlogPostPage = () => {
 
   return (
     <>
-      <Helmet>
-        <title>{post.title} - Tanner Braden</title>
-        <meta
-          name="description"
-          content={post.excerpt}
-        />
-        <meta
-          name="keywords"
-          content={`${post.category}, tanner braden, digital creation, mindfulness, consciousness, ${post.title.toLowerCase()}`}
-        />
-        <meta property="og:title" content={`${post.title} - Tanner Braden`} />
-        <meta property="og:description" content={post.excerpt} />
-        <meta property="og:type" content="article" />
-        <meta property="og:url" content={window.location.href} />
-        {post.coverImage && <meta property="og:image" content={post.coverImage} />}
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content={`${post.title} - Tanner Braden`} />
-        <meta name="twitter:description" content={post.excerpt} />
-        {post.coverImage && <meta name="twitter:image" content={post.coverImage} />}
-        <meta property="article:published_time" content={post.publishedAt?.toString()} />
-        <meta property="article:section" content={post.category} />
-      </Helmet>
+      <SEO data={generateBlogSEOMetadata(post)} />
     <div className="container py-12">
       <motion.article
         initial={{ opacity: 0, y: 20 }}
