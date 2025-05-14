@@ -92,7 +92,7 @@ export const favorites = pgTable("favorites", {
 });
 
 // Add projects table after the existing tables
-// Update projects table to properly handle buttons and add company reference
+// Update projects table to properly handle buttons and add venture reference
 export const projects = pgTable("projects", {
   id: serial("id").primaryKey(),
   title: text("title").notNull(),
@@ -100,7 +100,7 @@ export const projects = pgTable("projects", {
   imageUrl: text("image_url").notNull(),
   technologies: text("technologies").array().notNull(),
   buttons: jsonb("buttons").notNull().$type<Button[]>().default([]), // Properly type the buttons field
-  companyId: integer("company_id").references(() => companies.id),
+  ventureId: integer("venture_id").references(() => ventures.id),
   sortOrder: integer("sort_order").notNull().default(0),
   featured: boolean("featured").notNull().default(false),
   createdAt: timestamp("created_at").notNull().defaultNow(),
@@ -116,9 +116,9 @@ export const blogPostsRelations = relations(blogPosts, ({ one }) => ({
 
 // Project relationships
 export const projectsRelations = relations(projects, ({ one }) => ({
-  company: one(companies, {
-    fields: [projects.companyId],
-    references: [companies.id],
+  ventures: one(ventures, {
+    fields: [projects.ventureId],
+    references: [ventures.id],
   }),
 }));
 
@@ -170,8 +170,8 @@ export const insertTimelineSchema = createInsertSchema(timeline).omit({
   imageUrl: z.string().optional(),
 });
 
-// Company/Brand schema
-export const insertCompanySchema = createInsertSchema(companies).omit({
+// Venture/Brand schema
+export const insertVentureSchema = createInsertSchema(ventures).omit({
   id: true,
 }).extend({
   name: z.string().min(1, "Name is required"),
@@ -181,14 +181,14 @@ export const insertCompanySchema = createInsertSchema(companies).omit({
   sortOrder: z.number().int().nonnegative().default(0),
 });
 
-// Update insertProjectSchema to properly validate buttons and add company reference
+// Update insertProjectSchema to properly validate buttons and add venture reference
 export const insertProjectSchema = createInsertSchema(projects).omit({
   id: true,
   createdAt: true,
 }).extend({
   technologies: z.array(z.string()),
   buttons: z.array(buttonSchema).default([]),
-  companyId: z.number().int().positive().optional().nullable(),
+  ventureId: z.number().int().positive().optional().nullable(),
 });
 
 // Types for TypeScript

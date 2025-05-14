@@ -26,8 +26,8 @@ import {
   type InsertFavorite,
   type Project,
   type InsertProject,
-  type Company,
-  type InsertCompany,
+  type Venture,
+  type InsertVenture,
 } from "@shared/schema";
 
 const PostgresSessionStore = connectPg(session);
@@ -81,12 +81,12 @@ export interface IStorage {
   updateFavorite(id: number, updates: Partial<InsertFavorite>): Promise<Favorite | undefined>;
   deleteFavorite(id: number): Promise<boolean>;
 
-  // Company/Brand operations
-  createCompany(company: InsertCompany): Promise<Company>;
-  getCompany(id: number): Promise<Company | undefined>;
-  listCompanies(): Promise<Company[]>;
-  updateCompany(id: number, updates: Partial<InsertCompany>): Promise<Company | undefined>;
-  deleteCompany(id: number): Promise<boolean>;
+  // Venture/Brand operations
+  createVenture(venture: InsertVenture): Promise<Venture>;
+  getVenture(id: number): Promise<Venture | undefined>;
+  listVentures(): Promise<Venture[]>;
+  updateVenture(id: number, updates: Partial<InsertVenture>): Promise<Venture | undefined>;
+  deleteVenture(id: number): Promise<boolean>;
 
   // Project operations
   createProject(project: InsertProject): Promise<Project>;
@@ -332,14 +332,14 @@ export class DatabaseStorage implements IStorage {
         sortOrder: projects.sortOrder,
         featured: projects.featured,
         createdAt: projects.createdAt,
-        company: {
+        venture: {
           id: companies.id,
           name: companies.name,
           color: companies.color
         }
       })
       .from(projects)
-      .leftJoin(companies, eq(projects.companyId, companies.id))
+      .leftJoin(companies, eq(projects.ventureId, companies.id))
       .where(eq(projects.id, id));
     
     return results.length > 0 ? results[0] : undefined;
@@ -357,14 +357,14 @@ export class DatabaseStorage implements IStorage {
         sortOrder: projects.sortOrder,
         featured: projects.featured,
         createdAt: projects.createdAt,
-        company: {
+        venture: {
           id: companies.id,
           name: companies.name,
           color: companies.color
         }
       })
       .from(projects)
-      .leftJoin(companies, eq(projects.companyId, companies.id))
+      .leftJoin(companies, eq(projects.ventureId, companies.id))
       .orderBy(projects.sortOrder);
     return result;
   }
@@ -401,31 +401,31 @@ export class DatabaseStorage implements IStorage {
     return updated;
   }
 
-  // Company methods
-  async createCompany(company: InsertCompany): Promise<Company> {
-    const [newCompany] = await db
+  // Venture methods
+  async createVenture(venture: InsertVenture): Promise<Venture> {
+    const [newVenture] = await db
       .insert(companies)
-      .values(company)
+      .values(venture)
       .returning();
-    return newCompany;
+    return newVenture;
   }
 
-  async getCompany(id: number): Promise<Company | undefined> {
-    const [company] = await db
+  async getVenture(id: number): Promise<Venture | undefined> {
+    const [venture] = await db
       .select()
       .from(companies)
       .where(eq(companies.id, id));
-    return company;
+    return venture;
   }
 
-  async listCompanies(): Promise<Company[]> {
+  async listVentures(): Promise<Venture[]> {
     return db
       .select()
       .from(companies)
       .orderBy(companies.sortOrder);
   }
 
-  async updateCompany(id: number, updates: Partial<InsertCompany>): Promise<Company | undefined> {
+  async updateVenture(id: number, updates: Partial<InsertVenture>): Promise<Venture | undefined> {
     const [updated] = await db
       .update(companies)
       .set(updates)
@@ -434,12 +434,12 @@ export class DatabaseStorage implements IStorage {
     return updated;
   }
 
-  async deleteCompany(id: number): Promise<boolean> {
-    const [deletedCompany] = await db
+  async deleteVenture(id: number): Promise<boolean> {
+    const [deletedVenture] = await db
       .delete(companies)
       .where(eq(companies.id, id))
       .returning();
-    return !!deletedCompany;
+    return !!deletedVenture;
   }
 }
 
