@@ -62,10 +62,14 @@ const Ventures = () => {
                   <p className="text-muted-foreground mb-6">{venture.description}</p>
                   {venture.websiteUrl && (
                     <Button variant="outline" asChild className="gap-2">
-                      <Link href={venture.websiteUrl}>
+                      <a 
+                        href={venture.websiteUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
                         Visit Website
                         <Icons.ExternalLink className="h-4 w-4" />
-                      </Link>
+                      </a>
                     </Button>
                   )}
                 </CardContent>
