@@ -5,19 +5,9 @@ import * as Icons from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useQuery } from "@tanstack/react-query";
 import type { Project, Venture } from "@shared/schema";
-import Masonry from 'react-masonry-css';
-
-const breakpointColumnsObj = {
-  default: 2,
-  1536: 2, // 2xl
-  1280: 2, // xl
-  768: 2,  // md
-  640: 1,  // sm
-};
 
 // Custom styles are now in project-cards.css
 import "../../styles/project-cards.css";
-
 
 
 const Projects = () => {
@@ -51,75 +41,72 @@ const Projects = () => {
           </p>
         </div>
 
-        <Masonry
-          breakpointCols={breakpointColumnsObj}
-          className="flex -ml-4 w-auto"
-          columnClassName="pl-4 bg-clip-padding"
-        >
-          {projects?.map((project, index) => {            
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
+          {projects?.map((project, index) => {
+            // We don't need to get venture name for now
+            
             return (
               <motion.div
                 key={project.id}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
-                className="mb-4"
               >
-                <Card className="h-full flex flex-col overflow-hidden hover:shadow-lg transition-shadow duration-300">
-                  <CardHeader className="p-0">
-                    <div className="w-full project-image-container">
+                <Card className="h-full overflow-hidden hover:shadow-lg transition-shadow duration-300">
+                  <CardHeader className="p-6 flex flex-col items-center text-center">
+                    <div className="w-32 h-32 mb-4 flex items-center justify-center overflow-hidden">
                       <img
                         src={project.imageUrl}
                         alt={project.title}
-                        className="project-image"
+                        className="max-w-full max-h-full"
                         loading="lazy"
                       />
                     </div>
+                    <h3 className="text-2xl font-bold mb-2">{project.title}</h3>
                   </CardHeader>
-                  <CardContent className="flex-1 p-4 md:p-6 space-y-4">
-                    {project.venture?.name && (
-                      <Badge variant="outline" className="mb-2">
-                        {project.venture.name}
-                      </Badge>
+                  <CardContent className="text-center px-6 pb-6 space-y-4">
+                    <p className="text-muted-foreground mb-6">{project.description}</p>
+                    
+                    {project.technologies.length > 0 && (
+                      <div className="flex flex-wrap gap-2 justify-center">
+                        {project.technologies.map((tech) => (
+                          <Badge key={tech} variant="secondary" className="text-xs">
+                            {tech}
+                          </Badge>
+                        ))}
+                      </div>
                     )}
-                    <CardTitle className="text-xl md:text-2xl">{project.title}</CardTitle>
-                    <p className="text-sm md:text-base text-muted-foreground">{project.description}</p>
-                    <div className="flex flex-wrap gap-2">
-                      {project.technologies.map((tech) => (
-                        <Badge key={tech} variant="secondary" className="text-xs md:text-sm">
-                          {tech}
-                        </Badge>
-                      ))}
-                    </div>
-                    <div className="flex flex-wrap gap-3 pt-4">
-                      {project.buttons?.map((button, index) => {
-                        const Icon = button.icon ? (Icons as any)[button.icon] : null;
-                        return (
-                          <a
-                            key={index}
-                            href={button.url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="flex-1 sm:flex-none"
-                          >
-                            <Button
-                              variant={button.variant as any}
-                              size="sm"
-                              className="w-full sm:w-auto gap-2"
+                    
+                    {project.buttons && project.buttons.length > 0 && (
+                      <div className="flex flex-wrap gap-3 pt-4 justify-center">
+                        {project.buttons.map((button, idx) => {
+                          const Icon = button.icon ? (Icons as any)[button.icon] : null;
+                          return (
+                            <a
+                              key={idx}
+                              href={button.url}
+                              target="_blank"
+                              rel="noopener noreferrer"
                             >
-                              {Icon && <Icon className="h-4 w-4" />}
-                              {button.title}
-                            </Button>
-                          </a>
-                        );
-                      })}
-                    </div>
+                              <Button
+                                variant={button.variant as any}
+                                size="sm"
+                                className="gap-2"
+                              >
+                                {Icon && <Icon className="h-4 w-4" />}
+                                {button.title}
+                              </Button>
+                            </a>
+                          );
+                        })}
+                      </div>
+                    )}
                   </CardContent>
                 </Card>
               </motion.div>
             );
           })}
-        </Masonry>
+        </div>
       </motion.div>
     </section>
   );
