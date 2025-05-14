@@ -116,7 +116,7 @@ export const blogPostsRelations = relations(blogPosts, ({ one }) => ({
 
 // Project relationships
 export const projectsRelations = relations(projects, ({ one }) => ({
-  ventures: one(ventures, {
+  venture: one(ventures, {
     fields: [projects.ventureId],
     references: [ventures.id],
   }),

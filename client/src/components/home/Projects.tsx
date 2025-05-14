@@ -77,7 +77,7 @@ const Projects = () => {
                     </div>
                   </CardHeader>
                   <CardContent className="flex-1 p-4 md:p-6 space-y-4">
-                    {project.venture && (
+                    {project.venture?.name && (
                       <Badge variant="outline" className="mb-2">
                         {project.venture.name}
                       </Badge>
