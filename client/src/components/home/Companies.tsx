@@ -11,17 +11,17 @@ const tempCompanies = [
   {
     id: 1,
     name: "Solaris Labs",
-    description: "Pioneering technological innovations that elevate human consciousness and foster mindfulness in the digital age.",
-    logoUrl: "https://res.cloudinary.com/dvk20sglr/image/upload/v1739851958/solaris-labs-logo-500x500_nw8qfk.png",
+    description: "Increasing the quality of human consciousness through software and media.",
+    logoUrl: "https://tannerbraden.com/api/objects/projects/solaris-labs-logo-500x500.png",
     websiteUrl: "https://solarislabs.org",
     sortOrder: 1
   },
   {
     id: 2,
     name: "Lunaris Labs",
-    description: "Creating immersive audio experiences and interactive sound technologies that transform how we perceive and interact with sound.",
-    logoUrl: "https://res.cloudinary.com/dvk20sglr/image/upload/v1739852090/lunaris-labs-logo-500x500_bv0j8c.png",
-    websiteUrl: "https://lunarislabs.org",
+    description: "Helping SaaS companies grow with integrity through affiliate marketing services and software.",
+    logoUrl: "https://tannerbraden.com/api/objects/projects/lunaris-labs-logo-500x500.png",
+    websiteUrl: "https://lunarislabs.io",
     sortOrder: 2
   }
 ];
