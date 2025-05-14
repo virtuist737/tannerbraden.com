@@ -8,7 +8,7 @@ import {
   insertFavoriteSchema,
   insertInterestSchema,
   insertProjectSchema,
-  insertCompanySchema
+  insertVentureSchema
 } from "@shared/schema";
 import { isAuthenticated } from "./auth";
 
@@ -463,130 +463,88 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Companies/Brands Routes
-  app.get("/api/companies", async (req, res) => {
+  // Ventures Routes
+  app.get("/api/ventures", async (req, res) => {
     try {
-      const companies = await storage.listCompanies();
-      res.json(companies);
+      const ventures = await storage.listVentures();
+      res.json(ventures);
     } catch (error) {
-      console.error("Error fetching companies:", error);
-      res.status(500).json({ error: "Failed to fetch companies" });
+      console.error("Error fetching ventures:", error);
+      res.status(500).json({ error: "Failed to fetch ventures" });
     }
   });
 
-  app.get("/api/companies/:id", async (req, res) => {
+  app.get("/api/ventures/:id", async (req, res) => {
     try {
       const id = parseInt(req.params.id);
       if (isNaN(id)) {
-        return res.status(400).json({ error: "Invalid company ID" });
+        return res.status(400).json({ error: "Invalid venture ID" });
       }
-      const company = await storage.getCompany(id);
-      if (!company) {
-        return res.status(404).json({ error: "Company not found" });
+      const venture = await storage.getVenture(id);
+      if (!venture) {
+        return res.status(404).json({ error: "Venture not found" });
       }
-      res.json(company);
+      res.json(venture);
     } catch (error) {
-      res.status(500).json({ error: "Failed to fetch company" });
+      res.status(500).json({ error: "Failed to fetch venture" });
     }
   });
 
-  app.post("/api/companies", isAuthenticated, async (req, res) => {
+  app.post("/api/ventures", isAuthenticated, async (req, res) => {
     try {
-      const parsedBody = insertCompanySchema.safeParse(req.body);
+      const parsedBody = insertVentureSchema.safeParse(req.body);
       if (!parsedBody.success) {
         return res.status(400).json({
-          error: "Invalid company data",
+          error: "Invalid venture data",
           details: parsedBody.error.errors
         });
       }
 
-      const company = await storage.createCompany(parsedBody.data);
-      res.status(201).json(company);
+      const venture = await storage.createVenture(parsedBody.data);
+      res.status(201).json(venture);
     } catch (error) {
-      console.error("Error creating company:", error);
-      res.status(500).json({ error: "Failed to create company" });
+      console.error("Error creating venture:", error);
+      res.status(500).json({ error: "Failed to create venture" });
     }
   });
 
-  app.patch("/api/companies/:id", isAuthenticated, async (req, res) => {
+  app.patch("/api/ventures/:id", isAuthenticated, async (req, res) => {
     try {
       const id = parseInt(req.params.id);
       if (isNaN(id)) {
-        return res.status(400).json({ error: "Invalid company ID" });
+        return res.status(400).json({ error: "Invalid venture ID" });
       }
 
-      const parsedBody = insertCompanySchema.partial().safeParse(req.body);
+      const parsedBody = insertVentureSchema.partial().safeParse(req.body);
       if (!parsedBody.success) {
-        return res.status(400).json({ error: "Invalid company data", details: parsedBody.error });
+        return res.status(400).json({ error: "Invalid venture data", details: parsedBody.error });
       }
 
-      const company = await storage.updateCompany(id, parsedBody.data);
-      if (!company) {
-        return res.status(404).json({ error: "Company not found" });
+      const venture = await storage.updateVenture(id, parsedBody.data);
+      if (!venture) {
+        return res.status(404).json({ error: "Venture not found" });
       }
 
-      return res.status(200).json(company);
+      return res.status(200).json(venture);
     } catch (error) {
-      console.error('Error updating company:', error);
-      return res.status(500).json({ error: "Failed to update company" });
+      console.error('Error updating venture:', error);
+      return res.status(500).json({ error: "Failed to update venture" });
     }
   });
 
-  app.delete("/api/companies/:id", isAuthenticated, async (req, res) => {
+  app.delete("/api/ventures/:id", isAuthenticated, async (req, res) => {
     try {
-      const success = await storage.deleteCompany(parseInt(req.params.id));
+      const success = await storage.deleteVenture(parseInt(req.params.id));
       if (!success) {
-        return res.status(404).json({ error: "Company not found" });
+        return res.status(404).json({ error: "Venture not found" });
       }
       res.status(204).end();
     } catch (error) {
-      res.status(500).json({ error: "Failed to delete company" });
+      res.status(500).json({ error: "Failed to delete venture" });
     }
   });
 
-  // Get all companies
-  app.get("/api/companies", async (req, res) => {
-    try {
-      const companies = await storage.listCompanies();
-      res.json(companies);
-    } catch (error) {
-      console.error("Error fetching companies:", error);
-      res.status(500).json({ error: "Failed to fetch companies" });
-    }
-  });
-  
-  // Get single company
-  app.get("/api/companies/:id", async (req, res) => {
-    try {
-      const id = parseInt(req.params.id);
-      if (isNaN(id)) {
-        return res.status(400).json({ error: "Invalid company ID" });
-      }
-      const company = await storage.getCompany(id);
-      if (!company) {
-        return res.status(404).json({ error: "Company not found" });
-      }
-      res.json(company);
-    } catch (error) {
-      console.error("Error fetching company:", error);
-      res.status(500).json({ error: "Failed to fetch company" });
-    }
-  });
-  
-  // Create new company
-  app.post("/api/companies", isAuthenticated, async (req, res) => {
-    try {
-      const parsedBody = insertCompanySchema.safeParse(req.body);
-      if (!parsedBody.success) {
-        return res.status(400).json({ error: "Invalid company data", details: parsedBody.error });
-      }
-      const company = await storage.createCompany(parsedBody.data);
-      res.status(201).json(company);
-    } catch (error) {
-      console.error("Error creating company:", error);
-      res.status(500).json({ error: "Failed to create company" });
-    }
-  });
+  // These routes are now handled above with the ventures endpoints
 
   // Projects Routes
   app.get("/api/projects", async (req, res) => {

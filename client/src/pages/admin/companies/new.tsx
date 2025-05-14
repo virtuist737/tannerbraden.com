@@ -21,15 +21,15 @@ import { PageTitle } from "@/components/ui/page-title";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import AdminLayout from "@/components/layout/AdminLayout";
-import { insertCompanySchema, type InsertCompany } from "@shared/schema";
+import { insertVentureSchema, type InsertVenture } from "@shared/schema";
 
-export default function NewCompany() {
+export default function NewVenture() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const form = useForm<InsertCompany>({
-    resolver: zodResolver(insertCompanySchema),
+  const form = useForm<InsertVenture>({
+    resolver: zodResolver(insertVentureSchema),
     defaultValues: {
       name: "",
       description: "",

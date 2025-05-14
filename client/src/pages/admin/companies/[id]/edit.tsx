@@ -21,22 +21,22 @@ import { PageTitle } from "@/components/ui/page-title";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import AdminLayout from "@/components/layout/AdminLayout";
-import { insertCompanySchema, type Company, type InsertCompany } from "@shared/schema";
+import { insertVentureSchema, type Venture, type InsertVenture } from "@shared/schema";
 
-export default function EditCompany() {
+export default function EditVenture() {
   const { id } = useParams();
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Fetch company data for the form
-  const { data: company, isLoading, error } = useQuery<Company>({
-    queryKey: [`/api/companies/${id}`],
+  // Fetch venture data for the form
+  const { data: venture, isLoading, error } = useQuery<Venture>({
+    queryKey: [`/api/ventures/${id}`],
     enabled: !!id,
   });
 
-  const form = useForm<InsertCompany>({
-    resolver: zodResolver(insertCompanySchema),
+  const form = useForm<InsertVenture>({
+    resolver: zodResolver(insertVentureSchema),
     defaultValues: {
       name: "",
       description: "",
@@ -47,51 +47,51 @@ export default function EditCompany() {
     },
   });
 
-  // Set form defaults when company data is loaded
+  // Set form defaults when venture data is loaded
   useEffect(() => {
-    if (company) {
+    if (venture) {
       form.reset({
-        name: company.name,
-        description: company.description,
-        logoUrl: company.logoUrl,
-        websiteUrl: company.websiteUrl || "",
-        color: company.color,
-        sortOrder: company.sortOrder,
+        name: venture.name,
+        description: venture.description,
+        logoUrl: venture.logoUrl,
+        websiteUrl: venture.websiteUrl || "",
+        color: venture.color,
+        sortOrder: venture.sortOrder,
       });
     }
-  }, [company, form]);
+  }, [venture, form]);
 
   const updateMutation = useMutation({
-    mutationFn: async (data: InsertCompany) => {
+    mutationFn: async (data: InsertVenture) => {
       const formattedData = {
         ...data,
         sortOrder: Number(data.sortOrder),
       };
       
-      const updatedCompany = await apiRequest(`/api/companies/${id}`, {
+      const updatedVenture = await apiRequest(`/api/ventures/${id}`, {
         method: "PATCH",
         body: JSON.stringify(formattedData),
       });
       
-      return updatedCompany;
+      return updatedVenture;
     },
     onSuccess: () => {
       toast({
         title: "Success",
-        description: "Company updated successfully",
+        description: "Venture updated successfully",
       });
-      setLocation("/admin/companies");
+      setLocation("/admin/ventures");
     },
     onError: (error: Error) => {
       toast({
         title: "Error",
-        description: error.message || "Failed to update company",
+        description: error.message || "Failed to update venture",
         variant: "destructive",
       });
     },
   });
 
-  const onSubmit = async (data: InsertCompany) => {
+  const onSubmit = async (data: InsertVenture) => {
     setIsSubmitting(true);
     try {
       await updateMutation.mutateAsync(data);
@@ -106,12 +106,12 @@ export default function EditCompany() {
       <AdminLayout>
         <div className="text-center py-10">
           <h2 className="text-2xl font-bold text-destructive mb-2">Error</h2>
-          <p>Failed to load company data. Please try again.</p>
+          <p>Failed to load venture data. Please try again.</p>
           <Button 
             className="mt-4" 
-            onClick={() => setLocation("/admin/companies")}
+            onClick={() => setLocation("/admin/ventures")}
           >
-            Back to Companies
+            Back to Ventures
           </Button>
         </div>
       </AdminLayout>
@@ -120,16 +120,16 @@ export default function EditCompany() {
 
   return (
     <AdminLayout>
-      <PageTitle>Edit Company</PageTitle>
+      <PageTitle>Edit Venture</PageTitle>
       
       {isLoading ? (
         <div className="flex justify-center items-center min-h-[300px]">
-          <p>Loading company data...</p>
+          <p>Loading venture data...</p>
         </div>
       ) : (
         <Card className="max-w-2xl mx-auto">
           <CardHeader>
-            <CardTitle>Company Information</CardTitle>
+            <CardTitle>Venture Information</CardTitle>
           </CardHeader>
           <CardContent>
             <Form {...form}>
@@ -139,9 +139,9 @@ export default function EditCompany() {
                   name="name"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Company Name</FormLabel>
+                      <FormLabel>Venture Name</FormLabel>
                       <FormControl>
-                        <Input {...field} placeholder="e.g., Acme Corporation" />
+                        <Input {...field} placeholder="e.g., Acme Ventures" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -174,7 +174,7 @@ export default function EditCompany() {
                       <FormControl>
                         <Input {...field} placeholder="https://example.com/logo.png" />
                       </FormControl>
-                      <FormDescription>URL to the company's logo image</FormDescription>
+                      <FormDescription>URL to the venture's logo image</FormDescription>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -203,7 +203,7 @@ export default function EditCompany() {
                       <FormControl>
                         <Input {...field} placeholder="bg-gray-500/20 text-gray-700 dark:text-gray-400" />
                       </FormControl>
-                      <FormDescription>Tailwind CSS classes for company badge color</FormDescription>
+                      <FormDescription>Tailwind CSS classes for venture badge color</FormDescription>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -234,12 +234,12 @@ export default function EditCompany() {
                   <Button
                     type="button"
                     variant="outline"
-                    onClick={() => setLocation("/admin/companies")}
+                    onClick={() => setLocation("/admin/ventures")}
                   >
                     Cancel
                   </Button>
                   <Button type="submit" disabled={isSubmitting}>
-                    {isSubmitting ? "Updating..." : "Update Company"}
+                    {isSubmitting ? "Updating..." : "Update Venture"}
                   </Button>
                 </div>
               </form>

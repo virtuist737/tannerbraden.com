@@ -11,7 +11,7 @@ import {
   interests,
   favorites,
   projects,
-  companies,
+  ventures,
   type User,
   type InsertUser,
   type BlogPost,
@@ -333,13 +333,13 @@ export class DatabaseStorage implements IStorage {
         featured: projects.featured,
         createdAt: projects.createdAt,
         venture: {
-          id: companies.id,
-          name: companies.name,
-          color: companies.color
+          id: ventures.id,
+          name: ventures.name,
+          color: ventures.color
         }
       })
       .from(projects)
-      .leftJoin(companies, eq(projects.ventureId, companies.id))
+      .leftJoin(ventures, eq(projects.ventureId, ventures.id))
       .where(eq(projects.id, id));
     
     return results.length > 0 ? results[0] : undefined;
@@ -358,13 +358,13 @@ export class DatabaseStorage implements IStorage {
         featured: projects.featured,
         createdAt: projects.createdAt,
         venture: {
-          id: companies.id,
-          name: companies.name,
-          color: companies.color
+          id: ventures.id,
+          name: ventures.name,
+          color: ventures.color
         }
       })
       .from(projects)
-      .leftJoin(companies, eq(projects.ventureId, companies.id))
+      .leftJoin(ventures, eq(projects.ventureId, ventures.id))
       .orderBy(projects.sortOrder);
     return result;
   }
@@ -404,7 +404,7 @@ export class DatabaseStorage implements IStorage {
   // Venture methods
   async createVenture(venture: InsertVenture): Promise<Venture> {
     const [newVenture] = await db
-      .insert(companies)
+      .insert(ventures)
       .values(venture)
       .returning();
     return newVenture;
@@ -413,31 +413,31 @@ export class DatabaseStorage implements IStorage {
   async getVenture(id: number): Promise<Venture | undefined> {
     const [venture] = await db
       .select()
-      .from(companies)
-      .where(eq(companies.id, id));
+      .from(ventures)
+      .where(eq(ventures.id, id));
     return venture;
   }
 
   async listVentures(): Promise<Venture[]> {
     return db
       .select()
-      .from(companies)
-      .orderBy(companies.sortOrder);
+      .from(ventures)
+      .orderBy(ventures.sortOrder);
   }
 
   async updateVenture(id: number, updates: Partial<InsertVenture>): Promise<Venture | undefined> {
     const [updated] = await db
-      .update(companies)
+      .update(ventures)
       .set(updates)
-      .where(eq(companies.id, id))
+      .where(eq(ventures.id, id))
       .returning();
     return updated;
   }
 
   async deleteVenture(id: number): Promise<boolean> {
     const [deletedVenture] = await db
-      .delete(companies)
-      .where(eq(companies.id, id))
+      .delete(ventures)
+      .where(eq(ventures.id, id))
       .returning();
     return !!deletedVenture;
   }

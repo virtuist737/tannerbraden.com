@@ -4,7 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import * as Icons from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useQuery } from "@tanstack/react-query";
-import type { Project, Company } from "@shared/schema";
+import type { Project, Venture } from "@shared/schema";
 import Masonry from 'react-masonry-css';
 
 const breakpointColumnsObj = {
@@ -77,9 +77,9 @@ const Projects = () => {
                     </div>
                   </CardHeader>
                   <CardContent className="flex-1 p-4 md:p-6 space-y-4">
-                    {project.company && (
+                    {project.venture && (
                       <Badge variant="outline" className="mb-2">
-                        {project.company.name}
+                        {project.venture.name}
                       </Badge>
                     )}
                     <CardTitle className="text-xl md:text-2xl">{project.title}</CardTitle>
