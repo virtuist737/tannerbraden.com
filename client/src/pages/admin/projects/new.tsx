@@ -1,4 +1,4 @@
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import { motion } from "framer-motion";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -25,13 +25,18 @@ import {
 } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { insertProjectSchema, type InsertProject } from "@shared/schema";
+import { insertProjectSchema, type InsertProject, type Company } from "@shared/schema";
 import { apiRequest } from "@/lib/queryClient";
 import { Plus, Trash2 } from "lucide-react";
 
 export default function NewProject() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
+  
+  // Fetch companies for dropdown
+  const { data: companies } = useQuery<Company[]>({
+    queryKey: ["/api/companies"],
+  });
 
   const form = useForm<InsertProject>({
     resolver: zodResolver(insertProjectSchema),
@@ -43,6 +48,7 @@ export default function NewProject() {
       buttons: [],
       sortOrder: 0,
       featured: false,
+      companyId: null,
     },
   });
 

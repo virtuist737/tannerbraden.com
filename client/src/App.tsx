@@ -37,6 +37,9 @@ import EditFavorite from "@/pages/admin/favorites/[id]/edit";
 import AdminProjects from "@/pages/admin/projects";
 import NewProject from "@/pages/admin/projects/new";
 import EditProject from "@/pages/admin/projects/[id]/edit";
+import AdminCompanies from "@/pages/admin/companies";
+import NewCompany from "@/pages/admin/companies/new";
+import EditCompany from "@/pages/admin/companies/[id]/edit";
 
 
 export default function App() {
@@ -77,6 +80,9 @@ export default function App() {
                 <ProtectedRoute path="/admin/projects" component={AdminProjects} />
                 <ProtectedRoute path="/admin/projects/new" component={NewProject} />
                 <ProtectedRoute path="/admin/projects/:id/edit" component={EditProject} />
+                <ProtectedRoute path="/admin/companies" component={AdminCompanies} />
+                <ProtectedRoute path="/admin/companies/new" component={NewCompany} />
+                <ProtectedRoute path="/admin/companies/:id/edit" component={EditCompany} />
                 <Route component={NotFound} />
               </Switch>
             </main>
