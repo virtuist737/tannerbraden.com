@@ -22,7 +22,7 @@ const Ventures = () => {
   }
 
   return (
-    <section className="container px-4 py-16 md:py-20 bg-muted/30">
+    <section className="container px-4 py-16 md:py-20">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -33,6 +33,9 @@ const Ventures = () => {
           <h2 className="text-3xl md:text-4xl font-bold tracking-tighter">
             Ventures
           </h2>
+          <p className="text-base md:text-lg text-muted-foreground max-w-2xl mx-auto px-4">
+            Here are my main two ventures to which I dedicate most of my time and energy.
+          </p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">

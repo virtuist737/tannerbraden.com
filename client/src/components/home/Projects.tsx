@@ -47,7 +47,7 @@ const Projects = () => {
             Featured Projects
           </h2>
           <p className="text-base md:text-lg text-muted-foreground max-w-2xl mx-auto px-4">
-            Here are some of my recent projects that showcase my skills and expertise.
+            Here are some of my recent projects within either Solaris Labs or Lunaris Labs.
           </p>
         </div>
 
