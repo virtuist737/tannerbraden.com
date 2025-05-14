@@ -48,8 +48,6 @@ export interface IStorage {
   confirmNewsletterSubscription(email: string): Promise<void>;
   listNewsletterSubscribers(): Promise<NewsletterSubscription[]>;
 
-
-
   // Session store for authentication
   sessionStore: session.Store;
 
@@ -79,6 +77,13 @@ export interface IStorage {
   createFavorite(favorite: InsertFavorite): Promise<Favorite>;
   updateFavorite(id: number, updates: Partial<InsertFavorite>): Promise<Favorite | undefined>;
   deleteFavorite(id: number): Promise<boolean>;
+
+  // Company/Brand operations
+  createCompany(company: InsertCompany): Promise<Company>;
+  getCompany(id: number): Promise<Company | undefined>;
+  listCompanies(): Promise<Company[]>;
+  updateCompany(id: number, updates: Partial<InsertCompany>): Promise<Company | undefined>;
+  deleteCompany(id: number): Promise<boolean>;
 
   // Project operations
   createProject(project: InsertProject): Promise<Project>;

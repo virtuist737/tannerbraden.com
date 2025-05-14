@@ -18,6 +18,16 @@ export const users = pgTable("users", {
   password: text("password").notNull(),
 });
 
+// Companies/Brands table
+export const companies = pgTable("companies", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull(),
+  description: text("description").notNull(),
+  logoUrl: text("logo_url").notNull(),
+  websiteUrl: text("website_url"),
+  sortOrder: integer("sort_order").notNull().default(0),
+});
+
 // Blog posts table
 export const blogPosts = pgTable("blog_posts", {
   id: serial("id").primaryKey(),
@@ -81,7 +91,7 @@ export const favorites = pgTable("favorites", {
 });
 
 // Add projects table after the existing tables
-// Update projects table to properly handle buttons
+// Update projects table to properly handle buttons and add company reference
 export const projects = pgTable("projects", {
   id: serial("id").primaryKey(),
   title: text("title").notNull(),
@@ -89,6 +99,7 @@ export const projects = pgTable("projects", {
   imageUrl: text("image_url").notNull(),
   technologies: text("technologies").array().notNull(),
   buttons: jsonb("buttons").notNull().$type<Button[]>().default([]), // Properly type the buttons field
+  companyId: integer("company_id").references(() => companies.id),
   sortOrder: integer("sort_order").notNull().default(0),
   featured: boolean("featured").notNull().default(false),
   createdAt: timestamp("created_at").notNull().defaultNow(),
@@ -99,6 +110,14 @@ export const blogPostsRelations = relations(blogPosts, ({ one }) => ({
   author: one(users, {
     fields: [blogPosts.authorId],
     references: [users.id],
+  }),
+}));
+
+// Project relationships
+export const projectsRelations = relations(projects, ({ one }) => ({
+  company: one(companies, {
+    fields: [projects.companyId],
+    references: [companies.id],
   }),
 }));
 
@@ -150,14 +169,25 @@ export const insertTimelineSchema = createInsertSchema(timeline).omit({
   imageUrl: z.string().optional(),
 });
 
-// Add after existing schemas
-// Update insertProjectSchema to properly validate buttons
+// Company/Brand schema
+export const insertCompanySchema = createInsertSchema(companies).omit({
+  id: true,
+}).extend({
+  name: z.string().min(1, "Name is required"),
+  description: z.string().min(1, "Description is required"),
+  logoUrl: z.string().min(1, "Logo URL is required"),
+  websiteUrl: z.string().url("Valid URL is required").optional(),
+  sortOrder: z.number().int().nonnegative().default(0),
+});
+
+// Update insertProjectSchema to properly validate buttons and add company reference
 export const insertProjectSchema = createInsertSchema(projects).omit({
   id: true,
   createdAt: true,
 }).extend({
   technologies: z.array(z.string()),
   buttons: z.array(buttonSchema).default([]),
+  companyId: z.number().int().positive().optional().nullable(),
 });
 
 // Types for TypeScript
@@ -187,3 +217,7 @@ export type InsertTimeline = z.infer<typeof insertTimelineSchema>;
 export type Button = z.infer<typeof buttonSchema>;
 export type Project = typeof projects.$inferSelect;
 export type InsertProject = z.infer<typeof insertProjectSchema>;
+
+// Company type
+export type Company = typeof companies.$inferSelect;
+export type InsertCompany = z.infer<typeof insertCompanySchema>;
