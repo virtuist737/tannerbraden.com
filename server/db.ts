@@ -28,14 +28,15 @@ const createPool = async (retryCount = 0): Promise<Pool> => {
     await pool.query('SELECT 1');
     console.log("Successfully connected to the database.");
     return pool;
-  } catch (error) {
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : String(error);
     if (retryCount < MAX_RETRIES) {
-      console.error(`Database connection attempt ${retryCount + 1} failed: ${error.message}, retrying in ${RETRY_DELAY}ms...`);
+      console.error(`Database connection attempt ${retryCount + 1} failed: ${errorMessage}, retrying in ${RETRY_DELAY}ms...`);
       await new Promise(resolve => setTimeout(resolve, RETRY_DELAY));
       return createPool(retryCount + 1);
     }
-    console.error(`Database connection failed after ${MAX_RETRIES} retries: ${error.message}`);
-    throw new Error(`Failed to connect to the database after multiple retries: ${error.message}`);
+    console.error(`Database connection failed after ${MAX_RETRIES} retries: ${errorMessage}`);
+    throw new Error(`Failed to connect to the database after multiple retries: ${errorMessage}`);
   }
 };
 
