@@ -3,6 +3,7 @@ import { Info, ArrowRight, AtSign, ExternalLink } from "lucide-react";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import Companies from "@/components/home/Companies";
 import Projects from "@/components/home/Projects";
 import BlogCard from "@/components/blog/BlogCard";
 import { useQuery } from "@tanstack/react-query";
@@ -73,11 +74,13 @@ const Home = () => {
         </motion.div>
       </section>
 
+      {/* Companies/Brands Section */}
+      <Companies />
+
       {/* Featured Projects Section */}
       <Projects />
 
       {/* GRRIIDD Section */}
-
       <section className="container py-12">
         <div className="text-center space-y-4 mb-8">
           <h2 className="text-3xl font-bold tracking-tighter">Just for fun</h2>

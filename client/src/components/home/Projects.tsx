@@ -18,6 +18,12 @@ const breakpointColumnsObj = {
 // Custom styles are now in project-cards.css
 import "../../styles/project-cards.css";
 
+// Define temporary mapping for company names until we have the proper DB relation
+const companyNameById: Record<number, { name: string, color: string }> = {
+  1: { name: "Solaris Labs", color: "bg-yellow-500/20 text-yellow-700 dark:text-yellow-400" },
+  2: { name: "Lunaris Labs", color: "bg-purple-500/20 text-purple-700 dark:text-purple-400" }
+};
+
 const Projects = () => {
   const { data: projects, isLoading } = useQuery<Project[]>({
     queryKey: ["/api/projects"],
@@ -54,62 +60,74 @@ const Projects = () => {
           className="flex -ml-4 w-auto"
           columnClassName="pl-4 bg-clip-padding"
         >
-          {projects?.map((project, index) => (
-            <motion.div
-              key={project.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: index * 0.1 }}
-              className="mb-4"
-            >
-              <Card className="h-full flex flex-col overflow-hidden hover:shadow-lg transition-shadow duration-300">
-                <CardHeader className="p-0">
-                  <div className="w-full project-image-container">
-                    <img
-                      src={project.imageUrl}
-                      alt={project.title}
-                      className="project-image"
-                      loading="lazy"
-                    />
-                  </div>
-                </CardHeader>
-                <CardContent className="flex-1 p-4 md:p-6 space-y-4">
-                  <CardTitle className="text-xl md:text-2xl">{project.title}</CardTitle>
-                  <p className="text-sm md:text-base text-muted-foreground">{project.description}</p>
-                  <div className="flex flex-wrap gap-2">
-                    {project.technologies.map((tech) => (
-                      <Badge key={tech} variant="secondary" className="text-xs md:text-sm">
-                        {tech}
+          {projects?.map((project, index) => {
+            // Get company info if available (temporary mock)
+            // In reality, this would come from project.companyId in the database
+            const mockCompanyId = index % 3 === 0 ? 1 : (index % 3 === 1 ? 2 : undefined);
+            const companyInfo = mockCompanyId ? companyNameById[mockCompanyId] : undefined;
+            
+            return (
+              <motion.div
+                key={project.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}
+                className="mb-4"
+              >
+                <Card className="h-full flex flex-col overflow-hidden hover:shadow-lg transition-shadow duration-300">
+                  <CardHeader className="p-0">
+                    <div className="w-full project-image-container">
+                      <img
+                        src={project.imageUrl}
+                        alt={project.title}
+                        className="project-image"
+                        loading="lazy"
+                      />
+                    </div>
+                  </CardHeader>
+                  <CardContent className="flex-1 p-4 md:p-6 space-y-4">
+                    {companyInfo && (
+                      <Badge variant="outline" className={`${companyInfo.color} mb-2`}>
+                        {companyInfo.name}
                       </Badge>
-                    ))}
-                  </div>
-                  <div className="flex flex-wrap gap-3 pt-4">
-                    {project.buttons?.map((button, index) => {
-                      const Icon = button.icon ? (Icons as any)[button.icon] : null;
-                      return (
-                        <a
-                          key={index}
-                          href={button.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="flex-1 sm:flex-none"
-                        >
-                          <Button
-                            variant={button.variant as any}
-                            size="sm"
-                            className="w-full sm:w-auto gap-2"
+                    )}
+                    <CardTitle className="text-xl md:text-2xl">{project.title}</CardTitle>
+                    <p className="text-sm md:text-base text-muted-foreground">{project.description}</p>
+                    <div className="flex flex-wrap gap-2">
+                      {project.technologies.map((tech) => (
+                        <Badge key={tech} variant="secondary" className="text-xs md:text-sm">
+                          {tech}
+                        </Badge>
+                      ))}
+                    </div>
+                    <div className="flex flex-wrap gap-3 pt-4">
+                      {project.buttons?.map((button, index) => {
+                        const Icon = button.icon ? (Icons as any)[button.icon] : null;
+                        return (
+                          <a
+                            key={index}
+                            href={button.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex-1 sm:flex-none"
                           >
-                            {Icon && <Icon className="h-4 w-4" />}
-                            {button.title}
-                          </Button>
-                        </a>
-                      );
-                    })}
-                  </div>
-                </CardContent>
-              </Card>
-            </motion.div>
-          ))}
+                            <Button
+                              variant={button.variant as any}
+                              size="sm"
+                              className="w-full sm:w-auto gap-2"
+                            >
+                              {Icon && <Icon className="h-4 w-4" />}
+                              {button.title}
+                            </Button>
+                          </a>
+                        );
+                      })}
+                    </div>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            );
+          })}
         </Masonry>
       </motion.div>
     </section>

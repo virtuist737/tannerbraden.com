@@ -1,0 +1,105 @@
+import { motion } from "framer-motion";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { ExternalLink } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import type { Company } from "@shared/schema";
+import { Link } from "wouter";
+
+// Define our temporary static company data until we can populate from the database
+const tempCompanies = [
+  {
+    id: 1,
+    name: "Solaris Labs",
+    description: "Pioneering technological innovations that elevate human consciousness and foster mindfulness in the digital age.",
+    logoUrl: "https://res.cloudinary.com/dvk20sglr/image/upload/v1739851958/solaris-labs-logo-500x500_nw8qfk.png",
+    websiteUrl: "https://solarislabs.org",
+    sortOrder: 1
+  },
+  {
+    id: 2,
+    name: "Lunaris Labs",
+    description: "Creating immersive audio experiences and interactive sound technologies that transform how we perceive and interact with sound.",
+    logoUrl: "https://res.cloudinary.com/dvk20sglr/image/upload/v1739852090/lunaris-labs-logo-500x500_bv0j8c.png",
+    websiteUrl: "https://lunarislabs.org",
+    sortOrder: 2
+  }
+];
+
+const Companies = () => {
+  // This will be replaced with actual API data once we have companies in the database
+  // const { data: companies, isLoading } = useQuery<Company[]>({
+  //   queryKey: ["/api/companies"],
+  // });
+
+  // For now, use our static data
+  const companies = tempCompanies;
+  const isLoading = false;
+
+  if (isLoading) {
+    return (
+      <section className="container px-4 py-16 md:py-20">
+        <div className="text-center">Loading companies...</div>
+      </section>
+    );
+  }
+
+  return (
+    <section className="container px-4 py-16 md:py-20 bg-muted/30">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="space-y-10"
+      >
+        <div className="text-center space-y-4">
+          <h2 className="text-3xl md:text-4xl font-bold tracking-tighter">
+            My Companies
+          </h2>
+          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+            Innovative brands creating technology to elevate human consciousness
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
+          {companies?.map((company) => (
+            <motion.div
+              key={company.id}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+            >
+              <Card className="h-full overflow-hidden hover:shadow-lg transition-shadow duration-300 border-t-4 border-primary">
+                <CardContent className="p-6 flex flex-col items-center text-center space-y-4">
+                  <div className="w-36 h-36 mb-2 flex items-center justify-center p-2">
+                    <img 
+                      src={company.logoUrl} 
+                      alt={company.name} 
+                      className="max-w-full max-h-full" 
+                      loading="lazy"
+                    />
+                  </div>
+                  <h3 className="text-2xl font-bold">{company.name}</h3>
+                  <p className="text-muted-foreground">{company.description}</p>
+                  
+                  {company.websiteUrl && (
+                    <div className="pt-4">
+                      <Link href={company.websiteUrl}>
+                        <Button variant="outline" className="gap-2">
+                          Visit Website
+                          <ExternalLink className="h-4 w-4" />
+                        </Button>
+                      </Link>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </motion.div>
+          ))}
+        </div>
+      </motion.div>
+    </section>
+  );
+};
+
+export default Companies;
