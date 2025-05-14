@@ -25,7 +25,7 @@ import {
 } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { insertProjectSchema, type InsertProject, type Company } from "@shared/schema";
+import { insertProjectSchema, type InsertProject, type Venture } from "@shared/schema";
 import { apiRequest } from "@/lib/queryClient";
 import { Plus, Trash2 } from "lucide-react";
 
@@ -33,9 +33,9 @@ export default function NewProject() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   
-  // Fetch companies for dropdown
-  const { data: companies } = useQuery<Company[]>({
-    queryKey: ["/api/companies"],
+  // Fetch ventures for dropdown
+  const { data: ventures } = useQuery<Venture[]>({
+    queryKey: ["/api/ventures"],
   });
 
   const form = useForm<InsertProject>({

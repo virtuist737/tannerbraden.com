@@ -41,36 +41,36 @@ export default function NewVenture() {
   });
 
   const createMutation = useMutation({
-    mutationFn: async (data: InsertCompany) => {
+    mutationFn: async (data: InsertVenture) => {
       const formattedData = {
         ...data,
         sortOrder: Number(data.sortOrder),
       };
       
-      const company = await apiRequest("/api/companies", {
+      const venture = await apiRequest("/api/ventures", {
         method: "POST",
         body: JSON.stringify(formattedData),
       });
       
-      return company;
+      return venture;
     },
     onSuccess: () => {
       toast({
         title: "Success",
-        description: "Company created successfully",
+        description: "Venture created successfully",
       });
-      setLocation("/admin/companies");
+      setLocation("/admin/ventures");
     },
     onError: (error: Error) => {
       toast({
         title: "Error",
-        description: error.message || "Failed to create company",
+        description: error.message || "Failed to create venture",
         variant: "destructive",
       });
     },
   });
 
-  const onSubmit = async (data: InsertCompany) => {
+  const onSubmit = async (data: InsertVenture) => {
     setIsSubmitting(true);
     try {
       await createMutation.mutateAsync(data);
@@ -81,11 +81,11 @@ export default function NewVenture() {
 
   return (
     <AdminLayout>
-      <PageTitle>Add New Company</PageTitle>
+      <PageTitle>Add New Venture</PageTitle>
       
       <Card className="max-w-2xl mx-auto">
         <CardHeader>
-          <CardTitle>Company Information</CardTitle>
+          <CardTitle>Venture Information</CardTitle>
         </CardHeader>
         <CardContent>
           <Form {...form}>
@@ -95,9 +95,9 @@ export default function NewVenture() {
                 name="name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Company Name</FormLabel>
+                    <FormLabel>Venture Name</FormLabel>
                     <FormControl>
-                      <Input {...field} placeholder="e.g., Acme Corporation" />
+                      <Input {...field} placeholder="e.g., Acme Ventures" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -113,7 +113,7 @@ export default function NewVenture() {
                     <FormControl>
                       <Textarea 
                         {...field} 
-                        placeholder="Brief description of the company" 
+                        placeholder="Brief description of the venture" 
                       />
                     </FormControl>
                     <FormMessage />
@@ -130,7 +130,7 @@ export default function NewVenture() {
                     <FormControl>
                       <Input {...field} placeholder="https://example.com/logo.png" />
                     </FormControl>
-                    <FormDescription>URL to the company's logo image</FormDescription>
+                    <FormDescription>URL to the venture's logo image</FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -159,7 +159,7 @@ export default function NewVenture() {
                     <FormControl>
                       <Input {...field} placeholder="bg-gray-500/20 text-gray-700 dark:text-gray-400" />
                     </FormControl>
-                    <FormDescription>Tailwind CSS classes for company badge color</FormDescription>
+                    <FormDescription>Tailwind CSS classes for venture badge color</FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -190,12 +190,12 @@ export default function NewVenture() {
                 <Button
                   type="button"
                   variant="outline"
-                  onClick={() => setLocation("/admin/companies")}
+                  onClick={() => setLocation("/admin/ventures")}
                 >
                   Cancel
                 </Button>
                 <Button type="submit" disabled={isSubmitting}>
-                  {isSubmitting ? "Creating..." : "Create Company"}
+                  {isSubmitting ? "Creating..." : "Create Venture"}
                 </Button>
               </div>
             </form>
