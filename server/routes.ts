@@ -463,6 +463,86 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Companies/Brands Routes
+  app.get("/api/companies", async (req, res) => {
+    try {
+      const companies = await storage.listCompanies();
+      res.json(companies);
+    } catch (error) {
+      console.error("Error fetching companies:", error);
+      res.status(500).json({ error: "Failed to fetch companies" });
+    }
+  });
+
+  app.get("/api/companies/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ error: "Invalid company ID" });
+      }
+      const company = await storage.getCompany(id);
+      if (!company) {
+        return res.status(404).json({ error: "Company not found" });
+      }
+      res.json(company);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch company" });
+    }
+  });
+
+  app.post("/api/companies", isAuthenticated, async (req, res) => {
+    try {
+      const parsedBody = insertCompanySchema.safeParse(req.body);
+      if (!parsedBody.success) {
+        return res.status(400).json({
+          error: "Invalid company data",
+          details: parsedBody.error.errors
+        });
+      }
+
+      const company = await storage.createCompany(parsedBody.data);
+      res.status(201).json(company);
+    } catch (error) {
+      console.error("Error creating company:", error);
+      res.status(500).json({ error: "Failed to create company" });
+    }
+  });
+
+  app.patch("/api/companies/:id", isAuthenticated, async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ error: "Invalid company ID" });
+      }
+
+      const parsedBody = insertCompanySchema.partial().safeParse(req.body);
+      if (!parsedBody.success) {
+        return res.status(400).json({ error: "Invalid company data", details: parsedBody.error });
+      }
+
+      const company = await storage.updateCompany(id, parsedBody.data);
+      if (!company) {
+        return res.status(404).json({ error: "Company not found" });
+      }
+
+      return res.status(200).json(company);
+    } catch (error) {
+      console.error('Error updating company:', error);
+      return res.status(500).json({ error: "Failed to update company" });
+    }
+  });
+
+  app.delete("/api/companies/:id", isAuthenticated, async (req, res) => {
+    try {
+      const success = await storage.deleteCompany(parseInt(req.params.id));
+      if (!success) {
+        return res.status(404).json({ error: "Company not found" });
+      }
+      res.status(204).end();
+    } catch (error) {
+      res.status(500).json({ error: "Failed to delete company" });
+    }
+  });
 
   // Projects Routes
   app.get("/api/projects", async (req, res) => {
