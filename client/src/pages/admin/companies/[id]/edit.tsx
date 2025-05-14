@@ -1,6 +1,9 @@
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { useState, useEffect } from "react";
+import { useLocation, useParams } from "wouter";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -12,58 +15,39 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { useMutation, useQuery } from "@tanstack/react-query";
-import { apiRequest, queryClient } from "@/lib/queryClient";
-import { toast } from "@/hooks/use-toast";
+import { Textarea } from "@/components/ui/textarea";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { PageTitle } from "@/components/ui/page-title";
-import { useLocation, useParams } from "wouter";
-import { motion } from "framer-motion";
-import { ArrowLeft } from "lucide-react";
-import { Company, insertCompanySchema } from "@shared/schema";
+import { useToast } from "@/hooks/use-toast";
+import { apiRequest } from "@/lib/queryClient";
 import AdminLayout from "@/components/layout/AdminLayout";
-import { useCallback, useEffect } from "react";
-
-// Extend the insert schema to add validation rules
-const formSchema = insertCompanySchema.extend({
-  name: z.string().min(1, "Name is required"),
-  description: z.string().min(1, "Description is required"),
-  logoUrl: z.string().url("Must be a valid URL").min(1, "Logo URL is required"),
-  websiteUrl: z.string().url("Must be a valid URL").optional(),
-  color: z.string().default("bg-gray-500/20 text-gray-700 dark:text-gray-400"),
-  sortOrder: z.coerce.number().int().nonnegative().default(0),
-});
-
-type FormValues = z.infer<typeof formSchema>;
+import { insertCompanySchema, type Company, type InsertCompany } from "@shared/schema";
 
 export default function EditCompany() {
-  const params = useParams();
-  const companyId = params.id ? parseInt(params.id) : 0;
-  const [location, navigate] = useLocation();
+  const { id } = useParams();
+  const [, setLocation] = useLocation();
+  const { toast } = useToast();
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Create the form
-  const form = useForm<FormValues>({
-    resolver: zodResolver(formSchema),
+  // Fetch company data for the form
+  const { data: company, isLoading, error } = useQuery<Company>({
+    queryKey: [`/api/companies/${id}`],
+    enabled: !!id,
+  });
+
+  const form = useForm<InsertCompany>({
+    resolver: zodResolver(insertCompanySchema),
     defaultValues: {
       name: "",
       description: "",
       logoUrl: "",
       websiteUrl: "",
-      color: "bg-gray-500/20 text-gray-700 dark:text-gray-400",
+      color: "",
       sortOrder: 0,
     },
   });
 
-  // Fetch the company data
-  const { data: company, isLoading } = useQuery<Company>({
-    queryKey: ["/api/companies", companyId],
-    queryFn: async () => {
-      const result = await apiRequest(`/api/companies/${companyId}`);
-      return result;
-    },
-    enabled: !!companyId,
-  });
-
-  // Update form when data is loaded
+  // Set form defaults when company data is loaded
   useEffect(() => {
     if (company) {
       form.reset({
@@ -77,45 +61,58 @@ export default function EditCompany() {
     }
   }, [company, form]);
 
-  // Create mutation
-  const mutation = useMutation({
-    mutationFn: async (data: FormValues) => {
-      const response = await apiRequest(`/api/companies/${companyId}`, {
+  const updateMutation = useMutation({
+    mutationFn: async (data: InsertCompany) => {
+      const formattedData = {
+        ...data,
+        sortOrder: Number(data.sortOrder),
+      };
+      
+      const updatedCompany = await apiRequest(`/api/companies/${id}`, {
         method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
+        body: JSON.stringify(formattedData),
       });
-      return response;
+      
+      return updatedCompany;
     },
     onSuccess: () => {
       toast({
-        title: "Company updated",
-        description: "The company has been successfully updated",
+        title: "Success",
+        description: "Company updated successfully",
       });
-      queryClient.invalidateQueries({ queryKey: ["/api/companies"] });
-      navigate("/admin/companies");
+      setLocation("/admin/companies");
     },
-    onError: (error) => {
+    onError: (error: Error) => {
       toast({
         title: "Error",
-        description: error.message,
+        description: error.message || "Failed to update company",
         variant: "destructive",
       });
     },
   });
 
-  // Submit handler
-  const onSubmit = useCallback((data: FormValues) => {
-    mutation.mutate(data);
-  }, [mutation]);
+  const onSubmit = async (data: InsertCompany) => {
+    setIsSubmitting(true);
+    try {
+      await updateMutation.mutateAsync(data);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
-  if (isLoading) {
+  // Error state handling
+  if (error) {
     return (
       <AdminLayout>
-        <div className="container py-8">
-          <div className="text-center py-12">Loading company...</div>
+        <div className="text-center py-10">
+          <h2 className="text-2xl font-bold text-destructive mb-2">Error</h2>
+          <p>Failed to load company data. Please try again.</p>
+          <Button 
+            className="mt-4" 
+            onClick={() => setLocation("/admin/companies")}
+          >
+            Back to Companies
+          </Button>
         </div>
       </AdminLayout>
     );
@@ -123,145 +120,133 @@ export default function EditCompany() {
 
   return (
     <AdminLayout>
-      <div className="container py-8">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="space-y-8"
-        >
-          <div className="flex items-center gap-4">
-            <Button
-              variant="ghost"
-              className="p-0 h-8 w-8"
-              onClick={() => navigate("/admin/companies")}
-            >
-              <ArrowLeft className="h-5 w-5" />
-            </Button>
-            <PageTitle>Edit Company</PageTitle>
-          </div>
-
-          <Form {...form}>
-            <form
-              onSubmit={form.handleSubmit(onSubmit)}
-              className="space-y-8 max-w-2xl"
-            >
-              <FormField
-                control={form.control}
-                name="name"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Name</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Company Name" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="description"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Description</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Company Description" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="logoUrl"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Logo URL</FormLabel>
-                    <FormControl>
-                      <Input placeholder="https://example.com/logo.png" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="websiteUrl"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Website URL (Optional)</FormLabel>
-                    <FormControl>
-                      <Input placeholder="https://example.com" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="color"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Badge Color Class</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder="bg-gray-500/20 text-gray-700 dark:text-gray-400"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormDescription>
-                      Tailwind CSS classes for the badge background and text color
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="sortOrder"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Sort Order</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="number"
-                        min="0"
-                        placeholder="0"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormDescription>
-                      Lower numbers will appear first
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <Button
-                type="submit"
-                disabled={mutation.isPending}
-                className="mr-2"
-              >
-                {mutation.isPending ? "Updating..." : "Update Company"}
-              </Button>
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => navigate("/admin/companies")}
-              >
-                Cancel
-              </Button>
-            </form>
-          </Form>
-        </motion.div>
-      </div>
+      <PageTitle>Edit Company</PageTitle>
+      
+      {isLoading ? (
+        <div className="flex justify-center items-center min-h-[300px]">
+          <p>Loading company data...</p>
+        </div>
+      ) : (
+        <Card className="max-w-2xl mx-auto">
+          <CardHeader>
+            <CardTitle>Company Information</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                <FormField
+                  control={form.control}
+                  name="name"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Company Name</FormLabel>
+                      <FormControl>
+                        <Input {...field} placeholder="e.g., Acme Corporation" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
+                <FormField
+                  control={form.control}
+                  name="description"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Description</FormLabel>
+                      <FormControl>
+                        <Textarea 
+                          {...field} 
+                          placeholder="Brief description of the company" 
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
+                <FormField
+                  control={form.control}
+                  name="logoUrl"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Logo URL</FormLabel>
+                      <FormControl>
+                        <Input {...field} placeholder="https://example.com/logo.png" />
+                      </FormControl>
+                      <FormDescription>URL to the company's logo image</FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
+                <FormField
+                  control={form.control}
+                  name="websiteUrl"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Website URL (Optional)</FormLabel>
+                      <FormControl>
+                        <Input {...field} placeholder="https://example.com" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
+                <FormField
+                  control={form.control}
+                  name="color"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Color Class</FormLabel>
+                      <FormControl>
+                        <Input {...field} placeholder="bg-gray-500/20 text-gray-700 dark:text-gray-400" />
+                      </FormControl>
+                      <FormDescription>Tailwind CSS classes for company badge color</FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
+                <FormField
+                  control={form.control}
+                  name="sortOrder"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Sort Order</FormLabel>
+                      <FormControl>
+                        <Input 
+                          {...field} 
+                          type="number" 
+                          min="0"
+                          onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
+                          value={field.value}
+                        />
+                      </FormControl>
+                      <FormDescription>Lower numbers appear first</FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
+                <div className="flex justify-between">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => setLocation("/admin/companies")}
+                  >
+                    Cancel
+                  </Button>
+                  <Button type="submit" disabled={isSubmitting}>
+                    {isSubmitting ? "Updating..." : "Update Company"}
+                  </Button>
+                </div>
+              </form>
+            </Form>
+          </CardContent>
+        </Card>
+      )}
     </AdminLayout>
   );
 }

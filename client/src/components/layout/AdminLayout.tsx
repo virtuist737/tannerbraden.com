@@ -1,7 +1,7 @@
-import { Link, useLocation } from "wouter";
 import { ReactNode } from "react";
-import { cn } from "@/lib/utils";
-import { useAuth } from "@/hooks/use-auth";
+import { Link, useLocation } from "wouter";
+import { Button } from "@/components/ui/button";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface AdminLayoutProps {
   children: ReactNode;
@@ -9,74 +9,77 @@ interface AdminLayoutProps {
 
 export default function AdminLayout({ children }: AdminLayoutProps) {
   const [location] = useLocation();
-  const { user } = useAuth();
 
-  if (!user) {
-    return (
-      <div className="flex items-center justify-center h-screen">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold mb-4">Authentication Required</h1>
-          <p className="mb-4">You need to log in to access the admin area.</p>
-          <Link href="/login">
-            <button className="px-4 py-2 bg-primary text-primary-foreground rounded">
-              Log In
-            </button>
-          </Link>
-        </div>
-      </div>
-    );
-  }
-
-  const navItems = [
-    {
-      name: "Dashboard",
-      href: "/dashboard",
-    },
-    {
-      name: "Companies",
-      href: "/admin/companies",
-    },
-    {
-      name: "Projects",
-      href: "/admin/projects",
-    },
-    {
-      name: "Blog",
-      href: "/admin/blog",
-    }
-  ];
+  const isActive = (path: string) => {
+    return location.startsWith(path) ? "bg-accent" : "";
+  };
 
   return (
-    <div className="flex min-h-screen flex-col">
-      <header className="sticky top-0 z-10 border-b bg-background">
-        <div className="container flex h-14 items-center">
-          <Link href="/dashboard" className="font-bold mr-8">
-            Admin
-          </Link>
-          <nav className="flex items-center space-x-4 lg:space-x-6">
-            {navItems.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={cn(
-                  "text-sm font-medium transition-colors hover:text-primary",
-                  location === item.href
-                    ? "text-foreground"
-                    : "text-muted-foreground"
-                )}
-              >
-                {item.name}
-              </Link>
-            ))}
-          </nav>
-          <div className="ml-auto flex items-center space-x-4">
-            <Link href="/" className="text-sm font-medium hover:underline">
-              View Site
-            </Link>
-          </div>
+    <div className="flex min-h-screen">
+      <ScrollArea className="w-64 border-r bg-card p-4 hidden md:block">
+        <h2 className="text-lg font-semibold mb-4">Admin Panel</h2>
+        <div className="space-y-2">
+          <Button
+            variant="ghost"
+            className={`w-full justify-start ${isActive("/admin/blog")}`}
+            asChild
+          >
+            <Link href="/admin/blog">Blog Posts</Link>
+          </Button>
+          
+          <Button
+            variant="ghost"
+            className={`w-full justify-start ${isActive("/admin/companies")}`}
+            asChild
+          >
+            <Link href="/admin/companies">Companies</Link>
+          </Button>
+          
+          <Button
+            variant="ghost"
+            className={`w-full justify-start ${isActive("/admin/projects")}`}
+            asChild
+          >
+            <Link href="/admin/projects">Projects</Link>
+          </Button>
+          
+          <Button
+            variant="ghost"
+            className={`w-full justify-start ${isActive("/admin/timeline")}`}
+            asChild
+          >
+            <Link href="/admin/timeline">Timeline</Link>
+          </Button>
+          
+          <Button
+            variant="ghost"
+            className={`w-full justify-start ${isActive("/admin/interests")}`}
+            asChild
+          >
+            <Link href="/admin/interests">Interests</Link>
+          </Button>
+          
+          <Button
+            variant="ghost"
+            className={`w-full justify-start ${isActive("/admin/favorites")}`}
+            asChild
+          >
+            <Link href="/admin/favorites">Favorites</Link>
+          </Button>
+
+          <Button
+            variant="ghost"
+            className={`w-full justify-start ${isActive("/admin/newsletter")}`}
+            asChild
+          >
+            <Link href="/admin/newsletter">Newsletter</Link>
+          </Button>
         </div>
-      </header>
-      <main className="flex-1">{children}</main>
+      </ScrollArea>
+
+      <main className="flex-1 p-6 overflow-auto">
+        {children}
+      </main>
     </div>
   );
 }

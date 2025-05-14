@@ -1,6 +1,9 @@
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { useState } from "react";
+import { useLocation } from "wouter";
+import { useMutation } from "@tanstack/react-query";
 import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -12,35 +15,21 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { useMutation } from "@tanstack/react-query";
-import { apiRequest, queryClient } from "@/lib/queryClient";
-import { toast } from "@/hooks/use-toast";
+import { Textarea } from "@/components/ui/textarea";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { PageTitle } from "@/components/ui/page-title";
-import { useLocation } from "wouter";
-import { motion } from "framer-motion";
-import { ArrowLeft } from "lucide-react";
-import { insertCompanySchema } from "@shared/schema";
+import { useToast } from "@/hooks/use-toast";
+import { apiRequest } from "@/lib/queryClient";
 import AdminLayout from "@/components/layout/AdminLayout";
-import { useCallback } from "react";
-
-// Extend the insert schema to add validation rules
-const formSchema = insertCompanySchema.extend({
-  name: z.string().min(1, "Name is required"),
-  description: z.string().min(1, "Description is required"),
-  logoUrl: z.string().url("Must be a valid URL").min(1, "Logo URL is required"),
-  websiteUrl: z.string().url("Must be a valid URL").optional(),
-  color: z.string().default("bg-gray-500/20 text-gray-700 dark:text-gray-400"),
-  sortOrder: z.coerce.number().int().nonnegative().default(0),
-});
-
-type FormValues = z.infer<typeof formSchema>;
+import { insertCompanySchema, type InsertCompany } from "@shared/schema";
 
 export default function NewCompany() {
-  const [location, navigate] = useLocation();
+  const [, setLocation] = useLocation();
+  const { toast } = useToast();
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Create the form
-  const form = useForm<FormValues>({
-    resolver: zodResolver(formSchema),
+  const form = useForm<InsertCompany>({
+    resolver: zodResolver(insertCompanySchema),
     defaultValues: {
       name: "",
       description: "",
@@ -51,79 +40,70 @@ export default function NewCompany() {
     },
   });
 
-  // Create mutation
-  const mutation = useMutation({
-    mutationFn: async (data: FormValues) => {
-      const response = await apiRequest("/api/companies", {
+  const createMutation = useMutation({
+    mutationFn: async (data: InsertCompany) => {
+      const formattedData = {
+        ...data,
+        sortOrder: Number(data.sortOrder),
+      };
+      
+      const company = await apiRequest("/api/companies", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
+        body: JSON.stringify(formattedData),
       });
-      return response;
+      
+      return company;
     },
     onSuccess: () => {
       toast({
-        title: "Company added",
-        description: "The company has been successfully added",
+        title: "Success",
+        description: "Company created successfully",
       });
-      queryClient.invalidateQueries({ queryKey: ["/api/companies"] });
-      navigate("/admin/companies");
+      setLocation("/admin/companies");
     },
-    onError: (error) => {
+    onError: (error: Error) => {
       toast({
         title: "Error",
-        description: error.message,
+        description: error.message || "Failed to create company",
         variant: "destructive",
       });
     },
   });
 
-  // Submit handler
-  const onSubmit = useCallback((data: FormValues) => {
-    mutation.mutate(data);
-  }, [mutation]);
+  const onSubmit = async (data: InsertCompany) => {
+    setIsSubmitting(true);
+    try {
+      await createMutation.mutateAsync(data);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
     <AdminLayout>
-      <div className="container py-8">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="space-y-8"
-        >
-          <div className="flex items-center gap-4">
-            <Button
-              variant="ghost"
-              className="p-0 h-8 w-8"
-              onClick={() => navigate("/admin/companies")}
-            >
-              <ArrowLeft className="h-5 w-5" />
-            </Button>
-            <PageTitle>Add New Company</PageTitle>
-          </div>
-
+      <PageTitle>Add New Company</PageTitle>
+      
+      <Card className="max-w-2xl mx-auto">
+        <CardHeader>
+          <CardTitle>Company Information</CardTitle>
+        </CardHeader>
+        <CardContent>
           <Form {...form}>
-            <form
-              onSubmit={form.handleSubmit(onSubmit)}
-              className="space-y-8 max-w-2xl"
-            >
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
               <FormField
                 control={form.control}
                 name="name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Name</FormLabel>
+                    <FormLabel>Company Name</FormLabel>
                     <FormControl>
-                      <Input placeholder="Company Name" {...field} />
+                      <Input {...field} placeholder="e.g., Acme Corporation" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-
+              
               <FormField
                 control={form.control}
                 name="description"
@@ -131,13 +111,16 @@ export default function NewCompany() {
                   <FormItem>
                     <FormLabel>Description</FormLabel>
                     <FormControl>
-                      <Input placeholder="Company Description" {...field} />
+                      <Textarea 
+                        {...field} 
+                        placeholder="Brief description of the company" 
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-
+              
               <FormField
                 control={form.control}
                 name="logoUrl"
@@ -145,13 +128,14 @@ export default function NewCompany() {
                   <FormItem>
                     <FormLabel>Logo URL</FormLabel>
                     <FormControl>
-                      <Input placeholder="https://example.com/logo.png" {...field} />
+                      <Input {...field} placeholder="https://example.com/logo.png" />
                     </FormControl>
+                    <FormDescription>URL to the company's logo image</FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-
+              
               <FormField
                 control={form.control}
                 name="websiteUrl"
@@ -159,33 +143,28 @@ export default function NewCompany() {
                   <FormItem>
                     <FormLabel>Website URL (Optional)</FormLabel>
                     <FormControl>
-                      <Input placeholder="https://example.com" {...field} />
+                      <Input {...field} placeholder="https://example.com" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-
+              
               <FormField
                 control={form.control}
                 name="color"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Badge Color Class</FormLabel>
+                    <FormLabel>Color Class</FormLabel>
                     <FormControl>
-                      <Input
-                        placeholder="bg-gray-500/20 text-gray-700 dark:text-gray-400"
-                        {...field}
-                      />
+                      <Input {...field} placeholder="bg-gray-500/20 text-gray-700 dark:text-gray-400" />
                     </FormControl>
-                    <FormDescription>
-                      Tailwind CSS classes for the badge background and text color
-                    </FormDescription>
+                    <FormDescription>Tailwind CSS classes for company badge color</FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-
+              
               <FormField
                 control={form.control}
                 name="sortOrder"
@@ -193,39 +172,36 @@ export default function NewCompany() {
                   <FormItem>
                     <FormLabel>Sort Order</FormLabel>
                     <FormControl>
-                      <Input
-                        type="number"
+                      <Input 
+                        {...field} 
+                        type="number" 
                         min="0"
-                        placeholder="0"
-                        {...field}
+                        onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
+                        value={field.value}
                       />
                     </FormControl>
-                    <FormDescription>
-                      Lower numbers will appear first
-                    </FormDescription>
+                    <FormDescription>Lower numbers appear first</FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-
-              <Button
-                type="submit"
-                disabled={mutation.isPending}
-                className="mr-2"
-              >
-                {mutation.isPending ? "Creating..." : "Create Company"}
-              </Button>
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => navigate("/admin/companies")}
-              >
-                Cancel
-              </Button>
+              
+              <div className="flex justify-between">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setLocation("/admin/companies")}
+                >
+                  Cancel
+                </Button>
+                <Button type="submit" disabled={isSubmitting}>
+                  {isSubmitting ? "Creating..." : "Create Company"}
+                </Button>
+              </div>
             </form>
           </Form>
-        </motion.div>
-      </div>
+        </CardContent>
+      </Card>
     </AdminLayout>
   );
 }
