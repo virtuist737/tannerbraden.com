@@ -8,9 +8,9 @@ import type { Project, Venture } from "@shared/schema";
 import Masonry from 'react-masonry-css';
 
 const breakpointColumnsObj = {
-  default: 3,
-  1536: 3, // 2xl
-  1280: 3, // xl
+  default: 2,
+  1536: 2, // 2xl
+  1280: 2, // xl
   768: 2,  // md
   640: 1,  // sm
 };
