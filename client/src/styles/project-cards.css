@@ -2,20 +2,23 @@
 /* Project card styles */
 .project-card {
   overflow: visible;
-  max-width: 600px;
+  max-width: 500px;
   margin: 0 auto;
 }
 
 .masonry-grid {
-  margin-left: -1rem !important;
+  margin-left: -2rem !important;
+  width: 100% !important;
+  max-width: 1024px;
+  margin: 0 auto !important;
 }
 
 .masonry-grid-column {
-  padding-left: 1rem !important;
+  padding-left: 2rem !important;
 }
 
 .masonry-grid-column > div {
-  margin-bottom: 1rem;
+  margin-bottom: 2rem;
 }
 
 .project-image-container {
