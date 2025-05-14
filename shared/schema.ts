@@ -18,8 +18,8 @@ export const users = pgTable("users", {
   password: text("password").notNull(),
 });
 
-// Companies/Brands table
-export const companies = pgTable("companies", {
+// Ventures table
+export const ventures = pgTable("ventures", {
   id: serial("id").primaryKey(),
   name: text("name").notNull(),
   description: text("description").notNull(),
@@ -219,6 +219,6 @@ export type Button = z.infer<typeof buttonSchema>;
 export type Project = typeof projects.$inferSelect;
 export type InsertProject = z.infer<typeof insertProjectSchema>;
 
-// Company type
-export type Company = typeof companies.$inferSelect;
-export type InsertCompany = z.infer<typeof insertCompanySchema>;
+// Venture type
+export type Venture = typeof ventures.$inferSelect;
+export type InsertVenture = z.infer<typeof insertVentureSchema>;

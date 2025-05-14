@@ -3,7 +3,7 @@ import { Info, ArrowRight, AtSign, ExternalLink } from "lucide-react";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import Companies from "@/components/home/Companies";
+import Ventures from "@/components/home/Ventures";
 import Projects from "@/components/home/Projects";
 import BlogCard from "@/components/blog/BlogCard";
 import { useQuery } from "@tanstack/react-query";
@@ -74,8 +74,8 @@ const Home = () => {
         </motion.div>
       </section>
 
-      {/* Companies/Brands Section */}
-      <Companies />
+      {/* Ventures Section */}
+      <Ventures />
 
       {/* Featured Projects Section */}
       <Projects />

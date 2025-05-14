@@ -1,21 +1,22 @@
+
 import { motion } from "framer-motion";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import * as Icons from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { ExternalLink } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
-import type { Company } from "@shared/schema";
+import type { Venture } from "@shared/schema";
 import { Link } from "wouter";
 
-const Companies = () => {
-  // Use actual API data from the database
-  const { data: companies, isLoading } = useQuery<Company[]>({
-    queryKey: ["/api/companies"],
+const Ventures = () => {
+  const { data: ventures, isLoading } = useQuery<Venture[]>({
+    queryKey: ["/api/ventures"],
   });
 
   if (isLoading) {
     return (
       <section className="container px-4 py-16 md:py-20">
-        <div className="text-center">Loading companies...</div>
+        <div className="text-center">Loading ventures...</div>
       </section>
     );
   }
@@ -30,14 +31,14 @@ const Companies = () => {
       >
         <div className="text-center space-y-4">
           <h2 className="text-3xl md:text-4xl font-bold tracking-tighter">
-            Companies
+            Ventures
           </h2>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
-          {companies?.map((company) => (
+          {ventures?.map((venture) => (
             <motion.div
-              key={company.id}
+              key={venture.id}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
@@ -46,21 +47,21 @@ const Companies = () => {
                 <CardContent className="p-6 flex flex-col items-center text-center space-y-4">
                   <div className="w-36 h-36 mb-2 flex items-center justify-center p-2">
                     <img 
-                      src={company.logoUrl} 
-                      alt={company.name} 
+                      src={venture.logoUrl} 
+                      alt={venture.name} 
                       className="max-w-full max-h-full" 
                       loading="lazy"
                     />
                   </div>
-                  <h3 className="text-2xl font-bold">{company.name}</h3>
-                  <p className="text-muted-foreground">{company.description}</p>
+                  <h3 className="text-2xl font-bold">{venture.name}</h3>
+                  <p className="text-muted-foreground">{venture.description}</p>
                   
-                  {company.websiteUrl && (
+                  {venture.websiteUrl && (
                     <div className="pt-4">
-                      <Link href={company.websiteUrl}>
+                      <Link href={venture.websiteUrl}>
                         <Button variant="outline" className="gap-2">
                           Visit Website
-                          <ExternalLink className="h-4 w-4" />
+                          <Icons.ExternalLink className="h-4 w-4" />
                         </Button>
                       </Link>
                     </div>
@@ -75,4 +76,4 @@ const Companies = () => {
   );
 };
 
-export default Companies;
+export default Ventures;
