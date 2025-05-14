@@ -554,6 +554,39 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: "Failed to fetch companies" });
     }
   });
+  
+  // Get single company
+  app.get("/api/companies/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ error: "Invalid company ID" });
+      }
+      const company = await storage.getCompany(id);
+      if (!company) {
+        return res.status(404).json({ error: "Company not found" });
+      }
+      res.json(company);
+    } catch (error) {
+      console.error("Error fetching company:", error);
+      res.status(500).json({ error: "Failed to fetch company" });
+    }
+  });
+  
+  // Create new company
+  app.post("/api/companies", isAuthenticated, async (req, res) => {
+    try {
+      const parsedBody = insertCompanySchema.safeParse(req.body);
+      if (!parsedBody.success) {
+        return res.status(400).json({ error: "Invalid company data", details: parsedBody.error });
+      }
+      const company = await storage.createCompany(parsedBody.data);
+      res.status(201).json(company);
+    } catch (error) {
+      console.error("Error creating company:", error);
+      res.status(500).json({ error: "Failed to create company" });
+    }
+  });
 
   // Projects Routes
   app.get("/api/projects", async (req, res) => {
