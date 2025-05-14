@@ -1,6 +1,6 @@
 
 import { motion } from "framer-motion";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import * as Icons from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -46,28 +46,27 @@ const Ventures = () => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
             >
-              <Card className="h-full overflow-hidden hover:shadow-lg transition-shadow duration-300 border-t-4 border-primary">
-                <CardContent className="p-6 flex flex-col items-center text-center space-y-4">
-                  <div className="w-36 h-36 mb-2 flex items-center justify-center p-2">
+              <Card className="h-full overflow-hidden hover:shadow-lg transition-shadow duration-300">
+                <CardHeader className="flex flex-col items-center text-center p-6">
+                  <div className="w-32 h-32 mb-4 flex items-center justify-center">
                     <img 
                       src={venture.logoUrl} 
                       alt={venture.name} 
-                      className="max-w-full max-h-full" 
+                      className="max-w-full max-h-full"
                       loading="lazy"
                     />
                   </div>
-                  <h3 className="text-2xl font-bold">{venture.name}</h3>
-                  <p className="text-muted-foreground">{venture.description}</p>
-                  
+                  <h3 className="text-2xl font-bold mb-2">{venture.name}</h3>
+                </CardHeader>
+                <CardContent className="text-center px-6 pb-6">
+                  <p className="text-muted-foreground mb-6">{venture.description}</p>
                   {venture.websiteUrl && (
-                    <div className="pt-4">
+                    <Button variant="outline" asChild className="gap-2">
                       <Link href={venture.websiteUrl}>
-                        <Button variant="outline" className="gap-2">
-                          Visit Website
-                          <Icons.ExternalLink className="h-4 w-4" />
-                        </Button>
+                        Visit Website
+                        <Icons.ExternalLink className="h-4 w-4" />
                       </Link>
-                    </div>
+                    </Button>
                   )}
                 </CardContent>
               </Card>
