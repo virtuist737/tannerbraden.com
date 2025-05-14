@@ -357,6 +357,7 @@ export class DatabaseStorage implements IStorage {
         sortOrder: projects.sortOrder,
         featured: projects.featured,
         createdAt: projects.createdAt,
+        ventureId: projects.ventureId,
         venture: {
           id: ventures.id,
           name: ventures.name,

@@ -48,7 +48,7 @@ export default function NewProject() {
       buttons: [],
       sortOrder: 0,
       featured: false,
-      companyId: null,
+      ventureId: null,
     },
   });
 
@@ -208,30 +208,30 @@ export default function NewProject() {
                 
                 <FormField
                   control={form.control}
-                  name="companyId"
+                  name="ventureId"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Company</FormLabel>
+                      <FormLabel>Venture</FormLabel>
                       <Select
                         onValueChange={(value) => field.onChange(value ? parseInt(value) : null)}
                         value={field.value?.toString() || ""}
                       >
                         <FormControl>
                           <SelectTrigger>
-                            <SelectValue placeholder="Select company (optional)" />
+                            <SelectValue placeholder="Select venture (optional)" />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
                           <SelectItem value="">None</SelectItem>
-                          {companies?.map((company) => (
-                            <SelectItem key={company.id} value={company.id.toString()}>
-                              {company.name}
+                          {ventures?.map((venture) => (
+                            <SelectItem key={venture.id} value={venture.id.toString()}>
+                              {venture.name}
                             </SelectItem>
                           ))}
                         </SelectContent>
                       </Select>
                       <FormDescription>
-                        Associate this project with a company
+                        Associate this project with a venture
                       </FormDescription>
                       <FormMessage />
                     </FormItem>
