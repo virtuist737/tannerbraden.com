@@ -6,35 +6,11 @@ import { useQuery } from "@tanstack/react-query";
 import type { Company } from "@shared/schema";
 import { Link } from "wouter";
 
-// Define our temporary static company data until we can populate from the database
-const tempCompanies = [
-  {
-    id: 1,
-    name: "Solaris Labs",
-    description: "Increasing the quality of human consciousness through software and media.",
-    logoUrl: "https://tannerbraden.com/api/objects/projects/solaris-labs-logo-500x500.png",
-    websiteUrl: "https://solarislabs.org",
-    sortOrder: 1
-  },
-  {
-    id: 2,
-    name: "Lunaris Labs",
-    description: "Helping SaaS companies grow with integrity through affiliate marketing services and software.",
-    logoUrl: "https://tannerbraden.com/api/objects/projects/lunaris-labs-logo-500x500.png",
-    websiteUrl: "https://lunarislabs.io",
-    sortOrder: 2
-  }
-];
-
 const Companies = () => {
-  // This will be replaced with actual API data once we have companies in the database
-  // const { data: companies, isLoading } = useQuery<Company[]>({
-  //   queryKey: ["/api/companies"],
-  // });
-
-  // For now, use our static data
-  const companies = tempCompanies;
-  const isLoading = false;
+  // Use actual API data from the database
+  const { data: companies, isLoading } = useQuery<Company[]>({
+    queryKey: ["/api/companies"],
+  });
 
   if (isLoading) {
     return (

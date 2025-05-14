@@ -56,9 +56,7 @@ const Projects = () => {
           className="flex -ml-4 w-auto"
           columnClassName="pl-4 bg-clip-padding"
         >
-          {projects?.map((project, index) => {
-            const companyInfo = project.company;
-            
+          {projects?.map((project, index) => {            
             return (
               <motion.div
                 key={project.id}
@@ -79,9 +77,9 @@ const Projects = () => {
                     </div>
                   </CardHeader>
                   <CardContent className="flex-1 p-4 md:p-6 space-y-4">
-                    {companyInfo && (
-                      <Badge variant="outline" className={`${companyInfo.color} mb-2`}>
-                        {companyInfo.name}
+                    {project.company && (
+                      <Badge variant="outline" className={`${project.company.color} mb-2`}>
+                        {project.company.name}
                       </Badge>
                     )}
                     <CardTitle className="text-xl md:text-2xl">{project.title}</CardTitle>

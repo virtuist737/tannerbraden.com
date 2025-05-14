@@ -544,6 +544,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get all companies
+  app.get("/api/companies", async (req, res) => {
+    try {
+      const companies = await storage.listCompanies();
+      res.json(companies);
+    } catch (error) {
+      console.error("Error fetching companies:", error);
+      res.status(500).json({ error: "Failed to fetch companies" });
+    }
+  });
+
   // Projects Routes
   app.get("/api/projects", async (req, res) => {
     try {
