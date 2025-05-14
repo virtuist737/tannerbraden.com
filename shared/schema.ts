@@ -25,6 +25,7 @@ export const companies = pgTable("companies", {
   description: text("description").notNull(),
   logoUrl: text("logo_url").notNull(),
   websiteUrl: text("website_url"),
+  color: text("color").notNull().default("bg-gray-500/20 text-gray-700 dark:text-gray-400"),
   sortOrder: integer("sort_order").notNull().default(0),
 });
 

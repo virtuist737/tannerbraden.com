@@ -18,11 +18,7 @@ const breakpointColumnsObj = {
 // Custom styles are now in project-cards.css
 import "../../styles/project-cards.css";
 
-// Define temporary mapping for company names until we have the proper DB relation
-const companyNameById: Record<number, { name: string, color: string }> = {
-  1: { name: "Solaris Labs", color: "bg-yellow-500/20 text-yellow-700 dark:text-yellow-400" },
-  2: { name: "Lunaris Labs", color: "bg-purple-500/20 text-purple-700 dark:text-purple-400" }
-};
+
 
 const Projects = () => {
   const { data: projects, isLoading } = useQuery<Project[]>({
@@ -61,10 +57,7 @@ const Projects = () => {
           columnClassName="pl-4 bg-clip-padding"
         >
           {projects?.map((project, index) => {
-            // Get company info if available (temporary mock)
-            // In reality, this would come from project.companyId in the database
-            const mockCompanyId = index % 3 === 0 ? 1 : (index % 3 === 1 ? 2 : undefined);
-            const companyInfo = mockCompanyId ? companyNameById[mockCompanyId] : undefined;
+            const companyInfo = project.company;
             
             return (
               <motion.div

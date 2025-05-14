@@ -330,11 +330,27 @@ export class DatabaseStorage implements IStorage {
   }
 
   async listProjects(): Promise<Project[]> {
-    // Temporarily using raw SQL to select only existing columns (avoiding company_id)
-    const result = await db.execute(
-      'SELECT id, title, description, image_url as "imageUrl", technologies, buttons, sort_order as "sortOrder", featured, created_at as "createdAt" FROM projects ORDER BY sort_order'
-    );
-    return result.rows as Project[];
+    const result = await db
+      .select({
+        id: projects.id,
+        title: projects.title,
+        description: projects.description,
+        imageUrl: projects.imageUrl,
+        technologies: projects.technologies,
+        buttons: projects.buttons,
+        sortOrder: projects.sortOrder,
+        featured: projects.featured,
+        createdAt: projects.createdAt,
+        company: {
+          id: companies.id,
+          name: companies.name,
+          color: companies.color
+        }
+      })
+      .from(projects)
+      .leftJoin(companies, eq(projects.companyId, companies.id))
+      .orderBy(projects.sortOrder);
+    return result;
   }
 
   async updateProject(id: number, updates: Partial<InsertProject>): Promise<Project | undefined> {
