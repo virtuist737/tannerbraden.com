@@ -30,11 +30,8 @@ const Companies = () => {
       >
         <div className="text-center space-y-4">
           <h2 className="text-3xl md:text-4xl font-bold tracking-tighter">
-            My Companies
+            Companies
           </h2>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Innovative brands creating technology to elevate human consciousness
-          </p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
