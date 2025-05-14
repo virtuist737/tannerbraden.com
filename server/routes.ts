@@ -7,7 +7,8 @@ import {
   insertTimelineSchema,
   insertFavoriteSchema,
   insertInterestSchema,
-  insertProjectSchema
+  insertProjectSchema,
+  insertCompanySchema
 } from "@shared/schema";
 import { isAuthenticated } from "./auth";
 

@@ -11,6 +11,7 @@ import {
   interests,
   favorites,
   projects,
+  companies,
   type User,
   type InsertUser,
   type BlogPost,
@@ -25,6 +26,8 @@ import {
   type InsertFavorite,
   type Project,
   type InsertProject,
+  type Company,
+  type InsertCompany,
 } from "@shared/schema";
 
 const PostgresSessionStore = connectPg(session);
@@ -356,6 +359,47 @@ export class DatabaseStorage implements IStorage {
       .where(eq(projects.id, id))
       .returning();
     return updated;
+  }
+
+  // Company methods
+  async createCompany(company: InsertCompany): Promise<Company> {
+    const [newCompany] = await db
+      .insert(companies)
+      .values(company)
+      .returning();
+    return newCompany;
+  }
+
+  async getCompany(id: number): Promise<Company | undefined> {
+    const [company] = await db
+      .select()
+      .from(companies)
+      .where(eq(companies.id, id));
+    return company;
+  }
+
+  async listCompanies(): Promise<Company[]> {
+    return db
+      .select()
+      .from(companies)
+      .orderBy(companies.sortOrder);
+  }
+
+  async updateCompany(id: number, updates: Partial<InsertCompany>): Promise<Company | undefined> {
+    const [updated] = await db
+      .update(companies)
+      .set(updates)
+      .where(eq(companies.id, id))
+      .returning();
+    return updated;
+  }
+
+  async deleteCompany(id: number): Promise<boolean> {
+    const [deletedCompany] = await db
+      .delete(companies)
+      .where(eq(companies.id, id))
+      .returning();
+    return !!deletedCompany;
   }
 }
 
