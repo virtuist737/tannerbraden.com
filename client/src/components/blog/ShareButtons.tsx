@@ -1,7 +1,7 @@
-
 import { Share2, Link, Twitter, Linkedin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
+import { Facebook, AtSign } from "lucide-react";
 
 interface ShareButtonsProps {
   title: string;
@@ -62,6 +62,36 @@ export default function ShareButtons({ title, className = "" }: ShareButtonsProp
         >
           <Linkedin className="h-4 w-4" />
         </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-8"
+            onClick={() =>
+              window.open(
+                `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(
+                  window.location.href
+                )}`,
+                "_blank"
+              )
+            }
+          >
+            <Facebook className="h-4 w-4" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-8"
+            onClick={() =>
+              window.open(
+                `https://www.threads.net/share?url=${encodeURIComponent(
+                  window.location.href
+                )}`,
+                "_blank"
+              )
+            }
+          >
+            <AtSign className="h-4 w-4" />
+          </Button>
       </div>
     </div>
   );
