@@ -223,11 +223,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   };
 
   // Upload routes for different entity types
-  app.post("/api/upload/blog/:id", isAuthenticated, upload.single("image"), async (req, res) => {
-    await handleImageUpload(req, res, "blog", (id, imageUrl) =>
-      storage.updateBlogPost(id, { coverImage: imageUrl })
-    );
-  });
+  // IMPORTANT: More specific routes must come before parameter routes
   
   // Add route for temporary blog uploads (for new blog posts)
   app.post("/api/upload/blog/temp", isAuthenticated, upload.single("image"), async (req, res) => {
@@ -247,21 +243,42 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
-  // Add route for blog content image uploads
-  app.post("/api/upload/blog-content/:id", isAuthenticated, upload.single("image"), async (req, res) => {
+  // Route for regular blog image uploads with IDs
+  app.post("/api/upload/blog/:id", isAuthenticated, upload.single("image"), async (req, res) => {
+    await handleImageUpload(req, res, "blog", (id, imageUrl) =>
+      storage.updateBlogPost(id, { coverImage: imageUrl })
+    );
+  });
+  
+  // Add route for blog content image uploads with temp ID
+  app.post("/api/upload/blog-content/temp", isAuthenticated, upload.single("image"), async (req, res) => {
     try {
       if (!req.file) {
         return res.status(400).json({ error: "No image file provided" });
       }
       
-      // For temporary content, we don't validate the ID
-      const id = req.params.id;
-      if (id !== "temp") {
-        // Validate if it's a numeric ID
-        const numericId = parseInt(id);
-        if (isNaN(numericId)) {
-          return res.status(400).json({ error: "Invalid blog ID" });
-        }
+      // Upload to Replit Object Storage
+      const imageUrl = await uploadToObjectStorage(req.file, "blog-content");
+      
+      // Return the image URL without updating the database
+      res.json({ imageUrl });
+    } catch (error) {
+      console.error(`Error uploading temporary blog content image:`, error);
+      res.status(500).json({ error: "Failed to upload image" });
+    }
+  });
+  
+  // Add route for blog content image uploads with numeric IDs
+  app.post("/api/upload/blog-content/:id([0-9]+)", isAuthenticated, upload.single("image"), async (req, res) => {
+    try {
+      if (!req.file) {
+        return res.status(400).json({ error: "No image file provided" });
+      }
+      
+      // Validate the numeric ID
+      const numericId = parseInt(req.params.id);
+      if (isNaN(numericId)) {
+        return res.status(400).json({ error: "Invalid blog ID" });
       }
       
       // Upload to Replit Object Storage
