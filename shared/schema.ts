@@ -136,7 +136,10 @@ export const insertBlogPostSchema = createInsertSchema(blogPosts).omit({
   seoTitle: z.string().max(60, "SEO Title should be under 60 characters").optional(),
   seoDescription: z.string().max(160, "SEO Description should be under 160 characters").optional(),
   seoKeywords: z.string().optional(),
-  canonicalUrl: z.string().url("Must be a valid URL").optional(),
+  canonicalUrl: z.union([
+    z.string().url("Must be a valid URL"),
+    z.string().max(0) // Empty string
+  ]).optional(),
   isIndexed: z.boolean().optional().default(true),
 });
 
