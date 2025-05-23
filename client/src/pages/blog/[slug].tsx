@@ -1,6 +1,7 @@
 import { useParams } from "wouter";
 import { motion } from "framer-motion";
-import { CalendarDays, Clock, Share2, Twitter, Facebook, Linkedin, Link } from "lucide-react";
+import { CalendarDays, Clock } from "lucide-react";
+import ShareButtons from "@/components/blog/ShareButtons";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
@@ -80,58 +81,7 @@ const BlogPostPage = () => {
             </div>
           </div>
           
-          {/* Share buttons */}
-          <div className="flex items-center gap-4 mt-6">
-            <span className="font-medium flex items-center gap-2">
-              <Share2 className="h-4 w-4" /> Share:
-            </span>
-            <div className="flex gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => {
-                  navigator.clipboard.writeText(window.location.href);
-                  toast({
-                    title: "Link copied",
-                    description: "The blog post URL has been copied to your clipboard",
-                  });
-                }}
-              >
-                <Link className="h-4 w-4 mr-2" />
-                Copy Link
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() =>
-                  window.open(
-                    `https://twitter.com/intent/tweet?url=${encodeURIComponent(
-                      window.location.href
-                    )}&text=${encodeURIComponent(post.title)}`,
-                    "_blank"
-                  )
-                }
-              >
-                <Twitter className="h-4 w-4 mr-2" />
-                Twitter
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() =>
-                  window.open(
-                    `https://www.linkedin.com/shareArticle?mini=true&url=${encodeURIComponent(
-                      window.location.href
-                    )}&title=${encodeURIComponent(post.title)}`,
-                    "_blank"
-                  )
-                }
-              >
-                <Linkedin className="h-4 w-4 mr-2" />
-                LinkedIn
-              </Button>
-            </div>
-          </div>
+          <ShareButtons title={post.title} className="mt-6" />
         </div>
 
         {post.coverImage && (
@@ -153,55 +103,7 @@ const BlogPostPage = () => {
 
         {/* Social Share */}
         <div className="mt-8 pt-8 border-t">
-          <div className="flex items-center gap-4">
-            <span className="font-medium flex items-center gap-2">
-              <Share2 className="h-4 w-4" /> Share this article:
-            </span>
-            <div className="flex gap-2">
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() =>
-                  window.open(
-                    `https://twitter.com/intent/tweet?url=${encodeURIComponent(
-                      shareUrl
-                    )}&text=${encodeURIComponent(post.title)}`,
-                    "_blank"
-                  )
-                }
-              >
-                <Twitter className="h-4 w-4" />
-              </Button>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() =>
-                  window.open(
-                    `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(
-                      shareUrl
-                    )}`,
-                    "_blank"
-                  )
-                }
-              >
-                <Facebook className="h-4 w-4" />
-              </Button>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() =>
-                  window.open(
-                    `https://www.linkedin.com/shareArticle?mini=true&url=${encodeURIComponent(
-                      shareUrl
-                    )}&title=${encodeURIComponent(post.title)}`,
-                    "_blank"
-                  )
-                }
-              >
-                <Linkedin className="h-4 w-4" />
-              </Button>
-            </div>
-          </div>
+          <ShareButtons title={post.title} />
         </div>
       </motion.article>
     </div>
