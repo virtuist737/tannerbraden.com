@@ -19,6 +19,7 @@ export default function SEO({ data }: SEOProps) {
     twitterImage,
     articlePublishedTime,
     articleSection,
+    articleAuthor,
     noIndex,
   } = data;
   
@@ -48,16 +49,30 @@ export default function SEO({ data }: SEOProps) {
       <meta property="og:type" content={ogType} />
       <meta property="og:url" content={window.location.href} />
       <meta property="og:image" content={ogImage} />
+      <meta property="og:image:alt" content={title} />
+      <meta property="og:site_name" content="Tanner Braden" />
+      
+      {/* Article Specific OpenGraph Tags */}
+      {ogType === 'article' && (
+        <>
+          {articlePublishedTime && <meta property="article:published_time" content={articlePublishedTime} />}
+          {articleSection && <meta property="article:section" content={articleSection} />}
+          {articleAuthor && <meta property="article:author" content={articleAuthor} />}
+          <meta property="article:publisher" content="https://tannerbraden.com" />
+        </>
+      )}
       
       {/* Twitter */}
       <meta name="twitter:card" content={twitterCard} />
       <meta name="twitter:title" content={twitterTitle || title} />
       <meta name="twitter:description" content={twitterDescription || description} />
-      {twitterImage && <meta name="twitter:image" content={twitterImage} />}
-      
-      {/* Article Specific (for blog posts) */}
-      {articlePublishedTime && <meta property="article:published_time" content={articlePublishedTime} />}
-      {articleSection && <meta property="article:section" content={articleSection} />}
+      <meta name="twitter:site" content="@tannerbraden" />
+      {twitterImage && (
+        <>
+          <meta name="twitter:image" content={twitterImage} />
+          <meta name="twitter:image:alt" content={title} />
+        </>
+      )}
     </Helmet>
   );
 }

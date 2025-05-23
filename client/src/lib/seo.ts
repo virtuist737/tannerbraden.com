@@ -28,6 +28,7 @@ export interface SEOData {
   twitterImage?: string;
   articlePublishedTime?: string;
   articleSection?: string;
+  articleAuthor?: string;
   noIndex?: boolean;
 }
 
@@ -53,17 +54,25 @@ export function generateSEOMetadata({
   twitterCard?: string;
   noIndex?: boolean;
 }): SEOData {
+  // Create formatted title with site name
+  const formattedTitle = `${title} - ${SITE_NAME}`;
+  
+  // Ensure image URL is absolute
+  const absoluteImageUrl = image?.startsWith('http') ? image : image;
+
   return {
-    title: `${title} - ${SITE_NAME}`,
+    title: formattedTitle,
     description,
     keywords,
     ogType,
-    ogImage: image,
+    ogImage: absoluteImageUrl,
     canonical,
     twitterCard,
-    twitterTitle: `${title} - ${SITE_NAME}`,
+    twitterTitle: formattedTitle,
     twitterDescription: description,
-    twitterImage: image,
+    twitterImage: absoluteImageUrl,
+    // Only set article properties for article type
+    articleAuthor: ogType === 'article' ? 'Tanner Braden' : undefined,
     noIndex,
   };
 }
@@ -72,19 +81,43 @@ export function generateSEOMetadata({
  * Generate SEO metadata specifically for blog posts
  */
 export function generateBlogSEOMetadata(post: BlogPost): SEOData {
+  // Create a clean title without site name for social sharing
+  const cleanTitle = post.seoTitle || post.title;
+  
+  // Make sure we always have an excerpt
+  const safeExcerpt = post.excerpt || 
+    (post.content ? post.content.substring(0, 160).replace(/<[^>]*>/g, '') : DEFAULT_DESCRIPTION);
+  
+  // Always ensure we have a good description
+  const safeDescription = post.seoDescription || safeExcerpt;
+  
+  // Ensure we have a cover image, falling back to default if needed
+  const coverImage = post.coverImage || DEFAULT_IMAGE;
+  
   return {
-    title: post.seoTitle || post.title,
-    description: post.seoDescription || post.excerpt,
-    keywords: post.seoKeywords || `${post.category}, tanner braden, digital creation, mindfulness, consciousness, ${post.title.toLowerCase()}`,
+    // Basic metadata
+    title: cleanTitle,
+    description: safeDescription,
+    keywords: post.seoKeywords || 
+      `${post.category || ''}, tanner braden, digital creation, mindfulness, consciousness, ${post.title.toLowerCase()}`,
+    
+    // OpenGraph
     ogType: "article",
-    ogImage: post.coverImage || DEFAULT_IMAGE,
+    ogImage: coverImage,
     canonical: post.canonicalUrl || undefined,
-    twitterCard: "summary_large_image",
-    twitterTitle: post.seoTitle || post.title,
-    twitterDescription: post.seoDescription || post.excerpt,
-    twitterImage: post.coverImage || DEFAULT_IMAGE,
+    
+    // Twitter
+    twitterCard: "summary_large_image", 
+    twitterTitle: cleanTitle,
+    twitterDescription: safeDescription,
+    twitterImage: coverImage,
+    
+    // Article metadata
     articlePublishedTime: post.publishedAt?.toString(),
     articleSection: post.category,
+    articleAuthor: "Tanner Braden",
+    
+    // Indexing
     noIndex: post.isIndexed === false,
   };
 }
