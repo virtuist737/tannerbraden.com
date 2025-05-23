@@ -31,14 +31,14 @@ const Navbar = () => {
         {/* Desktop Navigation */}
         <div className="hidden md:flex items-center gap-6">
           {navItems.map((item) => (
-            <Link key={item.href} href={item.href}>
-              <a
-                className={`text-sm font-medium transition-colors hover:text-primary ${
-                  location === item.href ? "text-primary" : "text-muted-foreground"
-                }`}
-              >
-                {item.label}
-              </a>
+            <Link 
+              key={item.href} 
+              href={item.href}
+              className={`text-sm font-medium transition-colors hover:text-primary ${
+                location === item.href ? "text-primary" : "text-muted-foreground"
+              }`}
+            >
+              {item.label}
             </Link>
           ))}
           <a
@@ -78,17 +78,17 @@ const Navbar = () => {
           <div className="md:hidden absolute top-16 left-0 right-0 border-b bg-background p-4">
             <div className="flex flex-col space-y-4">
               {navItems.map((item) => (
-                <Link key={item.href} href={item.href}>
-                  <a
-                    className={`text-sm font-medium transition-colors hover:text-primary ${
-                      location === item.href
-                        ? "text-primary"
-                        : "text-muted-foreground"
-                    }`}
-                    onClick={() => setIsOpen(false)}
-                  >
-                    {item.label}
-                  </a>
+                <Link 
+                  key={item.href} 
+                  href={item.href}
+                  className={`text-sm font-medium transition-colors hover:text-primary ${
+                    location === item.href
+                      ? "text-primary"
+                      : "text-muted-foreground"
+                  }`}
+                  onClick={() => setIsOpen(false)}
+                >
+                  {item.label}
                 </Link>
               ))}
             </div>
