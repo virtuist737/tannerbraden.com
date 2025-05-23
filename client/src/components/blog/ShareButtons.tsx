@@ -42,8 +42,7 @@ export default function ShareButtons({ title, className = "" }: ShareButtonsProp
             });
           }}
         >
-          <Link className="h-4 w-4 mr-1" />
-          Copy
+          <Link className="h-4 w-4" />
         </Button>
         <Button
           variant="ghost"
