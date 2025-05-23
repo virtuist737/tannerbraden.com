@@ -228,6 +228,52 @@ export async function registerRoutes(app: Express): Promise<Server> {
       storage.updateBlogPost(id, { coverImage: imageUrl })
     );
   });
+  
+  // Add route for temporary blog uploads (for new blog posts)
+  app.post("/api/upload/blog/temp", isAuthenticated, upload.single("image"), async (req, res) => {
+    try {
+      if (!req.file) {
+        return res.status(400).json({ error: "No image file provided" });
+      }
+      
+      // Upload to Replit Object Storage without database update
+      const imageUrl = await uploadToObjectStorage(req.file, "blog-temp");
+      
+      // Return the image URL
+      res.json({ imageUrl });
+    } catch (error) {
+      console.error(`Error uploading temporary blog image:`, error);
+      res.status(500).json({ error: "Failed to upload image" });
+    }
+  });
+  
+  // Add route for blog content image uploads
+  app.post("/api/upload/blog-content/:id", isAuthenticated, upload.single("image"), async (req, res) => {
+    try {
+      if (!req.file) {
+        return res.status(400).json({ error: "No image file provided" });
+      }
+      
+      // For temporary content, we don't validate the ID
+      const id = req.params.id;
+      if (id !== "temp") {
+        // Validate if it's a numeric ID
+        const numericId = parseInt(id);
+        if (isNaN(numericId)) {
+          return res.status(400).json({ error: "Invalid blog ID" });
+        }
+      }
+      
+      // Upload to Replit Object Storage
+      const imageUrl = await uploadToObjectStorage(req.file, "blog-content");
+      
+      // Return the image URL without updating the database
+      res.json({ imageUrl });
+    } catch (error) {
+      console.error(`Error uploading blog content image:`, error);
+      res.status(500).json({ error: "Failed to upload image" });
+    }
+  });
 
   app.post("/api/upload/timeline/:id", isAuthenticated, upload.single("image"), async (req, res) => {
     await handleImageUpload(req, res, "timeline", storage.updateTimelineImage);
