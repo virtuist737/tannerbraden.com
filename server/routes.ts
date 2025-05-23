@@ -143,17 +143,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Protected Admin Blog Routes
   app.post("/api/blog", isAuthenticated, async (req, res) => {
     try {
+      console.log("Creating blog post:", { 
+        isAuthenticated: req.isAuthenticated(), 
+        user: req.user,
+        body: req.body
+      });
+      
       const parsedBody = insertBlogPostSchema.safeParse(req.body);
       if (!parsedBody.success) {
-        return res.status(400).json({ error: "Invalid blog post data" });
+        console.error("Invalid blog post data:", parsedBody.error);
+        return res.status(400).json({ error: "Invalid blog post data", details: parsedBody.error.errors });
+      }
+
+      if (!req.user) {
+        return res.status(401).json({ error: "User not authenticated" });
       }
 
       const post = await storage.createBlogPost({
         ...parsedBody.data,
-        authorId: req.user!.id,
+        authorId: req.user.id,
       });
       res.status(201).json(post);
     } catch (error) {
+      console.error("Error creating blog post:", error);
       res.status(500).json({ error: "Failed to create blog post" });
     }
   });

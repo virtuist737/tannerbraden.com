@@ -14,14 +14,26 @@ export default function NewBlogPost() {
 
   const createPostMutation = useMutation({
     mutationFn: async (data: InsertBlogPost) => {
-      const res = await apiRequest("/api/blog", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-      });
-      return res.json();
+      try {
+        const res = await fetch("/api/blog", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(data),
+          credentials: "include" // Important for sending cookies with the request
+        });
+        
+        if (!res.ok) {
+          const errorData = await res.json();
+          throw new Error(errorData.error || "Failed to create blog post");
+        }
+        
+        return await res.json();
+      } catch (error) {
+        console.error("Blog post creation error:", error);
+        throw error;
+      }
     },
     onSuccess: () => {
       toast({
@@ -33,7 +45,7 @@ export default function NewBlogPost() {
     onError: (error: Error) => {
       toast({
         title: "Error",
-        description: error.message,
+        description: error.message || "Failed to create blog post",
         variant: "destructive",
       });
     },
