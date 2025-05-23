@@ -1,0 +1,29 @@
+Warning: validateDOMNesting(...): <a> cannot appear as a descendant of &lt;a&gt;.
+    at a
+    at a
+    at https://d3d70490-9a01-43c5-ac35-dd36ccb1e56c-00-1nkwdguoz3a99.riker.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=b496daf2:337:18
+    at div
+    at nav
+    at Navbar (https://d3d70490-9a01-43c5-ac35-dd36ccb1e56c-00-1nkwdguoz3a99.riker.replit.dev/src/components/layout/Navbar.tsx:32:22)
+    at div
+    at div
+    at AuthProvider (https://d3d70490-9a01-43c5-ac35-dd36ccb1e56c-00-1nkwdguoz3a99.riker.replit.dev/src/hooks/use-auth.tsx:26:32)
+    at QueryClientProvider (https://d3d70490-9a01-43c5-ac35-dd36ccb1e56c-00-1nkwdguoz3a99.riker.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@tanstack_react-query.js?v=b496daf2:2805:3)
+    at App (https://d3d70490-9a01-43c5-ac35-dd36ccb1e56c-00-1nkwdguoz3a99.riker.replit.dev/src/App.tsx?v=OIraINjsI0rIk1eEG1lPy:56:22)
+    at _a (https://d3d70490-9a01-43c5-ac35-dd36ccb1e56c-00-1nkwdguoz3a99.riker.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/react-helmet-async.js?v=b496daf2:624:5)
+Object {name: "FCP", value: 1948, rating: "needs-improvement", delta: 1948, entries: Array(1), …}
+Object {name: "TTFB", value: 1321.3999999761581, rating: "needs-improvement", delta: 1321.3999999761581, entries: Array(1), …}
+Object {name: "FID", value: 2.199999988079071, rating: "good", delta: 2.199999988079071, entries: Array(1), …}
+Object {name: "LCP", value: 9188, rating: "poor", delta: 9188, entries: Array(1), …}
+Upload error: 
+Error {}
+message: "Upload failed"
+stack: "Error: Upload failed↵ at https://d3d70490-9a01-43c5-ac35-dd36ccb1e56c-00-1nkwdguoz3a99.riker.replit.dev/src/components/shared/ImageUpload.tsx:71:17↵ at async Promise.all (index 0)↵ at async handleImageUpload (https://d3d70490-9a01-43c5-ac35-dd36ccb1e56c-00-1nkwdguoz3a99.riker.replit.dev/src/components/shared/ImageUpload.tsx:79:20)"
+get stack: ƒ ()
+set stack: ƒ ()
+[[Prototype]]: Object
+
+at t.value (https://d3d70490-9a01-43c5-ac35-dd36ccb1e56c-00-1nkwdguoz3a99.riker.replit.dev/__replco/static/devtools/eruda/3.2.3/eruda.js:2:17465)
+at new t (https://d3d70490-9a01-43c5-ac35-dd36ccb1e56c-00-1nkwdguoz3a99.riker.replit.dev/__replco/static/devtools/eruda/3.2.3/eruda.js:2:12630)
+at t.value (https://d3d70490-9a01-43c5-ac35-dd36ccb1e56c-00-1nkwdguoz3a99.riker.replit.dev/__replco/static/devtools/eruda/3.2.3/eruda.js:2:32766)
+at https://d3d70490-9a01-43c5-ac35-dd36ccb1e56c-00-1nkwdguoz3a99.riker.replit.dev/__replco/static/devtools/eruda/3.2.3/eruda.js:2:34400
