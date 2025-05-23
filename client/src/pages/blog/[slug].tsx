@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { CalendarDays, Clock, Share2, Twitter, Facebook, Linkedin, Link } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { useToast } from "@/hooks/use-toast";
 import type { BlogPost } from "@shared/schema";
 import { useQuery } from "@tanstack/react-query";
 import { format } from "date-fns";
@@ -10,6 +11,7 @@ import SEO from "@/components/shared/SEO";
 import { generateBlogSEOMetadata } from "@/lib/seo";
 
 const BlogPostPage = () => {
+  const { toast } = useToast();
   const { slug } = useParams();
 
   const { data: post, isLoading } = useQuery<BlogPost>({
