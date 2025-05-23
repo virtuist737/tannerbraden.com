@@ -1,4 +1,4 @@
-import { Share2, Link, Twitter, Linkedin } from "lucide-react";
+import { Share2, Link, X, Linkedin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { Facebook, AtSign } from "lucide-react";
@@ -45,7 +45,7 @@ export default function ShareButtons({ title, className = "" }: ShareButtonsProp
             )
           }
         >
-          <Twitter className="h-4 w-4" />
+          <X className="h-4 w-4" />
         </Button>
         <Button
           variant="ghost"
