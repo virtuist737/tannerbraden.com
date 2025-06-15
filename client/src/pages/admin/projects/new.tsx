@@ -47,6 +47,8 @@ export default function NewProject() {
       imageUrl: "",
       technologies: [],
       buttons: [],
+      githubUrl: "",
+      liveUrl: "",
       sortOrder: 0,
       featured: false,
       ventureId: null,
@@ -110,9 +112,7 @@ export default function NewProject() {
   const onSubmit = (data: InsertProject) => {
     const formattedData = {
       ...data,
-      technologies: typeof data.technologies === 'string'
-        ? data.technologies.split(',').map(tech => tech.trim()).filter(Boolean)
-        : data.technologies || [],
+      technologies: Array.isArray(data.technologies) ? data.technologies : [],
       sortOrder: Number(data.sortOrder) || 0,
       featured: Boolean(data.featured),
     };
@@ -203,10 +203,9 @@ export default function NewProject() {
                       <FormLabel>Technologies</FormLabel>
                       <FormControl>
                         <Input
-                          {...field}
                           value={Array.isArray(field.value) ? field.value.join(", ") : ""}
                           onChange={(e) =>
-                            field.onChange(e.target.value.split(",").map((t) => t.trim()).filter(Boolean))
+                            field.onChange(e.target.value.split(",").map((t: string) => t.trim()).filter(Boolean))
                           }
                         />
                       </FormControl>
@@ -257,7 +256,7 @@ export default function NewProject() {
                     <FormItem>
                       <FormLabel>GitHub URL</FormLabel>
                       <FormControl>
-                        <Input {...field} />
+                        <Input {...field} value={field.value || ""} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -271,7 +270,7 @@ export default function NewProject() {
                     <FormItem>
                       <FormLabel>Live URL</FormLabel>
                       <FormControl>
-                        <Input {...field} />
+                        <Input {...field} value={field.value || ""} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
