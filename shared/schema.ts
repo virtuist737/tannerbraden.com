@@ -97,9 +97,11 @@ export const projects = pgTable("projects", {
   id: serial("id").primaryKey(),
   title: text("title").notNull(),
   description: text("description").notNull(),
-  imageUrl: text("image_url").notNull(),
+  imageUrl: text("image_url"),
   technologies: text("technologies").array().notNull(),
   buttons: jsonb("buttons").notNull().$type<Button[]>().default([]), // Properly type the buttons field
+  githubUrl: text("github_url"),
+  liveUrl: text("live_url"),
   ventureId: integer("venture_id").references(() => ventures.id),
   sortOrder: integer("sort_order").notNull().default(0),
   featured: boolean("featured").notNull().default(false),

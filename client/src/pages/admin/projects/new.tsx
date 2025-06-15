@@ -28,6 +28,7 @@ import { useToast } from "@/hooks/use-toast";
 import { insertProjectSchema, type InsertProject, type Venture } from "@shared/schema";
 import { apiRequest } from "@/lib/queryClient";
 import { Plus, Trash2 } from "lucide-react";
+import { ImageUpload } from "@/components/shared/ImageUpload";
 
 export default function NewProject() {
   const [, setLocation] = useLocation();
@@ -171,12 +172,23 @@ export default function NewProject() {
                   name="imageUrl"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Image URL</FormLabel>
+                      <FormLabel>Project Image</FormLabel>
                       <FormControl>
-                        <Input {...field} />
+                        <ImageUpload
+                          imageUrl={field.value}
+                          entityId="temp"
+                          entityType="project"
+                          onSuccess={(newImageUrl) => {
+                            field.onChange(newImageUrl);
+                            toast({
+                              title: "Success",
+                              description: "Image uploaded successfully",
+                            });
+                          }}
+                        />
                       </FormControl>
                       <FormDescription>
-                        Enter the URL of the project image
+                        Upload an image for your project
                       </FormDescription>
                       <FormMessage />
                     </FormItem>
