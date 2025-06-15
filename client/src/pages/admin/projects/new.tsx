@@ -213,8 +213,8 @@ export default function NewProject() {
                     <FormItem>
                       <FormLabel>Venture</FormLabel>
                       <Select
-                        onValueChange={(value) => field.onChange(value ? parseInt(value) : null)}
-                        value={field.value?.toString() || ""}
+                        onValueChange={(value) => field.onChange(value === "none" ? null : parseInt(value))}
+                        value={field.value?.toString() || "none"}
                       >
                         <FormControl>
                           <SelectTrigger>
@@ -222,7 +222,7 @@ export default function NewProject() {
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          <SelectItem value="">None</SelectItem>
+                          <SelectItem value="none">None</SelectItem>
                           {ventures?.map((venture) => (
                             <SelectItem key={venture.id} value={venture.id.toString()}>
                               {venture.name}
