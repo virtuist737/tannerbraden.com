@@ -19,9 +19,10 @@ import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { insertProjectSchema, type Project, type InsertProject } from "@shared/schema";
+import { insertProjectSchema, type Project, type InsertProject, type Venture } from "@shared/schema";
 import { apiRequest } from "@/lib/queryClient";
 import { Plus, Trash2 } from "lucide-react";
+import { ImageUpload } from "@/components/shared/ImageUpload";
 import {
   Select,
   SelectContent,
@@ -38,6 +39,11 @@ export default function EditProject() {
   const { data: project, isLoading } = useQuery<Project>({
     queryKey: [`/api/projects/${id}`],
   });
+
+  // Fetch ventures for dropdown
+  const { data: ventures } = useQuery<Venture[]>({
+    queryKey: ["/api/ventures"],
+  });
   
   const form = useForm<InsertProject>({
     resolver: zodResolver(insertProjectSchema),
@@ -47,6 +53,8 @@ export default function EditProject() {
       imageUrl: "",
       technologies: [],
       buttons: [],
+      githubUrl: "",
+      liveUrl: "",
       sortOrder: 0,
       featured: false,
     },
@@ -190,12 +198,23 @@ export default function EditProject() {
                   name="imageUrl"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Image URL</FormLabel>
+                      <FormLabel>Project Image</FormLabel>
                       <FormControl>
-                        <Input {...field} />
+                        <ImageUpload
+                          imageUrl={field.value}
+                          entityId={id || "temp"}
+                          entityType="project"
+                          onSuccess={(newImageUrl) => {
+                            field.onChange(newImageUrl);
+                            toast({
+                              title: "Success",
+                              description: "Image uploaded successfully",
+                            });
+                          }}
+                        />
                       </FormControl>
                       <FormDescription>
-                        Enter the URL of the project image
+                        Upload an image for your project
                       </FormDescription>
                       <FormMessage />
                     </FormItem>
@@ -210,16 +229,43 @@ export default function EditProject() {
                       <FormLabel>Technologies</FormLabel>
                       <FormControl>
                         <Input
-                          {...field}
                           value={Array.isArray(field.value) ? field.value.join(", ") : ""}
                           onChange={(e) =>
-                            field.onChange(e.target.value.split(",").map((t) => t.trim()))
+                            field.onChange(e.target.value.split(",").map((t: string) => t.trim()).filter(Boolean))
                           }
                         />
                       </FormControl>
                       <FormDescription>
                         Enter technologies separated by commas (e.g., React, Node.js, PostgreSQL)
                       </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="githubUrl"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>GitHub URL</FormLabel>
+                      <FormControl>
+                        <Input {...field} value={field.value || ""} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="liveUrl"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Live URL</FormLabel>
+                      <FormControl>
+                        <Input {...field} value={field.value || ""} />
+                      </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
