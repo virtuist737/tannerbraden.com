@@ -242,6 +242,38 @@ export default function EditProject() {
                     </FormItem>
                   )}
                 />
+                
+                <FormField
+                  control={form.control}
+                  name="ventureId"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Venture</FormLabel>
+                      <Select
+                        onValueChange={(value) => field.onChange(value === "none" ? null : parseInt(value))}
+                        value={field.value?.toString() || "none"}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select venture (optional)" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="none">None</SelectItem>
+                          {ventures?.map((venture) => (
+                            <SelectItem key={venture.id} value={venture.id.toString()}>
+                              {venture.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormDescription>
+                        Associate this project with a venture
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
                 <FormField
                   control={form.control}
