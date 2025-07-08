@@ -24,9 +24,16 @@ const BlogCard = ({ post }: BlogCardProps) => {
           {post.coverImage && (
             <div className="aspect-video relative overflow-hidden">
               <img
-                src={post.coverImage}
+                src={post.coverImageMedium || post.coverImage}
+                srcSet={[
+                  post.coverImageThumbnail && `${post.coverImageThumbnail} 150w`,
+                  post.coverImageMedium && `${post.coverImageMedium} 600w`,
+                  post.coverImageLarge && `${post.coverImageLarge} 1200w`
+                ].filter(Boolean).join(', ')}
+                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                 alt={post.title}
                 className="object-cover w-full h-full transition-transform hover:scale-105"
+                loading="lazy"
               />
             </div>
           )}

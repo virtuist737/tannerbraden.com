@@ -85,6 +85,13 @@ Key entities include:
 
 ## Changelog
 
+- July 8, 2025. Implemented blog image optimization system with Sharp
+  - Added multi-size image processing (thumbnail, medium, large)
+  - Optimized JPEG compression with progressive loading
+  - Responsive image serving with srcset and sizes attributes
+  - Automatic cleanup of old optimized images
+  - Database schema updated to store optimized image URLs
+  - Frontend components updated to use responsive images
 - June 15, 2025. Initial setup
 
 ## User Preferences

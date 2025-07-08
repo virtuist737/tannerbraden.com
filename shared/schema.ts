@@ -36,10 +36,14 @@ export const blogPosts = pgTable("blog_posts", {
   title: text("title").notNull(),
   content: text("content").notNull(),
   excerpt: text("excerpt").notNull(),
-  coverImage: text("cover_image"),  // Remove notNull constraint
+  coverImage: text("cover_image"),  // Main cover image (medium size)
   authorId: integer("author_id").references(() => users.id),
   category: text("category").notNull(),
   publishedAt: timestamp("published_at").notNull().defaultNow(),
+  // Optimized image URLs for different sizes
+  coverImageThumbnail: text("cover_image_thumbnail"),
+  coverImageMedium: text("cover_image_medium"),
+  coverImageLarge: text("cover_image_large"),
   // SEO fields
   seoTitle: text("seo_title"),
   seoDescription: text("seo_description"),
@@ -133,6 +137,9 @@ export const insertUserSchema = createInsertSchema(users).pick({
 export const insertBlogPostSchema = createInsertSchema(blogPosts).omit({
   id: true,
   publishedAt: true,
+  coverImageThumbnail: true,
+  coverImageMedium: true,
+  coverImageLarge: true,
 }).extend({
   coverImage: z.string().optional(),  // Make explicitly optional in zod schema
   seoTitle: z.string().max(60, "SEO Title should be under 60 characters").optional(),

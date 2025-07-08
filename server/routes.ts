@@ -16,7 +16,7 @@ import { upload } from "./lib/upload";
 import path from "path";
 import fs from "fs";
 import { fileURLToPath } from 'url';
-import { uploadToObjectStorage, getObjectPathFromUrl, deleteFromObjectStorage, objectStore } from './lib/objectStorage';
+import { uploadToObjectStorage, getObjectPathFromUrl, deleteFromObjectStorage, objectStore, uploadOptimizedBlogImage } from './lib/objectStorage';
 
 // ESM module dirname equivalent
 const __filename = fileURLToPath(import.meta.url);
@@ -244,11 +244,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "No image file provided" });
       }
       
-      // Upload to Replit Object Storage without database update
-      const imageUrl = await uploadToObjectStorage(req.file, "blog-temp");
+      // Upload and optimize the image to Replit Object Storage without database update
+      const optimizedUrls = await uploadOptimizedBlogImage(req.file, "blog-temp");
       
-      // Return the image URL
-      res.json({ imageUrl });
+      // Return the optimized image URLs (medium as primary for form compatibility)
+      res.json({ 
+        imageUrl: optimizedUrls.medium,
+        optimizedUrls 
+      });
     } catch (error) {
       console.error(`Error uploading temporary blog image:`, error);
       res.status(500).json({ error: "Failed to upload image" });
@@ -257,9 +260,43 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // Route for regular blog image uploads with IDs
   app.post("/api/upload/blog/:id", isAuthenticated, upload.single("image"), async (req, res) => {
-    await handleImageUpload(req, res, "blog", async (id, imageUrl) => {
-      return await storage.updateBlogPost(id, { coverImage: imageUrl });
-    });
+    try {
+      if (!req.file) {
+        return res.status(400).json({ error: "No image file provided" });
+      }
+
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ error: "Invalid blog ID" });
+      }
+
+      // Get the current blog post to see if there's an existing image
+      const existingPost = await storage.getBlogPost(id);
+      
+      // Upload and optimize the image to Replit Object Storage
+      const optimizedUrls = await uploadOptimizedBlogImage(
+        req.file, 
+        "blog",
+        existingPost?.coverImage || undefined
+      );
+      
+      // Update the blog post with all optimized image URLs
+      const post = await storage.updateBlogPost(id, { 
+        coverImage: optimizedUrls.medium,
+        coverImageThumbnail: optimizedUrls.thumbnail,
+        coverImageMedium: optimizedUrls.medium,
+        coverImageLarge: optimizedUrls.large
+      });
+      
+      res.json({ 
+        post, 
+        imageUrl: optimizedUrls.medium,
+        optimizedUrls 
+      });
+    } catch (error) {
+      console.error(`Error uploading blog image:`, error);
+      res.status(500).json({ error: "Failed to upload image" });
+    }
   });
   
   // Add route for blog content image uploads with temp ID

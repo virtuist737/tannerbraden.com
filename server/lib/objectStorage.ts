@@ -1,6 +1,7 @@
 import { Client } from '@replit/object-storage';
 import crypto from 'crypto';
 import path from 'path';
+import { optimizeImage, cleanupOptimizedImages, type OptimizedImageUrls } from './imageOptimization';
 
 // Initialize the object store client
 export const objectStore = new Client();
@@ -51,6 +52,44 @@ export const uploadToObjectStorage = async (file: Express.Multer.File, folder: s
   } catch (error) {
     console.error('Object Storage upload error:', error);
     throw new Error(`Failed to upload image to Object Storage: ${error instanceof Error ? error.message : 'Unknown error'}`);
+  }
+};
+
+/**
+ * Uploads and optimizes a blog cover image to Object Storage
+ * @param file The file to upload (from multer)
+ * @param folder The folder to store the file in (used for path organization)
+ * @param oldImageUrl Optional old image URL to clean up
+ * @returns Object containing URLs for all optimized sizes
+ */
+export const uploadOptimizedBlogImage = async (
+  file: Express.Multer.File,
+  folder: string,
+  oldImageUrl?: string
+): Promise<OptimizedImageUrls> => {
+  try {
+    // Clean up old images if provided
+    if (oldImageUrl) {
+      await cleanupOptimizedImages(oldImageUrl);
+    }
+    
+    // Generate a unique filename to prevent collisions
+    const timestamp = Date.now();
+    const randomString = crypto.randomBytes(8).toString('hex');
+    
+    // Create a clean filename with timestamp and random string (no extension)
+    const filename = `${timestamp}-${randomString}`;
+    
+    // Create the full path with folder structure
+    const basePath = `portfolio/${folder}`;
+    
+    // Optimize and upload the image
+    const optimizedUrls = await optimizeImage(file, basePath, filename);
+    
+    return optimizedUrls;
+  } catch (error) {
+    console.error('Optimized image upload error:', error);
+    throw new Error(`Failed to upload and optimize image: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }
 };
 

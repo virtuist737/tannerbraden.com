@@ -100,9 +100,16 @@ const BlogPostPage = () => {
         {post.coverImage && (
           <div className="aspect-video relative mt-8 overflow-hidden rounded-lg">
             <img
-              src={post.coverImage}
+              src={post.coverImageLarge || post.coverImage}
+              srcSet={[
+                post.coverImageThumbnail && `${post.coverImageThumbnail} 150w`,
+                post.coverImageMedium && `${post.coverImageMedium} 600w`,
+                post.coverImageLarge && `${post.coverImageLarge} 1200w`
+              ].filter(Boolean).join(', ')}
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 1200px"
               alt={post.title}
               className="object-cover w-full h-full"
+              loading="lazy"
             />
           </div>
         )}

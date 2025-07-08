@@ -142,7 +142,12 @@ const Dashboard = () => {
                     <div key={post.id} className="flex items-center gap-4">
                       {post.coverImage && (
                         <div className="h-12 w-12 rounded-md overflow-hidden bg-muted flex-shrink-0">
-                          <img src={post.coverImage} alt={post.title} className="h-full w-full object-cover" />
+                          <img 
+                            src={post.coverImageThumbnail || post.coverImage} 
+                            alt={post.title} 
+                            className="h-full w-full object-cover"
+                            loading="lazy"
+                          />
                         </div>
                       )}
                       <div className="flex-1 min-w-0">
