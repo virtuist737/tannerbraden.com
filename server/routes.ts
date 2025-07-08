@@ -12,7 +12,7 @@ import {
 } from "@shared/schema";
 import { isAuthenticated } from "./auth";
 
-import { upload } from "./lib/upload";
+import { upload, audioUpload } from "./lib/upload";
 import path from "path";
 import fs from "fs";
 import { fileURLToPath } from 'url';
@@ -372,6 +372,40 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error(`Error uploading temporary project image:`, error);
       res.status(500).json({ error: "Failed to upload image" });
+    }
+  });
+
+  // Audio upload endpoint
+  app.post("/api/upload/audio", isAuthenticated, audioUpload.single("file"), async (req, res) => {
+    try {
+      if (!req.file) {
+        return res.status(400).json({ error: "No audio file provided" });
+      }
+
+      // Validate file type
+      if (!req.file.mimetype.startsWith("audio/")) {
+        return res.status(400).json({ error: "Please upload an audio file" });
+      }
+
+      // Validate file size (max 10MB)
+      if (req.file.size > 10 * 1024 * 1024) {
+        return res.status(400).json({ error: "File size must be less than 10MB" });
+      }
+
+      const folder = "audio";
+      
+      // Upload to Object Storage
+      const audioUrl = await uploadToObjectStorage(req.file, folder);
+      
+      res.json({
+        url: audioUrl,
+        originalName: req.file.originalname,
+        size: req.file.size,
+        mimetype: req.file.mimetype,
+      });
+    } catch (error) {
+      console.error("Audio upload failed:", error);
+      res.status(500).json({ error: "Audio upload failed" });
     }
   });
 
@@ -800,6 +834,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
           break;
         case '.webp':
           contentType = 'image/webp';
+          break;
+        case '.mp3':
+          contentType = 'audio/mpeg';
+          break;
+        case '.wav':
+          contentType = 'audio/wav';
+          break;
+        case '.ogg':
+          contentType = 'audio/ogg';
+          break;
+        case '.m4a':
+          contentType = 'audio/m4a';
+          break;
+        case '.flac':
+          contentType = 'audio/flac';
+          break;
+        case '.aac':
+          contentType = 'audio/aac';
           break;
       }
       

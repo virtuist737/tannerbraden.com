@@ -40,19 +40,36 @@ const createPool = async (retryCount = 0): Promise<Pool> => {
   }
 };
 
-export const pool = await createPool();
-export const db = drizzle({ client: pool, schema });
+let pool: Pool;
+let db: ReturnType<typeof drizzle>;
 
-// Handle pool errors with more informative logging
-pool.on('error', (err) => {
-  console.error('Unexpected database error:', err);
-  // Attempt to reconnect with improved error handling
-  createPool().then(newPool => {
-    pool.end();
-    Object.assign(pool, newPool);
-    console.log("Successfully reconnected to the database.");
-  }).catch(error => {
-    console.error('Failed to reconnect to the database:', error);
-    //Consider adding more robust error handling here, such as alerting or failing the application.
+const initializeDatabase = async () => {
+  pool = await createPool();
+  db = drizzle({ client: pool, schema });
+  return { pool, db };
+};
+
+export { pool, db, initializeDatabase };
+
+// Initialize database on startup
+initializeDatabase()
+  .then(({ pool: dbPool, db: dbInstance }) => {
+    console.log('Successfully connected to the database.');
+    
+    // Handle pool errors with more informative logging
+    dbPool.on('error', (err: Error) => {
+      console.error('Unexpected database error:', err);
+    });
+
+    process.on('SIGINT', () => {
+      console.log('\nShutting down gracefully...');
+      dbPool.end(() => {
+        console.log('Pool has ended');
+        process.exit(0);
+      });
+    });
+  })
+  .catch(error => {
+    console.error('Failed to initialize database:', error);
+    process.exit(1);
   });
-});

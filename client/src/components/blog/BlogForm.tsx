@@ -28,10 +28,12 @@ import {
 } from "@/components/ui/select";
 import { type BlogPost } from "@shared/schema";
 import { ImageUpload } from "@/components/shared/ImageUpload";
+import AudioUpload from "@/components/shared/AudioUpload";
 import { ImagePlus, Link2, Bold, Italic, Heading2, List, ListOrdered, Quote } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
+import { apiRequest } from "@/lib/queryClient";
 
 const blogFormSchema = insertBlogPostSchema.extend({
   title: z.string().min(1, "Title is required"),
@@ -45,6 +47,10 @@ const blogFormSchema = insertBlogPostSchema.extend({
   seoKeywords: z.string().optional(),
   canonicalUrl: z.string().url("Must be a valid URL").optional().or(z.literal("")),
   isIndexed: z.boolean().default(true),
+  // Song fields
+  songTitle: z.string().optional(),
+  songAudioUrl: z.string().optional(),
+  songCoverImage: z.string().optional(),
 });
 
 interface BlogFormProps {
@@ -78,6 +84,10 @@ const BlogForm = ({ initialData, onSubmit, isSubmitting }: BlogFormProps) => {
       seoKeywords: initialData?.seoKeywords || "",
       canonicalUrl: initialData?.canonicalUrl || "",
       isIndexed: initialData?.isIndexed ?? true,
+      // Song fields
+      songTitle: initialData?.songTitle || "",
+      songAudioUrl: initialData?.songAudioUrl || "",
+      songCoverImage: initialData?.songCoverImage || "",
     },
   });
 
@@ -388,6 +398,89 @@ const BlogForm = ({ initialData, onSubmit, isSubmitting }: BlogFormProps) => {
             </FormItem>
           )}
         />
+
+        {/* Song Attachment Section */}
+        <div className="space-y-6 border rounded-lg p-6">
+          <h3 className="text-lg font-semibold">Song Attachment (Optional)</h3>
+          <p className="text-sm text-muted-foreground">
+            Attach a song to this blog post. It will be displayed at the bottom of the post with a playback card.
+          </p>
+          
+          <FormField
+            control={form.control}
+            name="songTitle"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Song Title</FormLabel>
+                <FormControl>
+                  <Input 
+                    {...field} 
+                    placeholder="Enter song title..."
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="songAudioUrl"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Audio File</FormLabel>
+                <FormControl>
+                  <AudioUpload
+                    onUpload={async (file) => {
+                      try {
+                        const formData = new FormData();
+                        formData.append('file', file);
+                        
+                        const response = await apiRequest('/api/upload/audio', {
+                          method: 'POST',
+                          body: formData,
+                        });
+                        
+                        if (response.url) {
+                          field.onChange(response.url);
+                          return response.url;
+                        }
+                        
+                        throw new Error('Upload failed');
+                      } catch (error) {
+                        console.error('Upload failed:', error);
+                        throw error;
+                      }
+                    }}
+                    onRemove={() => field.onChange('')}
+                    value={field.value || ''}
+                    disabled={isSubmitting}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="songCoverImage"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Song Cover Image</FormLabel>
+                <FormControl>
+                  <ImageUpload
+                    imageUrl={field.value || null}
+                    entityId={initialData?.id || "temp"}
+                    entityType="song-cover"
+                    onSuccess={(url) => field.onChange(url)}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
 
         {/* SEO Section */}
         <Tabs defaultValue="basic">

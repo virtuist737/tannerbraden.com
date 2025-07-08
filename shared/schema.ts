@@ -50,6 +50,10 @@ export const blogPosts = pgTable("blog_posts", {
   seoKeywords: text("seo_keywords"),
   canonicalUrl: text("canonical_url"),
   isIndexed: boolean("is_indexed").notNull().default(true),
+  // Song attachment fields
+  songTitle: text("song_title"),
+  songAudioUrl: text("song_audio_url"),
+  songCoverImage: text("song_cover_image"),
 });
 
 
@@ -150,6 +154,9 @@ export const insertBlogPostSchema = createInsertSchema(blogPosts).omit({
     z.string().max(0) // Empty string
   ]).optional(),
   isIndexed: z.boolean().optional().default(true),
+  songTitle: z.string().optional(),
+  songAudioUrl: z.string().optional(),
+  songCoverImage: z.string().optional(),
 });
 
 export const insertNewsletterSubscriptionSchema = createInsertSchema(newsletterSubscriptions).pick({
