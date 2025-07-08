@@ -10,7 +10,7 @@ import { useQuery } from "@tanstack/react-query";
 import { format } from "date-fns";
 import SEO from "@/components/shared/SEO";
 import { generateBlogSEOMetadata } from "@/lib/seo";
-import SongPlaybackCard from "@/components/shared/SongPlaybackCard";
+import { SongPlaybackCard } from "@/components/blog/SongPlaybackCard";
 
 const BlogPostPage = () => {
   const { toast } = useToast();
@@ -126,9 +126,9 @@ const BlogPostPage = () => {
         {post.songTitle && post.songAudioUrl && (
           <div className="mt-8">
             <SongPlaybackCard
-              title={post.songTitle}
-              audioUrl={post.songAudioUrl}
-              coverImage={post.songCoverUrl}
+              songTitle={post.songTitle}
+              songAudioUrl={post.songAudioUrl}
+              songCoverImage={post.songCoverImage}
               className="w-full"
             />
           </div>

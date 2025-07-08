@@ -108,6 +108,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const posts = await storage.listBlogPosts();
       res.json(posts);
     } catch (error) {
+      console.error("Error fetching blog posts:", error);
       res.status(500).json({ error: "Failed to fetch blog posts" });
     }
   });
@@ -236,6 +237,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Upload routes for different entity types
   // IMPORTANT: More specific routes must come before parameter routes
+  
+  // Add route for audio uploads
+  app.post("/api/upload/audio", isAuthenticated, audioUpload.single("audio"), async (req, res) => {
+    try {
+      if (!req.file) {
+        return res.status(400).json({ error: "No audio file provided" });
+      }
+
+      const timestamp = Date.now();
+      const randomString = Math.random().toString(36).substring(2, 15);
+      const extension = req.file.originalname.split('.').pop();
+      const filename = `audio_${timestamp}_${randomString}.${extension}`;
+      
+      const audioUrl = await uploadToObjectStorage(req.file, "blog/audio", filename);
+      
+      res.json({ url: audioUrl });
+    } catch (error) {
+      console.error("Error uploading audio:", error);
+      res.status(500).json({ error: "Failed to upload audio file" });
+    }
+  });
   
   // Add route for temporary blog uploads (for new blog posts)
   app.post("/api/upload/blog/temp", isAuthenticated, upload.single("image"), async (req, res) => {

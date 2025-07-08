@@ -10,19 +10,27 @@ export const objectStore = new Client();
  * Uploads a file to Replit Object Storage
  * @param file The file to upload (from multer)
  * @param folder The folder to store the file in (used for path organization)
+ * @param customFilename Optional custom filename to use instead of generating one
  * @returns The public URL of the uploaded file
  */
-export const uploadToObjectStorage = async (file: Express.Multer.File, folder: string): Promise<string> => {
+export const uploadToObjectStorage = async (file: Express.Multer.File, folder: string, customFilename?: string): Promise<string> => {
   try {
-    // Generate a unique filename to prevent collisions
-    const timestamp = Date.now();
-    const randomString = crypto.randomBytes(8).toString('hex');
+    let filename: string;
     
-    // Extract the file extension from the original name
-    const fileExtension = path.extname(file.originalname).toLowerCase();
-    
-    // Create a clean filename with timestamp and random string
-    const filename = `${timestamp}-${randomString}${fileExtension}`;
+    if (customFilename) {
+      // Use the provided custom filename
+      filename = customFilename;
+    } else {
+      // Generate a unique filename to prevent collisions
+      const timestamp = Date.now();
+      const randomString = crypto.randomBytes(8).toString('hex');
+      
+      // Extract the file extension from the original name
+      const fileExtension = path.extname(file.originalname).toLowerCase();
+      
+      // Create a clean filename with timestamp and random string
+      filename = `${timestamp}-${randomString}${fileExtension}`;
+    }
     
     // Create the full path with folder structure
     const objectPath = `portfolio/${folder}/${filename}`;

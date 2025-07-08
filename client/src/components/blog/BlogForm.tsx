@@ -28,7 +28,7 @@ import {
 } from "@/components/ui/select";
 import { type BlogPost } from "@shared/schema";
 import { ImageUpload } from "@/components/shared/ImageUpload";
-import AudioUpload from "@/components/shared/AudioUpload";
+import { AudioUpload } from "@/components/blog/AudioUpload";
 import { ImagePlus, Link2, Bold, Italic, Heading2, List, ListOrdered, Quote } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Switch } from "@/components/ui/switch";
@@ -431,30 +431,9 @@ const BlogForm = ({ initialData, onSubmit, isSubmitting }: BlogFormProps) => {
                 <FormLabel>Audio File</FormLabel>
                 <FormControl>
                   <AudioUpload
-                    onUpload={async (file) => {
-                      try {
-                        const formData = new FormData();
-                        formData.append('file', file);
-                        
-                        const response = await apiRequest('/api/upload/audio', {
-                          method: 'POST',
-                          body: formData,
-                        });
-                        
-                        if (response.url) {
-                          field.onChange(response.url);
-                          return response.url;
-                        }
-                        
-                        throw new Error('Upload failed');
-                      } catch (error) {
-                        console.error('Upload failed:', error);
-                        throw error;
-                      }
-                    }}
+                    audioUrl={field.value}
+                    onUploadComplete={(url) => field.onChange(url)}
                     onRemove={() => field.onChange('')}
-                    value={field.value || ''}
-                    disabled={isSubmitting}
                   />
                 </FormControl>
                 <FormMessage />
