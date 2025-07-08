@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Loader2, Upload, Image as ImageIcon, X } from "lucide-react";
@@ -27,6 +27,7 @@ export const ImageUpload = ({ imageUrl, entityId, entityType, onSuccess, trigger
   const isAuthenticated = !!user;
   const [uploadedImages, setUploadedImages] = useState<string[]>([]);
   const [showGallery, setShowGallery] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
@@ -117,6 +118,10 @@ export const ImageUpload = ({ imageUrl, entityId, entityType, onSuccess, trigger
     setUploadedImages(prev => prev.filter(url => url !== urlToRemove));
   };
 
+  const triggerFileInput = () => {
+    fileInputRef.current?.click();
+  };
+
   const ImageGallery = () => (
     <Dialog open={showGallery} onOpenChange={setShowGallery}>
       <DialogContent className="sm:max-w-[80vw]">
@@ -153,15 +158,7 @@ export const ImageUpload = ({ imageUrl, entityId, entityType, onSuccess, trigger
   if (trigger) {
     return (
       <>
-        <label className="cursor-pointer">
-          <input
-            type="file"
-            accept="image/*"
-            multiple={multiple}
-            className="hidden"
-            onChange={handleImageUpload}
-            disabled={isUploading}
-          />
+        <div onClick={triggerFileInput} className="cursor-pointer">
           {isUploading ? (
             <div className="flex items-center gap-2 text-muted-foreground">
               <Loader2 className="h-4 w-4 animate-spin" />
@@ -170,7 +167,7 @@ export const ImageUpload = ({ imageUrl, entityId, entityType, onSuccess, trigger
           ) : (
             <div className="flex items-center">{trigger}</div>
           )}
-        </label>
+        </div>
         {multiple && uploadedImages.length > 0 && (
           <Button
             variant="ghost"
@@ -185,6 +182,15 @@ export const ImageUpload = ({ imageUrl, entityId, entityType, onSuccess, trigger
             <ImageIcon className="h-4 w-4" />
           </Button>
         )}
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/*"
+          multiple={multiple}
+          className="hidden"
+          onChange={handleImageUpload}
+          disabled={isUploading}
+        />
         <ImageGallery />
       </>
     );
@@ -201,57 +207,56 @@ export const ImageUpload = ({ imageUrl, entityId, entityType, onSuccess, trigger
           />
           {isAuthenticated && (
             <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-              <label className="cursor-pointer">
-                <input
-                  type="file"
-                  accept="image/*"
-                  multiple={multiple}
-                  className="hidden"
-                  onChange={handleImageUpload}
-                  disabled={isUploading}
-                />
-                <Button variant="secondary" disabled={isUploading}>
-                  {isUploading ? (
-                    <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Uploading...
-                    </>
-                  ) : (
-                    <>
-                      <Upload className="mr-2 h-4 w-4" />
-                      Change Image
-                    </>
-                  )}
-                </Button>
-              </label>
+              <Button 
+                type="button" 
+                variant="secondary" 
+                disabled={isUploading}
+                onClick={triggerFileInput}
+              >
+                {isUploading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Uploading...
+                  </>
+                ) : (
+                  <>
+                    <Upload className="mr-2 h-4 w-4" />
+                    Change Image
+                  </>
+                )}
+              </Button>
             </div>
           )}
         </div>
       ) : isAuthenticated ? (
-        <label className="cursor-pointer block">
-          <input
-            type="file"
-            accept="image/*"
-            multiple={multiple}
-            className="hidden"
-            onChange={handleImageUpload}
-            disabled={isUploading}
-          />
-          <div className="w-full p-8 border-2 border-dashed rounded-lg flex items-center justify-center">
-            {isUploading ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Uploading...
-              </>
-            ) : (
-              <>
-                <Upload className="mr-2 h-4 w-4" />
-                Upload Image{multiple ? 's' : ''}
-              </>
-            )}
-          </div>
-        </label>
+        <div 
+          className="w-full p-8 border-2 border-dashed rounded-lg flex items-center justify-center cursor-pointer hover:border-primary/50 transition-colors"
+          onClick={triggerFileInput}
+        >
+          {isUploading ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              Uploading...
+            </>
+          ) : (
+            <>
+              <Upload className="mr-2 h-4 w-4" />
+              Upload Image{multiple ? 's' : ''}
+            </>
+          )}
+        </div>
       ) : null}
+      
+      {/* Hidden file input */}
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="image/*"
+        multiple={multiple}
+        className="hidden"
+        onChange={handleImageUpload}
+        disabled={isUploading}
+      />
       {multiple && <ImageGallery />}
     </div>
   );
