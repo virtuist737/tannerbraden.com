@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
-import { Play, Pause, Volume2, Music } from 'lucide-react';
+import { Play, Pause, Volume2, Music, Download } from 'lucide-react';
 import { formatTime } from '@/lib/utils';
 
 interface SongPlaybackCardProps {
@@ -85,6 +85,16 @@ export function SongPlaybackCard({
     setVolume(newVolume);
   };
 
+  const handleDownload = () => {
+    const link = document.createElement('a');
+    link.href = songAudioUrl;
+    link.download = `${songTitle}.mp3`;
+    link.target = '_blank';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   const progress = duration > 0 ? (currentTime / duration) * 100 : 0;
 
   return (
@@ -127,6 +137,16 @@ export function SongPlaybackCard({
                 ) : (
                   <Play className="h-5 w-5" />
                 )}
+              </Button>
+
+              <Button
+                size="icon"
+                variant="outline"
+                onClick={handleDownload}
+                title="Download song"
+                className="h-10 w-10"
+              >
+                <Download className="h-5 w-5" />
               </Button>
 
               {/* Progress Bar */}
