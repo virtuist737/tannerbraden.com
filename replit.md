@@ -92,6 +92,17 @@ Key entities include:
 
 ## Changelog
 
+- July 8, 2025. Enhanced SEO and Social Media Metadata System
+  - Completely overhauled SEO metadata system for better social media previews
+  - Created custom SVG social media preview images (1200x630 optimized for Open Graph)
+  - Fixed blog post pages to use proper SEO generation functions
+  - Added structured data (JSON-LD) for better search engine understanding
+  - Improved Open Graph tags with proper image dimensions and alt text
+  - Enhanced Twitter Card metadata with creator and site information
+  - Added homepage-specific social media image and metadata
+  - Updated all pages (home, about, blog, projects, contact) to use improved SEO system
+  - Fixed image URL resolution for social media sharing
+  - Added rich snippets support for blog posts and person schema
 - July 8, 2025. Added Blog Song Attachment Functionality
   - Added song fields to blog_posts table (songTitle, songAudioUrl, songCoverImage)
   - Created AudioUpload component for uploading audio files with progress tracking

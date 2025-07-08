@@ -56,20 +56,7 @@ const BlogPostPage = () => {
 
   return (
     <>
-      <SEO data={{
-        title: post.title,
-        description: post.excerpt || post.content?.substring(0, 160).replace(/<[^>]*>/g, ''),
-        keywords: `${post.category}, blog, tanner braden, ${post.title.toLowerCase()}`,
-        ogType: "article",
-        ogImage: post.coverImage,
-        twitterCard: "summary_large_image",
-        twitterTitle: post.title,
-        twitterDescription: post.excerpt,
-        twitterImage: post.coverImage,
-        articlePublishedTime: post.publishedAt?.toString(),
-        articleSection: post.category,
-        articleAuthor: "Tanner Braden"
-      }} />
+      <SEO data={generateBlogSEOMetadata(post)} />
     <div className="container py-12">
       <motion.article
         initial={{ opacity: 0, y: 20 }}

@@ -17,7 +17,6 @@ const Projects = () => {
         title: "Projects",
         description: "Discover Tanner Braden's innovative digital creations, audio design projects, and interactive web applications focused on enhancing human consciousness and fostering mindfulness in the digital age.",
         keywords: "digital creator portfolio, audio design projects, web applications, interactive experiences, consciousness technology, creative development, music production tools, mindfulness innovations",
-        image: "https://res.cloudinary.com/dvk20sglr/image/upload/v1739851169/tanner2.0_dark-500x500_f0dznv.png",
       })} />
       <div className="container py-12">
         <motion.div

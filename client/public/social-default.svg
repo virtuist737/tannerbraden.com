@@ -1,0 +1,32 @@
+<svg width="1200" height="630" viewBox="0 0 1200 630" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0f0f23;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#1a1a2e;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="accentGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#8b5cf6;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#06b6d4;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="1200" height="630" fill="url(#bgGradient)"/>
+  
+  <!-- Decorative elements -->
+  <circle cx="150" cy="150" r="1.5" fill="url(#accentGradient)" opacity="0.5"/>
+  <circle cx="1050" cy="480" r="2" fill="url(#accentGradient)" opacity="0.4"/>
+  <circle cx="300" cy="550" r="1" fill="url(#accentGradient)" opacity="0.7"/>
+  <circle cx="900" cy="180" r="1.5" fill="url(#accentGradient)" opacity="0.6"/>
+  
+  <!-- Main logo/brand -->
+  <text x="600" y="300" text-anchor="middle" fill="white" font-family="system-ui, -apple-system, sans-serif" font-size="60" font-weight="bold">TB</text>
+  <text x="600" y="370" text-anchor="middle" fill="#a1a1aa" font-family="system-ui, -apple-system, sans-serif" font-size="28">Tanner Braden</text>
+  <text x="600" y="420" text-anchor="middle" fill="#71717a" font-family="system-ui, -apple-system, sans-serif" font-size="20">Digital Creator</text>
+  
+  <!-- Bottom accent -->
+  <rect x="400" y="480" width="400" height="1" fill="url(#accentGradient)" opacity="0.6"/>
+  
+  <!-- Website URL -->
+  <text x="600" y="550" text-anchor="middle" fill="#52525b" font-family="system-ui, -apple-system, sans-serif" font-size="18">tannerbraden.com</text>
+</svg>

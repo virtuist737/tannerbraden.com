@@ -28,7 +28,7 @@ const Home = () => {
         title: "Tanner Braden - Innovative Digital Creator & Audio Designer",
         description: "Tanner Braden is a forward-thinking digital creator specializing in audio design, web development, and interactive experiences that elevate human consciousness and foster mindfulness in the digital age.",
         keywords: "digital creator, audio designer, web developer, consciousness technology, mindfulness innovation, interactive experiences, digital wellbeing, creative technology, music production",
-        image: "https://res.cloudinary.com/dvk20sglr/image/upload/v1739851169/tanner2.0_dark-500x500_f0dznv.png",
+        isHomepage: true,
       })} />
 
       {/* Hero Section */}

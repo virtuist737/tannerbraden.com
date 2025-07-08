@@ -1,0 +1,32 @@
+<svg width="1200" height="630" viewBox="0 0 1200 630" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0f0f23;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#1a1a2e;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="accentGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#8b5cf6;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#06b6d4;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="1200" height="630" fill="url(#bgGradient)"/>
+  
+  <!-- Accent shapes -->
+  <circle cx="100" cy="100" r="2" fill="url(#accentGradient)" opacity="0.6"/>
+  <circle cx="1100" cy="530" r="3" fill="url(#accentGradient)" opacity="0.4"/>
+  <circle cx="200" cy="500" r="1.5" fill="url(#accentGradient)" opacity="0.8"/>
+  <circle cx="1000" cy="150" r="2.5" fill="url(#accentGradient)" opacity="0.5"/>
+  
+  <!-- Main content -->
+  <text x="600" y="280" text-anchor="middle" fill="white" font-family="system-ui, -apple-system, sans-serif" font-size="72" font-weight="bold">Tanner Braden</text>
+  <text x="600" y="340" text-anchor="middle" fill="#a1a1aa" font-family="system-ui, -apple-system, sans-serif" font-size="32" font-weight="500">Digital Creator & Audio Designer</text>
+  <text x="600" y="420" text-anchor="middle" fill="#71717a" font-family="system-ui, -apple-system, sans-serif" font-size="24">Creating innovative experiences that elevate human consciousness</text>
+  
+  <!-- Bottom accent -->
+  <rect x="300" y="500" width="600" height="2" fill="url(#accentGradient)" opacity="0.6"/>
+  
+  <!-- Website URL -->
+  <text x="600" y="560" text-anchor="middle" fill="#52525b" font-family="system-ui, -apple-system, sans-serif" font-size="20">tannerbraden.com</text>
+</svg>

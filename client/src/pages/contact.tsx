@@ -48,7 +48,6 @@ const Contact = () => {
         title: "Contact",
         description: "Connect with Tanner Braden for creative collaborations, audio design projects, web development opportunities, or to discuss innovative ideas around consciousness and digital wellbeing.",
         keywords: "contact digital creator, audio design collaboration, web development projects, creative technology partnership, consciousness innovation, digital content creation, audio production consultation",
-        image: "https://res.cloudinary.com/dvk20sglr/image/upload/v1739851169/tanner2.0_dark-500x500_f0dznv.png",
       })} />
     <div className="container py-12">
       <motion.div

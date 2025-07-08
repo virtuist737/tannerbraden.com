@@ -77,7 +77,6 @@ const About = () => {
         title: "About",
         description: "Learn about Tanner Braden's journey as a digital creator, audio designer, and consciousness explorer. Discover the inspiration behind my creative work and innovative technology projects.",
         keywords: "digital creator, audio design, consciousness explorer, web development, interactive experiences, creative technology, mindfulness innovation, personal journey",
-        image: "https://res.cloudinary.com/dvk20sglr/image/upload/v1739851169/tanner2.0_dark-500x500_f0dznv.png",
       })} />
       <div className="min-h-screen">
         <div className="container max-w-7xl mx-auto px-4 py-12 space-y-16">

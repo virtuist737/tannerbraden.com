@@ -44,13 +44,17 @@ export default function SEO({ data }: SEOProps) {
       )}
 
       {/* Open Graph / Facebook */}
-      <meta property="og:title" content={title} />
-      <meta property="og:description" content={description} />
+      <meta property="og:title" content={twitterTitle || title} />
+      <meta property="og:description" content={twitterDescription || description} />
       <meta property="og:type" content={ogType} />
       <meta property="og:url" content={window.location.href} />
       <meta property="og:image" content={ogImage} />
-      <meta property="og:image:alt" content={title} />
+      <meta property="og:image:alt" content={twitterTitle || title} />
       <meta property="og:site_name" content="Tanner Braden" />
+      <meta property="og:locale" content="en_US" />
+      {/* Image dimensions for better social media display */}
+      <meta property="og:image:width" content="1200" />
+      <meta property="og:image:height" content="630" />
       
       {/* Article Specific OpenGraph Tags */}
       {ogType === 'article' && (
@@ -67,11 +71,19 @@ export default function SEO({ data }: SEOProps) {
       <meta name="twitter:title" content={twitterTitle || title} />
       <meta name="twitter:description" content={twitterDescription || description} />
       <meta name="twitter:site" content="@tannerbraden" />
+      <meta name="twitter:creator" content="@tannerbraden" />
       {twitterImage && (
         <>
           <meta name="twitter:image" content={twitterImage} />
-          <meta name="twitter:image:alt" content={title} />
+          <meta name="twitter:image:alt" content={twitterTitle || title} />
         </>
+      )}
+      
+      {/* Structured Data */}
+      {data.structuredData && (
+        <script type="application/ld+json">
+          {JSON.stringify(data.structuredData)}
+        </script>
       )}
     </Helmet>
   );
