@@ -14,7 +14,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 interface ImageUploadProps {
   imageUrl?: string | null;
   entityId: string | number;
-  entityType: 'timeline' | 'interest' | 'favorite' | 'blog' | 'project' | 'blog-content' | 'timeline-content';
+  entityType: 'timeline' | 'interest' | 'favorite' | 'blog' | 'project' | 'blog-content' | 'timeline-content' | 'song-cover';
   onSuccess?: (newImageUrl: string) => void;
   trigger?: React.ReactNode;
   multiple?: boolean;
@@ -63,7 +63,14 @@ export const ImageUpload = ({ imageUrl, entityId, entityType, onSuccess, trigger
         const formData = new FormData();
         formData.append('image', file);
 
-        const response = await fetch(`/api/upload/${entityType}/${entityId}`, {
+        let uploadUrl: string;
+        if (entityType === 'song-cover') {
+          uploadUrl = '/api/upload/song-cover';
+        } else {
+          uploadUrl = `/api/upload/${entityType}/${entityId}`;
+        }
+
+        const response = await fetch(uploadUrl, {
           method: 'POST',
           body: formData,
         });
@@ -74,11 +81,12 @@ export const ImageUpload = ({ imageUrl, entityId, entityType, onSuccess, trigger
         }
 
         const data = await response.json();
-        if (!data.imageUrl) {
+        const imageUrl = data.imageUrl || data.url;
+        if (!imageUrl) {
           throw new Error('No image URL returned from server');
         }
 
-        return data.imageUrl;
+        return imageUrl;
       });
 
       const urls = await Promise.all(uploadPromises);

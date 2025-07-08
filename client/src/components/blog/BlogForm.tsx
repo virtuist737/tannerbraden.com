@@ -450,7 +450,7 @@ const BlogForm = ({ initialData, onSubmit, isSubmitting }: BlogFormProps) => {
                 <FormControl>
                   <ImageUpload
                     imageUrl={field.value || null}
-                    entityId={initialData?.id || "temp"}
+                    entityId="song-cover"
                     entityType="song-cover"
                     onSuccess={(url) => field.onChange(url)}
                   />

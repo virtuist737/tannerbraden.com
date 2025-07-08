@@ -258,6 +258,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: "Failed to upload audio file" });
     }
   });
+
+  // Add route for song cover image uploads
+  app.post("/api/upload/song-cover", isAuthenticated, upload.single("image"), async (req, res) => {
+    try {
+      if (!req.file) {
+        return res.status(400).json({ error: "No image file provided" });
+      }
+
+      const timestamp = Date.now();
+      const randomString = Math.random().toString(36).substring(2, 15);
+      const extension = req.file.originalname.split('.').pop();
+      const filename = `song_cover_${timestamp}_${randomString}.${extension}`;
+      
+      const imageUrl = await uploadToObjectStorage(req.file, "blog/song-covers", filename);
+      
+      res.json({ imageUrl });
+    } catch (error) {
+      console.error("Error uploading song cover:", error);
+      res.status(500).json({ error: "Failed to upload song cover image" });
+    }
+  });
   
   // Add route for temporary blog uploads (for new blog posts)
   app.post("/api/upload/blog/temp", isAuthenticated, upload.single("image"), async (req, res) => {
