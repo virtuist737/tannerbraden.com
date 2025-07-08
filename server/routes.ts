@@ -257,9 +257,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // Route for regular blog image uploads with IDs
   app.post("/api/upload/blog/:id", isAuthenticated, upload.single("image"), async (req, res) => {
-    await handleImageUpload(req, res, "blog", (id, imageUrl) =>
-      storage.updateBlogPost(id, { coverImage: imageUrl })
-    );
+    await handleImageUpload(req, res, "blog", async (id, imageUrl) => {
+      return await storage.updateBlogPost(id, { coverImage: imageUrl });
+    });
   });
   
   // Add route for blog content image uploads with temp ID
