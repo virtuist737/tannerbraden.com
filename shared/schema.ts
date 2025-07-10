@@ -170,7 +170,10 @@ export const insertInterestSchema = createInsertSchema(interests).omit({
   category: z.string().min(1, "Category is required"),
   sortOrder: z.number().int().nonnegative(),
   description: z.string().optional().nullable(),
-  link: z.string().url().optional().nullable(),
+  link: z.union([
+    z.string().url("Must be a valid URL"),
+    z.string().max(0) // Empty string
+  ]).optional().nullable(),
   image: z.string().optional().nullable(),
 });
 
@@ -179,7 +182,10 @@ export const insertFavoriteSchema = createInsertSchema(favorites).extend({
   category: z.string().min(1, "Category is required"),
   sortOrder: z.number().int().nonnegative(),
   description: z.string().optional().nullable(),
-  link: z.string().url().optional().nullable(),
+  link: z.union([
+    z.string().url("Must be a valid URL"),
+    z.string().max(0) // Empty string
+  ]).optional().nullable(),
   image: z.string().optional().nullable(),
 });
 

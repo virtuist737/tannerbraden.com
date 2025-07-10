@@ -392,11 +392,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     await handleImageUpload(req, res, "timeline-content", storage.updateTimelineImage);
   });
 
-  app.post("/api/upload/interest/:id", isAuthenticated, upload.single("image"), async (req, res) => {
-    await handleImageUpload(req, res, "interest", storage.updateInterestImage);
-  });
-
-  // Add route for temporary interest uploads (for new interests)
+  // Add route for temporary interest uploads (for new interests) - must come before parameterized route
   app.post("/api/upload/interest/temp", isAuthenticated, upload.single("image"), async (req, res) => {
     try {
       if (!req.file) {
@@ -412,6 +408,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.error(`Error uploading temporary interest image:`, error);
       res.status(500).json({ error: "Failed to upload image" });
     }
+  });
+
+  app.post("/api/upload/interest/:id", isAuthenticated, upload.single("image"), async (req, res) => {
+    await handleImageUpload(req, res, "interest", storage.updateInterestImage);
   });
 
   app.post("/api/upload/favorite/:id", isAuthenticated, upload.single("image"), async (req, res) => {
