@@ -396,6 +396,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
     await handleImageUpload(req, res, "interest", storage.updateInterestImage);
   });
 
+  // Add route for temporary interest uploads (for new interests)
+  app.post("/api/upload/interest/temp", isAuthenticated, upload.single("image"), async (req, res) => {
+    try {
+      if (!req.file) {
+        return res.status(400).json({ error: "No image file provided" });
+      }
+      
+      // Upload to Replit Object Storage without database update
+      const imageUrl = await uploadToObjectStorage(req.file, "interests");
+      
+      // Return the image URL
+      res.json({ imageUrl });
+    } catch (error) {
+      console.error(`Error uploading temporary interest image:`, error);
+      res.status(500).json({ error: "Failed to upload image" });
+    }
+  });
+
   app.post("/api/upload/favorite/:id", isAuthenticated, upload.single("image"), async (req, res) => {
     await handleImageUpload(req, res, "favorite", storage.updateFavoriteImage);
   });

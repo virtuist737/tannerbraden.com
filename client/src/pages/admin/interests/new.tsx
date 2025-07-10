@@ -1,7 +1,7 @@
 import { useMutation } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import { useToast } from "@/hooks/use-toast";
-import { apiRequest } from "@/lib/queryClient";
+import { apiRequest, queryClient } from "@/lib/queryClient";
 import type { InsertInterest } from "@shared/schema";
 import InterestForm from "@/components/interests/InterestForm";
 
@@ -21,6 +21,7 @@ export default function NewInterest() {
       return res.json();
     },
     onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/about/interests"] });
       toast({
         title: "Success",
         description: "Interest created successfully",

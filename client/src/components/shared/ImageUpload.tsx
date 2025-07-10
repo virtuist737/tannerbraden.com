@@ -66,6 +66,8 @@ export const ImageUpload = ({ imageUrl, entityId, entityType, onSuccess, trigger
         let uploadUrl: string;
         if (entityType === 'song-cover') {
           uploadUrl = '/api/upload/song-cover';
+        } else if (entityId === "temp") {
+          uploadUrl = `/api/upload/${entityType}/temp`;
         } else {
           uploadUrl = `/api/upload/${entityType}/${entityId}`;
         }
