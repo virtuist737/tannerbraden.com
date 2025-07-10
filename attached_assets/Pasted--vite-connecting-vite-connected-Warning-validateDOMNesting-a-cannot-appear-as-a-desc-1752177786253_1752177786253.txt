@@ -1,0 +1,78 @@
+[vite] connecting...
+[vite] connected.
+Warning: validateDOMNesting(...): <a> cannot appear as a descendant of &lt;a&gt;.
+    at a
+    at a
+    at https://d3d70490-9a01-43c5-ac35-dd36ccb1e56c-00-1nkwdguoz3a99.riker.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=2925140f:337:18
+    at div
+    at nav
+    at Navbar (https://d3d70490-9a01-43c5-ac35-dd36ccb1e56c-00-1nkwdguoz3a99.riker.replit.dev/src/components/layout/Navbar.tsx:32:22)
+    at div
+    at div
+    at AuthProvider (https://d3d70490-9a01-43c5-ac35-dd36ccb1e56c-00-1nkwdguoz3a99.riker.replit.dev/src/hooks/use-auth.tsx:26:32)
+    at QueryClientProvider (https://d3d70490-9a01-43c5-ac35-dd36ccb1e56c-00-1nkwdguoz3a99.riker.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@tanstack_react-query.js?v=2925140f:2805:3)
+    at App (https://d3d70490-9a01-43c5-ac35-dd36ccb1e56c-00-1nkwdguoz3a99.riker.replit.dev/src/App.tsx?v=PFrs12V1bJxLpG_S7OfcT:56:22)
+    at _a (https://d3d70490-9a01-43c5-ac35-dd36ccb1e56c-00-1nkwdguoz3a99.riker.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/react-helmet-async.js?v=2925140f:624:5)
+Object {name: "FCP", value: 816, rating: "good", delta: 816, entries: Array(1), …}
+Object {name: "TTFB", value: 264.5999999642372, rating: "good", delta: 264.5999999642372, entries: Array(1), …}
+Object {name: "LCP", value: 7364, rating: "poor", delta: 7364, entries: Array(1), …}
+Object {name: "CLS", value: 0.0030528733117582223, rating: "good", delta: 0.0030528733117582223, entries: Array(2), …}
+Object {name: "CLS", value: 0.005870894905159661, rating: "good", delta: 0.002818021593401439, entries: Array(2), …}
+[vite] hot updated: /src/pages/auth.tsx
+[vite] hot updated: /src/index.css?v=shtkhj3IgkNUKTWFh2Zd0
+[vite] hot updated: /src/pages/admin/companies/new.tsx
+[vite] hot updated: /src/pages/admin/companies/[id]/edit.tsx
+[vite] hot updated: /src/pages/admin/projects/[id]/edit.tsx
+[vite] hot updated: /src/pages/admin/projects/new.tsx
+[vite] hot updated: /src/components/interests/InterestForm.tsx
+[vite] hot updated: /src/components/blog/BlogForm.tsx
+[vite] hot updated: /src/components/favorites/FavoriteForm.tsx
+[vite] hot updated: /src/components/timeline/TimelineForm.tsx
+[vite] hot updated: /src/pages/auth.tsx
+[vite] hot updated: /src/index.css?v=shtkhj3IgkNUKTWFh2Zd0
+[vite] hot updated: /src/pages/admin/companies/new.tsx
+[vite] hot updated: /src/pages/admin/companies/[id]/edit.tsx
+[vite] hot updated: /src/pages/admin/projects/[id]/edit.tsx
+[vite] hot updated: /src/pages/admin/projects/new.tsx
+[vite] hot updated: /src/components/interests/InterestForm.tsx
+[vite] hot updated: /src/components/blog/BlogForm.tsx
+[vite] hot updated: /src/components/favorites/FavoriteForm.tsx
+[vite] hot updated: /src/components/timeline/TimelineForm.tsx
+Object {name: "CLS", value: 0.08184307064216623, rating: "good", delta: 0.07597217573700657, entries: Array(2), …}
+Warning: validateDOMNesting(...): <div> cannot appear as a descendant of &lt;p&gt;.
+    at div
+    at Badge (https://d3d70490-9a01-43c5-ac35-dd36ccb1e56c-00-1nkwdguoz3a99.riker.replit.dev/src/components/ui/badge.tsx:35:18)
+    at div
+    at p
+    at _c7 (https://d3d70490-9a01-43c5-ac35-dd36ccb1e56c-00-1nkwdguoz3a99.riker.replit.dev/src/components/ui/card.tsx:86:12)
+    at div
+    at _c3 (https://d3d70490-9a01-43c5-ac35-dd36ccb1e56c-00-1nkwdguoz3a99.riker.replit.dev/src/components/ui/card.tsx:43:12)
+    at div
+    at _c (https://d3d70490-9a01-43c5-ac35-dd36ccb1e56c-00-1nkwdguoz3a99.riker.replit.dev/src/components/ui/card.tsx:20:11)
+    at div
+    at div
+    at SortableItem (https://d3d70490-9a01-43c5-ac35-dd36ccb1e56c-00-1nkwdguoz3a99.riker.replit.dev/src/components/shared/SortableItem.tsx:21:32)
+    at SortableContext (https://d3d70490-9a01-43c5-ac35-dd36ccb1e56c-00-1nkwdguoz3a99.riker.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@dnd-kit_sortable.js?v=2925140f:261:5)
+    at div
+    at DndContext2 (https://d3d70490-9a01-43c5-ac35-dd36ccb1e56c-00-1nkwdguoz3a99.riker.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-AW7FROCU.js?v=2925140f:2521:5)
+    at div
+    at MotionComponent (https://d3d70490-9a01-43c5-ac35-dd36ccb1e56c-00-1nkwdguoz3a99.riker.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/framer-motion.js?v=2925140f:945:40)
+    at div
+    at AdminInterests (https://d3d70490-9a01-43c5-ac35-dd36ccb1e56c-00-1nkwdguoz3a99.riker.replit.dev/src/pages/admin/interests/index.tsx:49:21)
+    at Route (https://d3d70490-9a01-43c5-ac35-dd36ccb1e56c-00-1nkwdguoz3a99.riker.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=2925140f:323:16)
+    at ProtectedRoute (https://d3d70490-9a01-43c5-ac35-dd36ccb1e56c-00-1nkwdguoz3a99.riker.replit.dev/src/lib/protected-route.tsx:22:3)
+    at Switch (https://d3d70490-9a01-43c5-ac35-dd36ccb1e56c-00-1nkwdguoz3a99.riker.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=2925140f:379:17)
+    at main
+    at div
+    at div
+    at AuthProvider (https://d3d70490-9a01-43c5-ac35-dd36ccb1e56c-00-1nkwdguoz3a99.riker.replit.dev/src/hooks/use-auth.tsx:26:32)
+    at QueryClientProvider (https://d3d70490-9a01-43c5-ac35-dd36ccb1e56c-00-1nkwdguoz3a99.riker.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@tanstack_react-query.js?v=2925140f:2805:3)
+    at App (https://d3d70490-9a01-43c5-ac35-dd36ccb1e56c-00-1nkwdguoz3a99.riker.replit.dev/src/App.tsx?v=PFrs12V1bJxLpG_S7OfcT:56:22)
+    at _a (https://d3d70490-9a01-43c5-ac35-dd36ccb1e56c-00-1nkwdguoz3a99.riker.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/react-helmet-async.js?v=2925140f:624:5)
+Upload error: 
+Error {}
+message: "Upload failed"
+stack: "Error: Upload failed↵ at https://d3d70490-9a01-43c5-ac35-dd36ccb1e56c-00-1nkwdguoz3a99.riker.replit.dev/src/components/shared/ImageUpload.tsx:80:17↵ at async Promise.all (index 0)↵ at async handleImageUpload (https://d3d70490-9a01-43c5-ac35-dd36ccb1e56c-00-1nkwdguoz3a99.riker.replit.dev/src/components/shared/ImageUpload.tsx:89:20)"
+get stack: ƒ ()
+set stack: ƒ ()
+[[Prototype]]: Object
