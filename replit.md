@@ -92,6 +92,12 @@ Key entities include:
 
 ## Changelog
 
+- July 18, 2025. Security Updates
+  - Updated Multer from 2.0.1 to 2.0.2 to address DoS vulnerability (CVE affecting versions >= 1.4.4-lts.1, < 2.0.2)
+  - Applied npm audit fixes to resolve vulnerabilities in @babel/helpers and on-headers
+  - Updated esbuild to 0.25.6 to address development server security issue
+  - Remaining vulnerabilities in nested dependencies (drizzle-kit, vite) require major version updates
+  - All file upload functionality using Multer is now secure against malformed request DoS attacks
 - July 8, 2025. Enhanced SEO and Social Media Metadata System
   - Completely overhauled SEO metadata system for better social media previews
   - Created custom SVG social media preview images (1200x630 optimized for Open Graph)
