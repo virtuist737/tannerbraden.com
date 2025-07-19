@@ -17,7 +17,7 @@ This is a full-stack web application built for a digital creator's portfolio and
 
 ### Backend Architecture
 - **Framework**: Express.js with TypeScript
-- **Authentication**: Passport.js with local strategy using session-based auth
+- **Authentication**: Replit Auth with OpenID Connect for admin access only
 - **Database**: PostgreSQL with Drizzle ORM
 - **File Storage**: Replit Object Storage for audio files and images
 - **Development**: Hot reload with Vite integration
@@ -55,9 +55,10 @@ Key entities include:
 - **Image Serving**: Custom API endpoints for serving images with caching
 
 ### Authentication & Security
-- **Session-based Authentication**: Using express-session with PostgreSQL store
-- **Password Security**: Scrypt-based password hashing
-- **Protected Routes**: Client and server-side route protection
+- **Replit Auth Integration**: OpenID Connect authentication for admin access only
+- **Session Management**: PostgreSQL-backed session storage with automatic refresh
+- **Public Access**: Main site remains publicly accessible to anonymous visitors
+- **Protected Routes**: Admin routes require authentication, public routes always accessible
 
 ## Data Flow
 
@@ -92,6 +93,16 @@ Key entities include:
 
 ## Changelog
 
+- July 19, 2025. Authentication System Migration to Replit Auth
+  - Completely replaced Passport.js username/password system with Replit Auth using OpenID Connect
+  - Updated database schema to support Replit Auth with new sessions table and user structure
+  - Implemented backend Replit Auth with /api/login, /api/logout, and /api/callback endpoints
+  - Created new authentication hook and context for frontend Replit Auth integration
+  - Redesigned application routing to maintain public access for anonymous visitors
+  - Updated navbar to show Sign In/Sign Out buttons conditionally based on authentication state
+  - Admin routes now require Replit authentication, while public content remains accessible
+  - Removed all legacy authentication files and dependencies (auth.ts, old user management)
+  - Only authenticated users (admin) can access dashboard and admin routes
 - July 18, 2025. Security Updates
   - Updated Multer from 2.0.1 to 2.0.2 to address DoS vulnerability (CVE affecting versions >= 1.4.4-lts.1, < 2.0.2)
   - Applied npm audit fixes to resolve vulnerabilities in @babel/helpers and on-headers

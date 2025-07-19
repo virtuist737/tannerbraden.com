@@ -52,7 +52,7 @@ const Navbar = () => {
             <Linkedin className="h-5 w-5" />
           </a>
           <ThemeToggle />
-          {isAuthenticated && (
+          {isAuthenticated ? (
             <>
               <Link href="/dashboard">
                 <Button variant="ghost" size="sm">
@@ -69,6 +69,15 @@ const Navbar = () => {
                 Logout
               </Button>
             </>
+          ) : (
+            <Button 
+              variant="ghost" 
+              size="sm"
+              onClick={() => window.location.href = "/api/login"}
+            >
+              <Settings className="h-4 w-4 mr-2" />
+              Sign In
+            </Button>
           )}
         </div>
 
@@ -111,7 +120,7 @@ const Navbar = () => {
                   {item.label}
                 </Link>
               ))}
-              {isAuthenticated && (
+              {isAuthenticated ? (
                 <>
                   <Link href="/dashboard">
                     <Button variant="ghost" size="sm" onClick={() => setIsOpen(false)}>
@@ -131,6 +140,18 @@ const Navbar = () => {
                     Logout
                   </Button>
                 </>
+              ) : (
+                <Button 
+                  variant="ghost" 
+                  size="sm"
+                  onClick={() => {
+                    setIsOpen(false);
+                    window.location.href = "/api/login";
+                  }}
+                >
+                  <Settings className="h-4 w-4 mr-2" />
+                  Sign In
+                </Button>
               )}
             </div>
           </div>

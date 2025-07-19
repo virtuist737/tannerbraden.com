@@ -43,43 +43,38 @@ import EditCompany from "@/pages/admin/companies/[id]/edit";
 import Landing from "@/pages/landing";
 
 function Router() {
-  const { isAuthenticated, isLoading } = useAuth();
-
   return (
     <Switch>
-      {isLoading || !isAuthenticated ? (
-        <Route path="/" component={Landing} />
-      ) : (
-        <>
-          <Route path="/" component={Home} />
-          <Route path="/about" component={About} />
-          <Route path="/blog" component={Blog} />
-          <Route path="/blog/:slug" component={BlogPost} />
-          <Route path="/projects" component={Projects} />
-          <Route path="/contact" component={Contact} />
-          
-          <ProtectedRoute path="/dashboard" component={Dashboard} />
-          <ProtectedRoute path="/admin/interests" component={AdminInterests} />
-          <ProtectedRoute path="/admin/interests/new" component={NewInterest} />
-          <ProtectedRoute path="/admin/interests/:id/edit" component={EditInterest} />
-          <ProtectedRoute path="/admin/blog" component={AdminBlog} />
-          <ProtectedRoute path="/admin/blog/new" component={NewBlogPost} />
-          <ProtectedRoute path="/admin/blog/:id/edit" component={EditBlogPost} />
-          <ProtectedRoute path="/admin/newsletter" component={AdminNewsletter} />
-          <ProtectedRoute path="/admin/timeline" component={AdminTimeline} />
-          <ProtectedRoute path="/admin/timeline/new" component={NewTimelineEntry} />
-          <ProtectedRoute path="/admin/timeline/:id/edit" component={EditTimelineEntry} />
-          <ProtectedRoute path="/admin/favorites" component={() => <FavoritesList />} />
-          <ProtectedRoute path="/admin/favorites/new" component={() => <NewFavorite />} />
-          <ProtectedRoute path="/admin/favorites/:id/edit" component={() => <EditFavorite />} />
-          <ProtectedRoute path="/admin/projects" component={AdminProjects} />
-          <ProtectedRoute path="/admin/projects/new" component={NewProject} />
-          <ProtectedRoute path="/admin/projects/:id/edit" component={EditProject} />
-          <ProtectedRoute path="/admin/companies" component={AdminCompanies} />
-          <ProtectedRoute path="/admin/companies/new" component={NewCompany} />
-          <ProtectedRoute path="/admin/companies/:id/edit" component={EditCompany} />
-        </>
-      )}
+      {/* Public routes - always accessible */}
+      <Route path="/" component={Home} />
+      <Route path="/about" component={About} />
+      <Route path="/blog" component={Blog} />
+      <Route path="/blog/:slug" component={BlogPost} />
+      <Route path="/projects" component={Projects} />
+      <Route path="/contact" component={Contact} />
+      
+      {/* Protected admin routes - require authentication */}
+      <ProtectedRoute path="/dashboard" component={Dashboard} />
+      <ProtectedRoute path="/admin/interests" component={AdminInterests} />
+      <ProtectedRoute path="/admin/interests/new" component={NewInterest} />
+      <ProtectedRoute path="/admin/interests/:id/edit" component={EditInterest} />
+      <ProtectedRoute path="/admin/blog" component={AdminBlog} />
+      <ProtectedRoute path="/admin/blog/new" component={NewBlogPost} />
+      <ProtectedRoute path="/admin/blog/:id/edit" component={EditBlogPost} />
+      <ProtectedRoute path="/admin/newsletter" component={AdminNewsletter} />
+      <ProtectedRoute path="/admin/timeline" component={AdminTimeline} />
+      <ProtectedRoute path="/admin/timeline/new" component={NewTimelineEntry} />
+      <ProtectedRoute path="/admin/timeline/:id/edit" component={EditTimelineEntry} />
+      <ProtectedRoute path="/admin/favorites" component={() => <FavoritesList />} />
+      <ProtectedRoute path="/admin/favorites/new" component={() => <NewFavorite />} />
+      <ProtectedRoute path="/admin/favorites/:id/edit" component={() => <EditFavorite />} />
+      <ProtectedRoute path="/admin/projects" component={AdminProjects} />
+      <ProtectedRoute path="/admin/projects/new" component={NewProject} />
+      <ProtectedRoute path="/admin/projects/:id/edit" component={EditProject} />
+      <ProtectedRoute path="/admin/companies" component={AdminCompanies} />
+      <ProtectedRoute path="/admin/companies/new" component={NewCompany} />
+      <ProtectedRoute path="/admin/companies/:id/edit" component={EditCompany} />
+      
       <Route component={NotFound} />
     </Switch>
   );
