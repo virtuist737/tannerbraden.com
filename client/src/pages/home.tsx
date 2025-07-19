@@ -18,19 +18,7 @@ import { useEffect } from "react";
 const Home = () => {
   const { toast } = useToast();
   
-  // Check for auth failure in URL params
-  useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    if (urlParams.get('auth') === 'failed') {
-      toast({
-        title: "Access Restricted",
-        description: "New user registration is currently disabled. Only existing accounts can sign in.",
-        variant: "destructive",
-      });
-      // Clean up URL
-      window.history.replaceState({}, '', window.location.pathname);
-    }
-  }, [toast]);
+  
 
   // Blog posts query
   const { data: latestPosts, isLoading: isLoadingPosts } = useQuery<BlogPost[]>({

@@ -1,7 +1,8 @@
+
 import { useAuth } from "@/hooks/useAuth";
 import { Loader2 } from "lucide-react";
-import { Redirect, Route } from "wouter";
-import { ReactNode } from "react";
+import { Redirect, Route, useLocation } from "wouter";
+import { ReactNode, useEffect } from "react";
 
 type ProtectedRouteProps = {
   path?: string;
@@ -15,6 +16,14 @@ export function ProtectedRoute({
   children,
 }: ProtectedRouteProps) {
   const { user, isLoading } = useAuth();
+  const [location] = useLocation();
+
+  // Auto-redirect to auth flow for dashboard access
+  useEffect(() => {
+    if (!isLoading && !user && (location === "/dashboard" || location.startsWith("/admin/"))) {
+      window.location.href = "/api/login";
+    }
+  }, [user, isLoading, location]);
 
   // If used as a wrapper component
   if (!path || !Component) {
@@ -27,8 +36,7 @@ export function ProtectedRoute({
     }
 
     if (!user) {
-      window.location.href = "/api/login";
-      return null;
+      return null; // Will redirect via useEffect
     }
 
     return <>{children}</>;
@@ -49,7 +57,7 @@ export function ProtectedRoute({
     return (
       <Route path={path}>
         {(() => {
-          window.location.href = "/api/login";
+          // useEffect will handle the redirect
           return null;
         })()}
       </Route>

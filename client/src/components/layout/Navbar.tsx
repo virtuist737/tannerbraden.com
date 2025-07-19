@@ -52,31 +52,14 @@ const Navbar = () => {
             <Linkedin className="h-5 w-5" />
           </a>
           <ThemeToggle />
-          {isAuthenticated ? (
-            <>
-              <Link href="/dashboard">
-                <Button variant="ghost" size="sm">
-                  <Settings className="h-4 w-4 mr-2" />
-                  Dashboard
-                </Button>
-              </Link>
-              <Button 
-                variant="ghost" 
-                size="sm"
-                onClick={() => window.location.href = "/api/logout"}
-              >
-                <LogOut className="h-4 w-4 mr-2" />
-                Logout
-              </Button>
-            </>
-          ) : (
+          {isAuthenticated && (
             <Button 
               variant="ghost" 
               size="sm"
-              onClick={() => window.location.href = "/api/login"}
+              onClick={() => window.location.href = "/api/logout"}
             >
-              <Settings className="h-4 w-4 mr-2" />
-              Sign In
+              <LogOut className="h-4 w-4 mr-2" />
+              Logout
             </Button>
           )}
         </div>
@@ -120,37 +103,17 @@ const Navbar = () => {
                   {item.label}
                 </Link>
               ))}
-              {isAuthenticated ? (
-                <>
-                  <Link href="/dashboard">
-                    <Button variant="ghost" size="sm" onClick={() => setIsOpen(false)}>
-                      <Settings className="h-4 w-4 mr-2" />
-                      Dashboard
-                    </Button>
-                  </Link>
-                  <Button 
-                    variant="ghost" 
-                    size="sm"
-                    onClick={() => {
-                      setIsOpen(false);
-                      window.location.href = "/api/logout";
-                    }}
-                  >
-                    <LogOut className="h-4 w-4 mr-2" />
-                    Logout
-                  </Button>
-                </>
-              ) : (
+              {isAuthenticated && (
                 <Button 
                   variant="ghost" 
                   size="sm"
                   onClick={() => {
                     setIsOpen(false);
-                    window.location.href = "/api/login";
+                    window.location.href = "/api/logout";
                   }}
                 >
-                  <Settings className="h-4 w-4 mr-2" />
-                  Sign In
+                  <LogOut className="h-4 w-4 mr-2" />
+                  Logout
                 </Button>
               )}
             </div>

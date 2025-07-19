@@ -52,7 +52,7 @@ function Router() {
       <Route path="/blog/:slug" component={BlogPost} />
       <Route path="/projects" component={Projects} />
       <Route path="/contact" component={Contact} />
-      
+
       {/* Protected admin routes - require authentication */}
       <ProtectedRoute path="/dashboard" component={Dashboard} />
       <ProtectedRoute path="/admin/interests" component={AdminInterests} />
@@ -74,7 +74,7 @@ function Router() {
       <ProtectedRoute path="/admin/companies" component={AdminCompanies} />
       <ProtectedRoute path="/admin/companies/new" component={NewCompany} />
       <ProtectedRoute path="/admin/companies/:id/edit" component={EditCompany} />
-      
+
       <Route component={NotFound} />
     </Switch>
   );
