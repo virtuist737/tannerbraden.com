@@ -10,7 +10,7 @@ import {
   insertProjectSchema,
   insertVentureSchema
 } from "@shared/schema";
-import { isAuthenticated } from "./auth";
+import { setupAuth, isAuthenticated } from "./replitAuth";
 
 import { upload, audioUpload } from "./lib/upload";
 import path from "path";
@@ -27,6 +27,20 @@ const imagesDir = path.join(__dirname, '../client/public/images');
 fs.mkdirSync(imagesDir, { recursive: true });
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Setup Replit Auth
+  await setupAuth(app);
+
+  // Auth routes
+  app.get('/api/auth/user', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const user = await storage.getUser(userId);
+      res.json(user);
+    } catch (error) {
+      console.error("Error fetching user:", error);
+      res.status(500).json({ message: "Failed to fetch user" });
+    }
+  });
   // Timeline Routes
   app.get("/api/timeline", async (req, res) => {
     try {

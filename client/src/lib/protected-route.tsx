@@ -1,4 +1,4 @@
-import { useAuth } from "@/hooks/use-auth";
+import { useAuth } from "@/hooks/useAuth";
 import { Loader2 } from "lucide-react";
 import { Redirect, Route } from "wouter";
 import { ReactNode } from "react";
@@ -27,7 +27,8 @@ export function ProtectedRoute({
     }
 
     if (!user) {
-      return <Redirect to="/auth" />;
+      window.location.href = "/api/login";
+      return null;
     }
 
     return <>{children}</>;
@@ -47,7 +48,10 @@ export function ProtectedRoute({
   if (!user) {
     return (
       <Route path={path}>
-        <Redirect to="/auth" />
+        {(() => {
+          window.location.href = "/api/login";
+          return null;
+        })()}
       </Route>
     );
   }

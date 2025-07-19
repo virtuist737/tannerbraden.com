@@ -1,8 +1,9 @@
 import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
-import { Menu, X, Linkedin } from "lucide-react";
+import { Menu, X, Linkedin, LogOut, Settings } from "lucide-react";
 import { useState } from "react";
 import ThemeToggle from "../shared/ThemeToggle";
+import { useAuth } from "@/hooks/useAuth";
 
 interface NavItem {
   href: string;
@@ -20,6 +21,7 @@ const navItems: NavItem[] = [
 const Navbar = () => {
   const [location] = useLocation();
   const [isOpen, setIsOpen] = useState(false);
+  const { user, isAuthenticated } = useAuth();
 
   return (
     <nav className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -50,6 +52,24 @@ const Navbar = () => {
             <Linkedin className="h-5 w-5" />
           </a>
           <ThemeToggle />
+          {isAuthenticated && (
+            <>
+              <Link href="/dashboard">
+                <Button variant="ghost" size="sm">
+                  <Settings className="h-4 w-4 mr-2" />
+                  Dashboard
+                </Button>
+              </Link>
+              <Button 
+                variant="ghost" 
+                size="sm"
+                onClick={() => window.location.href = "/api/logout"}
+              >
+                <LogOut className="h-4 w-4 mr-2" />
+                Logout
+              </Button>
+            </>
+          )}
         </div>
 
         {/* Mobile Navigation */}
@@ -91,6 +111,27 @@ const Navbar = () => {
                   {item.label}
                 </Link>
               ))}
+              {isAuthenticated && (
+                <>
+                  <Link href="/dashboard">
+                    <Button variant="ghost" size="sm" onClick={() => setIsOpen(false)}>
+                      <Settings className="h-4 w-4 mr-2" />
+                      Dashboard
+                    </Button>
+                  </Link>
+                  <Button 
+                    variant="ghost" 
+                    size="sm"
+                    onClick={() => {
+                      setIsOpen(false);
+                      window.location.href = "/api/logout";
+                    }}
+                  >
+                    <LogOut className="h-4 w-4 mr-2" />
+                    Logout
+                  </Button>
+                </>
+              )}
             </div>
           </div>
         )}
