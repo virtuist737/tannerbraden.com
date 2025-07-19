@@ -93,7 +93,7 @@ Key entities include:
 
 ## Changelog
 
-- July 19, 2025. Authentication System Migration to Replit Auth
+- July 19, 2025. Authentication System Migration to Replit Auth with Registration Lock
   - Completely replaced Passport.js username/password system with Replit Auth using OpenID Connect
   - Updated database schema to support Replit Auth with new sessions table and user structure
   - Implemented backend Replit Auth with /api/login, /api/logout, and /api/callback endpoints
@@ -102,6 +102,8 @@ Key entities include:
   - Updated navbar to show Sign In/Sign Out buttons conditionally based on authentication state
   - Admin routes now require Replit authentication, while public content remains accessible
   - Removed all legacy authentication files and dependencies (auth.ts, old user management)
+  - Added registration blocking: Only existing users can sign in, new account creation is prevented
+  - Added error handling with toast notifications for blocked registration attempts
   - Only authenticated users (admin) can access dashboard and admin routes
 - July 18, 2025. Security Updates
   - Updated Multer from 2.0.1 to 2.0.2 to address DoS vulnerability (CVE affecting versions >= 1.4.4-lts.1, < 2.0.2)

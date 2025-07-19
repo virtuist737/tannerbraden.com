@@ -54,9 +54,16 @@ function updateUserSession(
   user.expires_at = user.claims?.exp;
 }
 
-async function upsertUser(
+async function checkExistingUser(
   claims: any,
 ) {
+  // Only allow existing users to sign in - block new registrations
+  const existingUser = await storage.getUser(claims["sub"]);
+  if (!existingUser) {
+    throw new Error("New user registration is not allowed. Only existing accounts can sign in.");
+  }
+  
+  // Update existing user's profile information from Replit
   await storage.upsertUser({
     id: claims["sub"],
     email: claims["email"],
@@ -64,6 +71,8 @@ async function upsertUser(
     lastName: claims["last_name"],
     profileImageUrl: claims["profile_image_url"],
   });
+  
+  return existingUser;
 }
 
 export async function setupAuth(app: Express) {
@@ -78,10 +87,18 @@ export async function setupAuth(app: Express) {
     tokens: client.TokenEndpointResponse & client.TokenEndpointResponseHelpers,
     verified: passport.AuthenticateCallback
   ) => {
-    const user = {};
-    updateUserSession(user, tokens);
-    await upsertUser(tokens.claims());
-    verified(null, user);
+    try {
+      // Check if user exists and update their info
+      await checkExistingUser(tokens.claims());
+      
+      const user = {};
+      updateUserSession(user, tokens);
+      verified(null, user);
+    } catch (error) {
+      // Authentication failed - user not allowed
+      console.error("Authentication rejected:", error.message);
+      verified(error, null);
+    }
   };
 
   for (const domain of process.env
@@ -109,9 +126,26 @@ export async function setupAuth(app: Express) {
   });
 
   app.get("/api/callback", (req, res, next) => {
-    passport.authenticate(`replitauth:${req.hostname}`, {
-      successReturnToOrRedirect: "/",
-      failureRedirect: "/api/login",
+    passport.authenticate(`replitauth:${req.hostname}`, (err, user) => {
+      if (err) {
+        // Authentication failed - redirect to home with error message
+        console.error("Authentication failed:", err.message);
+        return res.redirect("/?auth=failed");
+      }
+      
+      if (!user) {
+        // No user returned - redirect to login
+        return res.redirect("/api/login");
+      }
+      
+      // Successful authentication
+      req.logIn(user, (loginErr) => {
+        if (loginErr) {
+          console.error("Login failed:", loginErr);
+          return res.redirect("/?auth=failed");
+        }
+        return res.redirect("/");
+      });
     })(req, res, next);
   });
 
