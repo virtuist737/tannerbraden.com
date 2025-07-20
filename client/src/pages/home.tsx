@@ -102,7 +102,7 @@ const Home = () => {
             </Button>
           </a>
         </div>
-        <EmbeddedIframeCard embedUrl="https://grriidd.replit.app/embed.html" />
+        <EmbeddedIframeCard embedUrl="https://grriidd.replit.app/embed" />
       </section>
 
       {/* Latest Blog Posts */}
