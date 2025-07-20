@@ -95,12 +95,12 @@ const Home = () => {
           </p>
         </div>
         <div className="flex justify-center mb-8">
-          <Link href="https://grriidd.replit.app">
+          <a href="https://grriidd.replit.app" target="_blank" rel="noopener noreferrer">
             <Button variant="outline">
               Visit Web App
               <ExternalLink className="h-4 w-4" />
             </Button>
-          </Link>
+          </a>
         </div>
         <EmbeddedIframeCard embedUrl="https://grriidd.replit.app/embed.html" />
       </section>
