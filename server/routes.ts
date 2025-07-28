@@ -883,6 +883,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Add this new route for reordering projects
+  app.post("/api/projects/reorder", isAuthenticated, async (req, res) => {
+    try {
+      const { updates } = req.body;
+
+      if (!Array.isArray(updates)) {
+        return res.status(400).json({ error: "Updates must be an array" });
+      }
+
+      // Validate each update object
+      for (const update of updates) {
+        if (typeof update.id !== 'number' || typeof update.sortOrder !== 'number') {
+          return res.status(400).json({ error: "Invalid update format" });
+        }
+      }
+
+      // Process all updates sequentially
+      for (const update of updates) {
+        await storage.updateProject(update.id, { sortOrder: update.sortOrder });
+      }
+
+      // Return success
+      res.json({ message: "Sort order updated successfully" });
+    } catch (error) {
+      console.error("Error updating projects order:", error);
+      res.status(500).json({ error: "Failed to update projects order" });
+    }
+  });
+
   // Add GET single project route
   app.get("/api/projects/:id", async (req, res) => {
     try {
