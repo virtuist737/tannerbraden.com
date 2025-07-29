@@ -56,13 +56,13 @@ export async function submitContactToNotion(submission: ContactSubmission) {
             }
           ]
         },
-        "Submission Date": {
+        "Date Received": {
           date: {
             start: new Date().toISOString()
           }
         },
         Status: {
-          select: {
+          status: {
             name: "New"
           }
         }
