@@ -73,6 +73,7 @@ Key entities include:
 ### Core Dependencies
 - **@replit/object-storage**: File storage service
 - **@neondatabase/serverless**: PostgreSQL database connection
+- **@notionhq/client**: Notion API integration for contact form submissions
 - **drizzle-orm**: Type-safe database operations
 - **@tanstack/react-query**: Server state management
 - **@radix-ui/**: UI component primitives
@@ -93,6 +94,15 @@ Key entities include:
 
 ## Changelog
 
+- July 29, 2025. Contact Form Notion Integration
+  - Added Notion API integration for contact form submissions using @notionhq/client
+  - Created server/notion.ts with submitContactToNotion function for seamless database integration
+  - Updated contact form to use TanStack Query mutation with loading states and error handling
+  - Added contactFormSchema to shared/schema.ts for consistent validation across frontend and backend
+  - Implemented /api/contact endpoint that validates form data and submits to user's Notion database
+  - Contact form now shows real-time feedback with toast notifications for success/error states
+  - Form automatically resets after successful submission and prevents duplicate submissions
+  - Uses environment variables NOTION_INTEGRATION_SECRET and NOTION_DATABASE_ID for secure API access
 - July 19, 2025. Authentication System Migration to Replit Auth with Registration Lock
   - Completely replaced Passport.js username/password system with Replit Auth using OpenID Connect
   - Updated database schema to support Replit Auth with new sessions table and user structure

@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
+import { useMutation } from "@tanstack/react-query";
 import {
   Form,
   FormControl,
@@ -13,21 +13,17 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { Linkedin, Twitter } from "lucide-react";
+import { Linkedin, Twitter, CheckCircle, Send } from "lucide-react";
 import SEO from "@/components/shared/SEO";
 import { generateSEOMetadata } from "@/lib/seo";
-
-const contactFormSchema = z.object({
-  name: z.string().min(2, "Name must be at least 2 characters"),
-  email: z.string().email("Invalid email address"),
-  subject: z.string().min(5, "Subject must be at least 5 characters"),
-  message: z.string().min(10, "Message must be at least 10 characters"),
-});
-
-type ContactFormValues = z.infer<typeof contactFormSchema>;
+import { contactFormSchema, type ContactFormData } from "@shared/schema";
+import { apiRequest } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
 
 const Contact = () => {
-  const form = useForm<ContactFormValues>({
+  const { toast } = useToast();
+  
+  const form = useForm<ContactFormData>({
     resolver: zodResolver(contactFormSchema),
     defaultValues: {
       name: "",
@@ -37,9 +33,30 @@ const Contact = () => {
     },
   });
 
-  const onSubmit = (data: ContactFormValues) => {
-    console.log(data);
-    // Handle form submission
+  const contactMutation = useMutation({
+    mutationFn: (data: ContactFormData) => 
+      apiRequest("/api/contact", {
+        method: "POST",
+        body: JSON.stringify(data),
+      }),
+    onSuccess: () => {
+      toast({
+        title: "Message sent!",
+        description: "Thank you for your message. I'll get back to you soon.",
+      });
+      form.reset();
+    },
+    onError: (error: any) => {
+      toast({
+        variant: "destructive",
+        title: "Error sending message",
+        description: error.message || "Something went wrong. Please try again.",
+      });
+    },
+  });
+
+  const onSubmit = (data: ContactFormData) => {
+    contactMutation.mutate(data);
   };
 
   return (
@@ -156,8 +173,22 @@ const Contact = () => {
                     </FormItem>
                   )}
                 />
-                <Button type="submit" className="w-full">
-                  Send Message
+                <Button 
+                  type="submit" 
+                  className="w-full" 
+                  disabled={contactMutation.isPending}
+                >
+                  {contactMutation.isPending ? (
+                    <>
+                      <Send className="mr-2 h-4 w-4 animate-spin" />
+                      Sending...
+                    </>
+                  ) : (
+                    <>
+                      <Send className="mr-2 h-4 w-4" />
+                      Send Message
+                    </>
+                  )}
                 </Button>
               </form>
             </Form>

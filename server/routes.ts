@@ -8,7 +8,8 @@ import {
   insertFavoriteSchema,
   insertInterestSchema,
   insertProjectSchema,
-  insertVentureSchema
+  insertVentureSchema,
+  contactFormSchema
 } from "@shared/schema";
 import { setupAuth, isAuthenticated } from "./replitAuth";
 
@@ -17,6 +18,7 @@ import path from "path";
 import fs from "fs";
 import { fileURLToPath } from 'url';
 import { uploadToObjectStorage, getObjectPathFromUrl, deleteFromObjectStorage, objectStore, uploadOptimizedBlogImage } from './lib/objectStorage';
+import { submitContactToNotion } from './notion';
 
 // ESM module dirname equivalent
 const __filename = fileURLToPath(import.meta.url);
@@ -490,6 +492,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
 
 
+
+  // Contact Form Route (Notion Integration)
+  app.post("/api/contact", async (req, res) => {
+    try {
+      const parsedBody = contactFormSchema.safeParse(req.body);
+      if (!parsedBody.success) {
+        return res.status(400).json({ 
+          error: "Invalid contact form data", 
+          details: parsedBody.error.errors 
+        });
+      }
+
+      const result = await submitContactToNotion(parsedBody.data);
+      
+      res.status(201).json({ 
+        message: "Contact form submitted successfully",
+        notionPageId: result.notionPageId
+      });
+    } catch (error) {
+      console.error("Error submitting contact form to Notion:", error);
+      res.status(500).json({ error: "Failed to submit contact form" });
+    }
+  });
 
   // Newsletter Routes
   app.post("/api/newsletter/subscribe", async (req, res) => {

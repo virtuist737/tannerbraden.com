@@ -43,3 +43,6 @@ waitForPort = 5000
 
 [objectStorage]
 defaultBucketID = "replit-objstore-3ae85383-1a6f-420d-9fef-c83f7c0f906c"
+
+[agent]
+integrations = ["javascript_notion==1.0.0"]
