@@ -55,16 +55,6 @@ export async function submitContactToNotion(submission: ContactSubmission) {
               }
             }
           ]
-        },
-        "Date Received": {
-          date: {
-            start: new Date().toISOString()
-          }
-        },
-        Status: {
-          status: {
-            name: "New"
-          }
         }
       }
     });

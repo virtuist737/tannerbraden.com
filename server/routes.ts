@@ -496,8 +496,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Contact Form Route (Notion Integration)
   app.post("/api/contact", async (req, res) => {
     try {
+      console.log("Received contact form data:", req.body);
+      
       const parsedBody = contactFormSchema.safeParse(req.body);
       if (!parsedBody.success) {
+        console.log("Validation errors:", parsedBody.error.errors);
         return res.status(400).json({ 
           error: "Invalid contact form data", 
           details: parsedBody.error.errors 

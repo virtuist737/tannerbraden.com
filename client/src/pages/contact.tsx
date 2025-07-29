@@ -34,11 +34,16 @@ const Contact = () => {
   });
 
   const contactMutation = useMutation({
-    mutationFn: (data: ContactFormData) => 
-      apiRequest("/api/contact", {
+    mutationFn: (data: ContactFormData) => {
+      console.log("Submitting form data:", data);
+      return apiRequest("/api/contact", {
         method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify(data),
-      }),
+      });
+    },
     onSuccess: () => {
       toast({
         title: "Message sent!",
@@ -56,6 +61,8 @@ const Contact = () => {
   });
 
   const onSubmit = (data: ContactFormData) => {
+    console.log("Form onSubmit called with:", data);
+    console.log("Form values:", form.getValues());
     contactMutation.mutate(data);
   };
 
