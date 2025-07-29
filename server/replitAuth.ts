@@ -96,7 +96,7 @@ export async function setupAuth(app: Express) {
       verified(null, user);
     } catch (error) {
       // Authentication failed - user not allowed
-      console.error("Authentication rejected:", error.message);
+      console.error("Authentication rejected:", error instanceof Error ? error.message : String(error));
       verified(error, null);
     }
   };
@@ -126,7 +126,7 @@ export async function setupAuth(app: Express) {
   });
 
   app.get("/api/callback", (req, res, next) => {
-    passport.authenticate(`replitauth:${req.hostname}`, (err, user) => {
+    passport.authenticate(`replitauth:${req.hostname}`, (err: any, user: any) => {
       if (err) {
         // Authentication failed - redirect to home with error message
         console.error("Authentication failed:", err.message);

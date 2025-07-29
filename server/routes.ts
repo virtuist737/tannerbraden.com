@@ -176,7 +176,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const post = await storage.createBlogPost({
         ...parsedBody.data,
-        authorId: req.user.id,
+        authorId: (req.user as any).claims.sub,
       });
       res.status(201).json(post);
     } catch (error) {
@@ -343,7 +343,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         coverImageThumbnail: optimizedUrls.thumbnail,
         coverImageMedium: optimizedUrls.medium,
         coverImageLarge: optimizedUrls.large
-      });
+      } as any);
       
       res.json({ 
         post, 
